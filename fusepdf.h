@@ -11,12 +11,15 @@
 #include <QDebug>
 #include <QProcess>
 #include <QProcessEnvironment>
+#include<QFileDialog>
+#include <QDesktopServices>
+#include <QMessageBox>
 
 class FilesTreeWidget : public QTreeWidget
 {
     Q_OBJECT
 public:
-    FilesTreeWidget(QWidget *parent= Q_NULLPTR):
+    FilesTreeWidget(QWidget *parent= nullptr):
         QTreeWidget(parent)
     {
         setAcceptDrops(true);
@@ -33,7 +36,7 @@ protected:
         qDebug() << data->urls();
         for(const QUrl url: data->urls()) {
             const QFileInfo info( url.toLocalFile());
-            if (info.isFile() ){
+            if (info.isFile()){
                 QMimeDatabase db;
                 QMimeType type = db.mimeTypeForFile(info.absoluteFilePath());
                 if (type.name() != "application/pdf") {
@@ -45,9 +48,7 @@ protected:
                     item = new QTreeWidgetItem(parent);
                     parent->setExpanded(true);
                 }
-                else {
-                    item = new QTreeWidgetItem(this);
-                }
+                else { item = new QTreeWidgetItem(this); }
                 item->setText(0, info.fileName());
                 item->setText(1, info.filePath());
                 emit addedItem();
@@ -90,8 +91,10 @@ private slots:
     void on_preset_currentIndexChanged(const QString &arg1);
     void on_compat_currentIndexChanged(const QString &arg1);
     void on_dpi_valueChanged(int arg1);
+    void on_dpiCheck_stateChanged(int arg1);
     void on_fileButton_clicked();
     void on_clear_clicked();
+    void on_save_clicked();
     void makeCommand();
     void runCommand();
     void commandStarted();
@@ -99,9 +102,9 @@ private slots:
     void populateUI();
     void loadSettings();
     void saveSettings();
-    void on_dpiCheck_stateChanged(int arg1);
-    void on_save_clicked();
     void handleAddedItem();
+    void handleProcOutput();
+    void clearAll();
 
 private:
     Ui::FusePDF *ui;

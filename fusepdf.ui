@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>578</width>
-    <height>547</height>
+    <width>579</width>
+    <height>580</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -150,28 +150,15 @@
         </widget>
        </item>
        <item>
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item>
         <widget class="QGroupBox" name="groupBox_3">
          <property name="title">
-          <string>Advanced</string>
+          <string>Log</string>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_3">
           <item>
            <widget class="QPlainTextEdit" name="cmd">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
@@ -179,7 +166,7 @@
             <property name="maximumSize">
              <size>
               <width>16777215</width>
-              <height>75</height>
+              <height>16777215</height>
              </size>
             </property>
            </widget>
@@ -207,6 +194,9 @@
        </item>
        <item>
         <widget class="QProgressBar" name="progressBar">
+         <property name="maximum">
+          <number>100</number>
+         </property>
          <property name="value">
           <number>0</number>
          </property>
@@ -225,7 +215,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>578</width>
+     <width>579</width>
      <height>22</height>
     </rect>
    </property>
