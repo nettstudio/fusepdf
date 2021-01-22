@@ -115,6 +115,8 @@ private slots:
 
     void on_actionShow_log_triggered();
 
+    void on_actionAbout_Qt_triggered();
+
 private:
     Ui::FusePDF *ui;
     QString _cmd;

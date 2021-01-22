@@ -248,7 +248,6 @@
      <string>Help</string>
     </property>
     <addaction name="actionAbout"/>
-    <addaction name="separator"/>
     <addaction name="actionAbout_Qt"/>
     <addaction name="separator"/>
     <addaction name="actionShow_log"/>

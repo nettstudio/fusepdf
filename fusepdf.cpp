@@ -18,7 +18,7 @@ FusePDF::FusePDF(QWidget *parent)
             this, SLOT(handleAddedItem()));
     setWindowIcon(QIcon(":/fusepdf.png"));
     if (findGhost().isEmpty()) {
-        QMessageBox::warning(this, tr("Missing Ghostscript"), tr("Unable to find Ghostscript, please download the latest x86_64 installer from https://www.ghostscript.com/download/gsdnld.html"));
+        QMessageBox::warning(this, tr("Missing Ghostscript"), tr("Unable to find Ghostscript, please download the latest (x86_64) installer from <a href='https://www.ghostscript.com/download/gsdnld.html'>www.ghostscript.com</a> and install it before running FusePDF again."));
         QTimer::singleShot(100, qApp, SLOT(quit()));
     }
     loadSettings();
@@ -39,7 +39,7 @@ void FusePDF::on_actionOpen_triggered()
 void FusePDF::on_actionSave_triggered()
 {
     qDebug() << "on_actionSave_triggered";
-    on_fileButton_clicked();
+    runCommand();
 }
 
 void FusePDF::on_actionClear_triggered()
@@ -57,6 +57,7 @@ void FusePDF::on_actionQuit_triggered()
 void FusePDF::on_actionAbout_triggered()
 {
     qDebug() << "on_actionAbout_triggered";
+    QMessageBox::about(this, tr("FusePDF"), tr("<h2>FusePDF %1</h2><h3>Merge multiple PDF documents.</h3><p>Copyright &copy; 2021 <a href='https://nettstudio.no'>NettStudio AS</a>. All rights reserved.</p>").arg(VERSION_APP));
 }
 
 void FusePDF::on_paper_currentIndexChanged(const QString &arg1)
@@ -143,6 +144,10 @@ void FusePDF::makeCommand()
 void FusePDF::runCommand()
 {
     qDebug() << "runCommand";
+    if (ui->inputs->topLevelItemCount() == 0 || ui->fileName->text().isEmpty()) {
+        QMessageBox::warning(this, tr("Unable to process"), tr("Input and/or output is missing."));
+        return;
+    }
     if (_proc->isOpen()) {
         qDebug() << "proc still running?";
         return;
@@ -264,4 +269,9 @@ void FusePDF::on_actionShow_log_triggered()
 {
     qDebug() << "on_actionShow_log_triggered";
     ui->logBox->setVisible(ui->actionShow_log->isChecked());
+}
+
+void FusePDF::on_actionAbout_Qt_triggered()
+{
+    QMessageBox::aboutQt(this, tr("About Qt"));
 }
