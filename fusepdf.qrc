@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file>fusepdf.png</file>
+    </qresource>
+</RCC>

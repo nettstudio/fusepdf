@@ -16,6 +16,7 @@ FusePDF::FusePDF(QWidget *parent)
             this, SLOT(handleProcOutput()));
     connect(ui->inputs, SIGNAL(addedItem()),
             this, SLOT(handleAddedItem()));
+    setWindowIcon(QIcon(":/fusepdf.png"));
     loadSettings();
 }
 
@@ -111,11 +112,9 @@ void FusePDF::on_save_clicked()
 void FusePDF::makeCommand()
 {
     qDebug() << "makeCommand";
-    QString command;
-
-    command.append("gs");
+    QString command = "gs";
 #ifdef Q_OS_WIN
-    command.append(".exe");
+    command = "bin/gswin64c.exe";
 #endif
     command.append(" -sDEVICE=pdfwrite");
     command.append(QString(" -dCompatibilityLevel=%1").arg(ui->compat->currentText()));
