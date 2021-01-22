@@ -109,6 +109,7 @@ private slots:
     void loadOptions();
     void saveOptions();
     bool isNewVersion();
+    bool missingGhost();
 
 private:
     Ui::FusePDF *ui;

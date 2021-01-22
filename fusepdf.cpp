@@ -18,12 +18,6 @@ FusePDF::FusePDF(QWidget *parent)
     connect(ui->inputs, SIGNAL(foundPDF(QList<QUrl>)),
             this, SLOT(handleFoundPDF(QList<QUrl>)));
     setWindowIcon(QIcon(":/fusepdf.png"));
-    if (findGhost().isEmpty()) {
-        QMessageBox::warning(this,
-                             tr("Missing Ghostscript"),
-                             tr("Unable to find Ghostscript, please download the latest (x86_64) installer from <a href='https://www.ghostscript.com/download/gsdnld.html'>www.ghostscript.com</a> and install it before running FusePDF again."));
-        QTimer::singleShot(100, qApp, SLOT(quit()));
-    }
     loadSettings();
 }
 
@@ -160,6 +154,7 @@ void FusePDF::makeCommand()
 void FusePDF::runCommand()
 {
     qDebug() << "runCommand";
+    if (missingGhost()) { return; }
     if (ui->inputs->topLevelItemCount() == 0 || ui->fileName->text().isEmpty()) {
         QMessageBox::warning(this, tr("Unable to process"), tr("Input and/or output is missing."));
         return;
@@ -241,7 +236,7 @@ void FusePDF::loadSettings()
 {
     if (isNewVersion()) { on_actionAbout_triggered(); }
     qDebug() << "loadSettings";
-    if (!hasWindowState()) { setGeometry(0, 0, 700, 300); }
+    if (!hasWindowState()) { setGeometry(100, 100, 700, 300); }
     ui->progressBar->setMaximum(100);
     ui->progressBar->setValue(100);
     loadOptions();
@@ -370,6 +365,8 @@ void FusePDF::loadOptions()
 
     ui->logBox->setVisible(ui->actionShow_log->isChecked());
     ui->inputs->setSortingEnabled(ui->actionAuto_Sort->isChecked());
+
+    missingGhost();
 }
 
 void FusePDF::saveOptions()
@@ -380,6 +377,20 @@ void FusePDF::saveOptions()
 bool FusePDF::isNewVersion()
 {
     QSettings settings;
-    if (settings.value("version") != VERSION_APP) { return true; }
+    if (settings.value("version") != VERSION_APP) {
+        settings.setValue("version", VERSION_APP);
+        return true;
+    }
+    return false;
+}
+
+bool FusePDF::missingGhost()
+{
+    if (findGhost().isEmpty()) {
+        QMessageBox::warning(this,
+                             tr("Missing Ghostscript"),
+                             tr("Unable to find Ghostscript, please download the latest (x86_64) installer from <a href='https://www.ghostscript.com/download/gsdnld.html'>www.ghostscript.com</a> and install it before running FusePDF again."));
+        return true;
+    }
     return false;
 }
