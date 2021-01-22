@@ -17,6 +17,10 @@ FusePDF::FusePDF(QWidget *parent)
     connect(ui->inputs, SIGNAL(addedItem()),
             this, SLOT(handleAddedItem()));
     setWindowIcon(QIcon(":/fusepdf.png"));
+    if (findGhost().isEmpty()) {
+        QMessageBox::warning(this, tr("Missing Ghostscript"), tr("Unable to find Ghostscript, please download the latest x86_64 installer from https://www.ghostscript.com/download/gsdnld.html"));
+        QTimer::singleShot(100, qApp, SLOT(quit()));
+    }
     loadSettings();
 }
 
@@ -116,14 +120,7 @@ void FusePDF::on_save_clicked()
 void FusePDF::makeCommand()
 {
     qDebug() << "makeCommand";
-    //QString command = "gs";
-//#ifdef Q_OS_WIN
-    QString command = findGhost(); //"bin/gswin64c.exe";
-//#endif
-    if (command.isEmpty()) {
-        QMessageBox::warning(this, tr("Missing Ghostscript"), tr("Unable to find Ghostscript, please download the latest x86_65 release from https://www.ghostscript.com/download/gsdnld.html"));
-        return;
-    }
+    QString command = findGhost();
     command.append(" -sDEVICE=pdfwrite");
     command.append(QString(" -dCompatibilityLevel=%1").arg(ui->compat->currentText()));
     command.append(QString(" -dPDFSETTINGS=/%1").arg(ui->preset->currentText()));
@@ -209,12 +206,6 @@ void FusePDF::loadSettings()
 {
     qDebug() << "loadSettings";
     populateUI();
-
-    if (findGhost().isEmpty()) {
-        QMessageBox::warning(this, tr("Missing Ghostscript"), tr("Unable to find Ghostscript, please download the latest x86_64 installer from https://www.ghostscript.com/download/gsdnld.html"));
-        QTimer::singleShot(100, qApp, SLOT(quit()));
-    }
-
     ui->logBox->setVisible(ui->actionShow_log->isChecked());
 }
 
