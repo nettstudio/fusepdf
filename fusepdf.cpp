@@ -7,6 +7,7 @@ FusePDF::FusePDF(QWidget *parent)
     , _proc(nullptr)
 {
     ui->setupUi(this);
+    qApp->setStyle(QStyleFactory::create("fusion"));
     _proc = new QProcess(this);
     connect(_proc, SIGNAL(finished(int)),
             this, SLOT(commandFinished(int)));
@@ -14,11 +15,13 @@ FusePDF::FusePDF(QWidget *parent)
             this, SLOT(commandStarted()));
     connect(_proc, SIGNAL(readyReadStandardOutput()),
             this, SLOT(handleProcOutput()));
-    connect(ui->inputs, SIGNAL(addedItem()),
-            this, SLOT(handleAddedItem()));
+    connect(ui->inputs, SIGNAL(foundPDF(QList<QUrl>)),
+            this, SLOT(handleFoundPDF(QList<QUrl>)));
     setWindowIcon(QIcon(":/fusepdf.png"));
     if (findGhost().isEmpty()) {
-        QMessageBox::warning(this, tr("Missing Ghostscript"), tr("Unable to find Ghostscript, please download the latest (x86_64) installer from <a href='https://www.ghostscript.com/download/gsdnld.html'>www.ghostscript.com</a> and install it before running FusePDF again."));
+        QMessageBox::warning(this,
+                             tr("Missing Ghostscript"),
+                             tr("Unable to find Ghostscript, please download the latest (x86_64) installer from <a href='https://www.ghostscript.com/download/gsdnld.html'>www.ghostscript.com</a> and install it before running FusePDF again."));
         QTimer::singleShot(100, qApp, SLOT(quit()));
     }
     loadSettings();
@@ -60,11 +63,10 @@ void FusePDF::on_actionAbout_triggered()
     QMessageBox::about(this,
                        tr("FusePDF"),
                        tr("<h2>FusePDF %1</h2>"
-                          "<h3>Merge multiple PDF documents.</h3>"
                           "<p>Copyright &copy;2021 <a href='https://nettstudio.no'>NettStudio AS</a>. All rights reserved.</p>"
                           "<p style=\"font-size:small;\">Permission is hereby granted, free of charge, to any person obtaining a copy of FusePDF and associated documentation files from NettStudio AS, to use FusePDF for personal or commercial usage provided that the following conditions are met:</p>"
-                          "<p style=\"font-size:small;\"><b>1.</b> You are <b>not</b> allowed to modify, merge, publish, (re-)distribute, sublicense, and/or sell copies of FusePDF.</p>"
-                          "<p style=\"font-size:small;\"><b>2.</b> Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.</p>"
+                          "<p style=\"font-size:small;\">1. You are not allowed to modify, merge, publish, (re-)distribute, sublicense, and/or sell copies of FusePDF.</p>"
+                          "<p style=\"font-size:small;\">2. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.</p>"
                           "<p style=\"font-size:small;\">THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</p>"
                           ).arg(VERSION_APP));
 }
@@ -220,18 +222,13 @@ void FusePDF::loadSettings()
 {
     qDebug() << "loadSettings";
     populateUI();
+    if (!hasWindowState()) { setGeometry(0, 0, 700, 300); }
     ui->logBox->setVisible(ui->actionShow_log->isChecked());
 }
 
 void FusePDF::saveSettings()
 {
     qDebug() << "saveSettings";
-}
-
-void FusePDF::handleAddedItem()
-{
-    qDebug() << "handleAddedItem";
-    makeCommand();
 }
 
 void FusePDF::handleProcOutput()
@@ -283,4 +280,35 @@ void FusePDF::on_actionShow_log_triggered()
 void FusePDF::on_actionAbout_Qt_triggered()
 {
     QMessageBox::aboutQt(this, tr("About Qt"));
+}
+
+bool FusePDF::hasWindowState()
+{
+    return false;
+}
+
+void FusePDF::handleFoundPDF(const QList<QUrl> &urls)
+{
+    qDebug() << "found pdf" << urls;
+    for (int i=0;i< urls.size();++i) {
+        const QFileInfo info(urls.at(i).toLocalFile());
+        if (!info.isFile()) { continue; }
+        QMimeDatabase db;
+        QMimeType type = db.mimeTypeForFile(info.absoluteFilePath());
+        if (type.name() != "application/pdf") { continue; }
+        QTreeWidgetItem *item = new QTreeWidgetItem(ui->inputs);
+        item->setText(0, info.fileName());
+        item->setText(1, info.filePath());
+        item->setIcon(0, QIcon(":/fusepdf.png"));
+        item->setFlags(Qt::ItemIsSelectable|Qt::ItemIsDragEnabled|Qt::ItemIsEnabled|Qt::ItemNeverHasChildren);
+    }
+    makeCommand();
+}
+
+void FusePDF::on_inputs_itemDoubleClicked(QTreeWidgetItem *item, int column)
+{
+    Q_UNUSED(column)
+    qDebug() << "on_inputs_itemDoubleClicked";
+    if (!item) { return; }
+    QDesktopServices::openUrl(QUrl::fromUserInput(item->text(1)));
 }

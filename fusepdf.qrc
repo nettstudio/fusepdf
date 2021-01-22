@@ -1,5 +1,9 @@
 <RCC>
     <qresource prefix="/">
         <file>fusepdf.png</file>
+        <file>fusepdf-clear.png</file>
+        <file>fusepdf-open.png</file>
+        <file>fusepdf-quit.png</file>
+        <file>fusepdf-save.png</file>
     </qresource>
 </RCC>

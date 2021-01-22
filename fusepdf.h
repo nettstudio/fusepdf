@@ -2,7 +2,6 @@
 #define FUSEPDF_H
 
 #include <QMainWindow>
-
 #include <QDropEvent>
 #include <QTreeWidget>
 #include <QMimeData>
@@ -10,7 +9,6 @@
 #include <QFileInfo>
 #include <QDebug>
 #include <QProcess>
-#include <QProcessEnvironment>
 #include <QFileDialog>
 #include <QDesktopServices>
 #include <QMessageBox>
@@ -19,6 +17,12 @@
 #include <QDirIterator>
 #include <iostream>
 #include <QTimer>
+#include <QEvent>
+#include <QList>
+#include <QUrl>
+#include <QDragEnterEvent>
+#include <QDropEvent>
+#include <QStyleFactory>
 
 class FilesTreeWidget : public QTreeWidget
 {
@@ -27,52 +31,35 @@ public:
     FilesTreeWidget(QWidget *parent= nullptr):
         QTreeWidget(parent)
     {
+        setSortingEnabled(false);
         setAcceptDrops(true);
-        setDropIndicatorShown(true);
-        setColumnCount(1);
+        viewport()->setAcceptDrops(true);
+        setDragEnabled(true);
+        setDragDropMode(QAbstractItemView::InternalMove);
+        setDropIndicatorShown(false);
+        setIconSize(QSize(32, 32));
     }
 
 signals:
-    void addedItem();
+    void foundPDF(const QList<QUrl> &urls);
 
 protected:
-    bool dropMimeData(QTreeWidgetItem *parent, int /*index*/, const QMimeData *data, Qt::DropAction /*action*/)
+    void dragEnterEvent(QDragEnterEvent *e)
     {
-        qDebug() << data->urls();
-        for(const QUrl url: data->urls()) {
-            const QFileInfo info( url.toLocalFile());
-            if (info.isFile()){
-                QMimeDatabase db;
-                QMimeType type = db.mimeTypeForFile(info.absoluteFilePath());
-                if (type.name() != "application/pdf") {
-                    qDebug() << "unsupported format" << info.fileName() << type.name();
-                    continue;
-                }
-                QTreeWidgetItem *item;
-                if (parent){
-                    item = new QTreeWidgetItem(parent);
-                    parent->setExpanded(true);
-                }
-                else { item = new QTreeWidgetItem(this); }
-                item->setText(0, info.fileName());
-                item->setText(1, info.filePath());
-                item->setIcon(0, QIcon(":/fusepdf.png"));
-                emit addedItem();
-            }
+        qDebug() << "dragEnterEvent" << e;
+        e->acceptProposedAction();
+    }
+    void dropEvent(QDropEvent *e)
+    {
+        qDebug() << "dropEvent" << e;
+        if (e->mimeData()->hasUrls()) {
+            qDebug() << "dropped urls" << e->mimeData()->urls();
+            emit foundPDF(e->mimeData()->urls());
+        } else {
+            qDebug() << "Let Qt handle dropEvent";
+            QTreeWidget::dropEvent(e);
         }
-        return true;
     }
-
-    QStringList mimeTypes () const
-    {
-        return QStringList()<<"text/uri-list";
-    }
-
-    Qt::DropActions supportedDropActions () const
-    {
-        return Qt::CopyAction;
-    }
-
 };
 
 QT_BEGIN_NAMESPACE
@@ -108,14 +95,15 @@ private slots:
     void populateUI();
     void loadSettings();
     void saveSettings();
-    void handleAddedItem();
     void handleProcOutput();
     void clearAll();
     const QString findGhost();
-
     void on_actionShow_log_triggered();
-
     void on_actionAbout_Qt_triggered();
+    bool hasWindowState();
+    void handleFoundPDF(const QList<QUrl> &urls);
+
+    void on_inputs_itemDoubleClicked(QTreeWidgetItem *item, int column);
 
 private:
     Ui::FusePDF *ui;
