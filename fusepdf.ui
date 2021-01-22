@@ -68,7 +68,7 @@
      <widget class="QWidget" name="widget" native="true">
       <property name="maximumSize">
        <size>
-        <width>250</width>
+        <width>270</width>
         <height>16777215</height>
        </size>
       </property>
@@ -251,7 +251,7 @@
          </property>
          <property name="sizeHint" stdset="0">
           <size>
-           <width>229</width>
+           <width>249</width>
            <height>246</height>
           </size>
          </property>
