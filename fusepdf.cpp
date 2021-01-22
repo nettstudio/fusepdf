@@ -278,9 +278,9 @@ const QString FusePDF::findGhost()
     while (it.hasNext()) {
         QString folder = it.next();
         QString bin64 = folder + "/bin/gswin64c.exe";
-        if (QFile::exists(bin64)) { return bin; }
+        if (QFile::exists(bin64)) { return bin64; }
         QString bin32 = folder + "/bin/gswin32c.exe";
-        if (QFile::exists(bin32)) { return bin; }
+        if (QFile::exists(bin32)) { return bin32; }
     }
     return QString();
 #endif
