@@ -23,9 +23,9 @@ export PKG_CONFIG_PATH="${MXE}/usr/${MXE_TC}/lib/pkgconfig"
 qmake CONFIG+=release ${CWD} || exit 1
 make || exit 1
 $STRIP -s release/FusePDF.exe || exit 1
-#mv classic/release/Cryon.exe "${CWD}/Cryon.exe" || exit 1
-#cd $CWD || exit 1
-#7za -m0=lzma2 -mx=9 a $ZIP Cryon.exe || exit 1
-#echo "DONE!"
+cd release || exit 1
+7za -m0=lzma2 -mx=9 a $ZIP FusePDF.exe || exit 1
+mv $ZIP .. || exit 1
+echo "DONE!"
 #scp ${CWD}/$ZIP gir:/home/media/Cryon/
 #rm -rf $BUILD_DIR $CWD/Cryon.exe
