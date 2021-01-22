@@ -25,8 +25,8 @@ qmake CONFIG+=release ${CWD} || exit 1
 make || exit 1
 mkdir $ZIP $ZIP/platforms $ZIP/opensource || exit 1
 cp -a $CWD/legal/* $ZIP/opensource/ || exit 1
-cp $MXE_TC/qt5/plugins/platforms/qwindows.dll $ZIP/platforms/ || exit 1
-cp $MXE_TC/qt5/bin/{Qt5CoreNettStudio.dll,Qt5GuiNettStudio.dll,Qt5WidgetsNettStudio.dll} $ZIP/ || exit 1
+cp $MXE/usr/$MXE_TC/qt5/plugins/platforms/qwindows.dll $ZIP/platforms/ || exit 1
+cp $MXE/usr/$MXE_TC/qt5/bin/{Qt5CoreNettStudio.dll,Qt5GuiNettStudio.dll,Qt5WidgetsNettStudio.dll} $ZIP/ || exit 1
 cp release/FusePDF.exe $ZIP || exit 1
 $STRIP -s $ZIP/*.exe $ZIP/*.dll $ZIP/*/*.dll || exit 1
 zip -r -9 $ZIP.zip $ZIP || exit 1

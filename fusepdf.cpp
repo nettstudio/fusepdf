@@ -135,6 +135,9 @@ void FusePDF::makeCommand()
 {
     qDebug() << "makeCommand";
     QString command = findGhost();
+#ifdef Q_OS_WIN
+    command = QString("\"%1\"").arg(findGhost());
+#endif
     command.append(" -sDEVICE=pdfwrite");
     command.append(QString(" -dCompatibilityLevel=%1").arg(ui->compat->currentText()));
     command.append(QString(" -dPDFSETTINGS=/%1").arg(ui->preset->currentText()));
