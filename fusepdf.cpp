@@ -104,10 +104,12 @@ void FusePDF::on_dpiCheck_stateChanged(int arg1)
 void FusePDF::on_fileButton_clicked()
 {
     qDebug() << "on_fileButton_clicked";
-    QString file = QFileDialog::getSaveFileName(this,
-                                                tr("Save PDF"),
-                                                QDir::homePath(),
-                                                 "*.pdf");
+    QString dir = QDir::homePath();
+    if (!ui->fileName->text().isEmpty()) {
+        QFileInfo info(ui->fileName->text());
+        dir = info.absolutePath();
+    }
+    QString file = QFileDialog::getSaveFileName(this, tr("Save PDF"), dir, "*.pdf");
     if (file.isEmpty()) {
         qDebug() << "no save file";
         return;
@@ -159,8 +161,18 @@ void FusePDF::runCommand()
         QMessageBox::warning(this, tr("Unable to process"), tr("Input and/or output is missing."));
         return;
     }
+    if (hasFile(ui->fileName->text())) {
+        QMessageBox::warning(this, tr("Unable to save file"), tr("Unable to save to file, the output file is found in input."));
+        return;
+    }
+    if (QFile::exists(ui->fileName->text())) {
+        int ret = QMessageBox::question(this,
+                                        tr("File exists"),
+                                        tr("File already exists, are you sure you want to overwrite it?"));
+        if (ret == QMessageBox::No) { return; }
+    }
     if (_proc->isOpen()) {
-        qDebug() << "proc still running?";
+        QMessageBox::warning(this, tr("Still active"), tr("FusePDF is still active, please wait until done."));
         return;
     }
     makeCommand();
@@ -171,6 +183,7 @@ void FusePDF::commandStarted()
 {
     qDebug() << "commandStarted";
     ui->save->setDisabled(true);
+    ui->actionSave->setDisabled(true);
     ui->progressBar->setMaximum(0);
 }
 
@@ -179,6 +192,7 @@ void FusePDF::commandFinished(int exitCode)
     Q_UNUSED(exitCode)
     qDebug() << "commandfinished" << exitCode;
     ui->save->setDisabled(false);
+    ui->actionSave->setDisabled(false);
     ui->progressBar->setMaximum(100);
     _proc->close();
     if (exitCode == 0) {
@@ -221,15 +235,14 @@ void FusePDF::populateUI()
 void FusePDF::loadSettings()
 {
     qDebug() << "loadSettings";
-    populateUI();
     if (!hasWindowState()) { setGeometry(0, 0, 700, 300); }
-    ui->logBox->setVisible(ui->actionShow_log->isChecked());
-    ui->inputs->setSortingEnabled(ui->actionAuto_Sort->isChecked());
+    loadOptions();
 }
 
 void FusePDF::saveSettings()
 {
     qDebug() << "saveSettings";
+    saveOptions();
 }
 
 void FusePDF::handleProcOutput()
@@ -304,6 +317,13 @@ void FusePDF::handleFoundPDF(const QList<QUrl> &urls)
         item->setText(1, info.filePath());
         item->setIcon(0, QIcon(":/fusepdf.png"));
         item->setFlags(Qt::ItemIsSelectable|Qt::ItemIsDragEnabled|Qt::ItemIsEnabled|Qt::ItemNeverHasChildren);
+        if (ui->fileName->text().isEmpty()) {
+            QString outputFile = info.absolutePath() + "/FusePDF-output.pdf";
+            QFileInfo outputInfo(outputFile);
+            if (!QFile::exists(outputInfo.absoluteFilePath())) {
+                ui->fileName->setText(outputInfo.absoluteFilePath());
+            }
+        }
     }
     makeCommand();
 }
@@ -319,4 +339,27 @@ void FusePDF::on_inputs_itemDoubleClicked(QTreeWidgetItem *item, int column)
 void FusePDF::on_actionAuto_Sort_triggered()
 {
     ui->inputs->setSortingEnabled(ui->actionAuto_Sort->isChecked());
+}
+
+bool FusePDF::hasFile(const QString &file)
+{
+    qDebug() << "has file?" << file;
+    if (!file.isEmpty()) { return false; }
+    for (int i = 0; i < ui->inputs->topLevelItemCount(); ++i) {
+        if (ui->inputs->topLevelItem(i)->text(1) == file) { return  true; }
+    }
+    return false;
+}
+
+void FusePDF::loadOptions()
+{
+    qDebug() << "loadOptions";
+    populateUI();
+    ui->logBox->setVisible(ui->actionShow_log->isChecked());
+    ui->inputs->setSortingEnabled(ui->actionAuto_Sort->isChecked());
+}
+
+void FusePDF::saveOptions()
+{
+    qDebug() << "saveOptions";
 }

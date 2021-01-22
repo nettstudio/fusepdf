@@ -104,6 +104,9 @@ private slots:
     void handleFoundPDF(const QList<QUrl> &urls);
     void on_inputs_itemDoubleClicked(QTreeWidgetItem *item, int column);
     void on_actionAuto_Sort_triggered();
+    bool hasFile(const QString &file);
+    void loadOptions();
+    void saveOptions();
 
 private:
     Ui::FusePDF *ui;
