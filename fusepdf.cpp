@@ -21,7 +21,7 @@ FusePDF::FusePDF(QWidget *parent)
     if (findGhost().isEmpty()) {
         QMessageBox::warning(this,
                              tr("Missing Ghostscript"),
-                             tr("Unable to find Ghostscript, please download the latest (x86_64) installer from <a href='https://www.ghostscript.com/download/gsdnld.html'>www.ghostscript.com</a> and install it before running FusePDF again."));
+                             tr("Unable to find Ghostscript, please download the latest installer from <a href='https://www.ghostscript.com/download/gsdnld.html'>www.ghostscript.com</a> and install it before running FusePDF again."));
         QTimer::singleShot(100, qApp, SLOT(quit()));
     }
     loadSettings();
