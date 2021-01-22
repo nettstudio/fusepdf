@@ -21,7 +21,7 @@ FusePDF::FusePDF(QWidget *parent)
     if (findGhost().isEmpty()) {
         QMessageBox::warning(this,
                              tr("Missing Ghostscript"),
-                             tr("Unable to find Ghostscript, please download the latest installer from <a href='https://www.ghostscript.com/download/gsdnld.html'>www.ghostscript.com</a> and install it before running FusePDF again."));
+                             tr("Unable to find Ghostscript, please download the latest (x86_64) installer from <a href='https://www.ghostscript.com/download/gsdnld.html'>www.ghostscript.com</a> and install it before running FusePDF again."));
         QTimer::singleShot(100, qApp, SLOT(quit()));
     }
     loadSettings();
@@ -185,6 +185,7 @@ void FusePDF::commandStarted()
     ui->save->setDisabled(true);
     ui->actionSave->setDisabled(true);
     ui->progressBar->setMaximum(0);
+    ui->progressBar->setValue(0);
 }
 
 void FusePDF::commandFinished(int exitCode)
@@ -194,6 +195,7 @@ void FusePDF::commandFinished(int exitCode)
     ui->save->setDisabled(false);
     ui->actionSave->setDisabled(false);
     ui->progressBar->setMaximum(100);
+    ui->progressBar->setValue(100);
     _proc->close();
     if (exitCode == 0) {
         QDesktopServices::openUrl(ui->fileName->text());
@@ -234,8 +236,11 @@ void FusePDF::populateUI()
 
 void FusePDF::loadSettings()
 {
+    if (isNewVersion()) { on_actionAbout_triggered(); }
     qDebug() << "loadSettings";
     if (!hasWindowState()) { setGeometry(0, 0, 700, 300); }
+    ui->progressBar->setMaximum(100);
+    ui->progressBar->setValue(100);
     loadOptions();
 }
 
@@ -267,7 +272,7 @@ void FusePDF::clearAll()
     ui->paper->clear();
     ui->preset->clear();
     _cmd.clear();
-    loadSettings();
+    loadOptions();
 }
 
 const QString FusePDF::findGhost()
@@ -279,8 +284,8 @@ const QString FusePDF::findGhost()
         QString folder = it.next();
         QString bin64 = folder + "/bin/gswin64c.exe";
         if (QFile::exists(bin64)) { return bin64; }
-        QString bin32 = folder + "/bin/gswin32c.exe";
-        if (QFile::exists(bin32)) { return bin32; }
+        /*QString bin32 = folder + "/bin/gswin32c.exe";
+        if (QFile::exists(bin32)) { return bin32; }*/
     }
     return QString();
 #endif
@@ -315,7 +320,7 @@ void FusePDF::handleFoundPDF(const QList<QUrl> &urls)
         QTreeWidgetItem *item = new QTreeWidgetItem(ui->inputs);
         item->setText(0, info.fileName());
         item->setText(1, info.filePath());
-        item->setIcon(0, QIcon(":/fusepdf.png"));
+        item->setIcon(0, QIcon(":/fusepdf-notext.png"));
         item->setFlags(Qt::ItemIsSelectable|Qt::ItemIsDragEnabled|Qt::ItemIsEnabled|Qt::ItemNeverHasChildren);
         if (ui->fileName->text().isEmpty()) {
             QString outputFile = info.absolutePath() + "/FusePDF-output.pdf";
@@ -355,6 +360,11 @@ void FusePDF::loadOptions()
 {
     qDebug() << "loadOptions";
     populateUI();
+
+    QSettings settings;
+    settings.beginGroup("options");
+    settings.endGroup();
+
     ui->logBox->setVisible(ui->actionShow_log->isChecked());
     ui->inputs->setSortingEnabled(ui->actionAuto_Sort->isChecked());
 }
@@ -362,4 +372,11 @@ void FusePDF::loadOptions()
 void FusePDF::saveOptions()
 {
     qDebug() << "saveOptions";
+}
+
+bool FusePDF::isNewVersion()
+{
+    QSettings settings;
+    if (settings.value("version") != VERSION_APP) { return true; }
+    return false;
 }

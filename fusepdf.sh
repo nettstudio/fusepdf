@@ -4,9 +4,12 @@
 CWD=`pwd`
 BUILD_DIR=${BUILD_DIR:-"${CWD}/tmp"}
 MXE=${MXE:-"${CWD}/mxe"}
-MXE_TC=${MXE_TC:-i686-w64-mingw32.static}
+MXE_TC=${MXE_TC:-x86_64-w64-mingw32.static}
 STRIP=${MXE_TC}-strip
-ZIP="FusePDF.7z"
+TIMESTAMP=${TIMESTAMP:-`date +%Y%m%d%H%M`}
+VERSION=`cat $CWD/fusepdf.pro | sed '/VERSION =/!d' | awk '{print $3}'`
+COMMIT=`git rev-parse --short HEAD`
+ZIP="FusePDF-$VERSION-$TIMESTAMP-$COMMIT-Windows-x64"
 
 if [ ! -d "${MXE}" ]; then
     echo "Please setup MXE!"
@@ -20,8 +23,12 @@ export PKG_CONFIG_PATH="${MXE}/usr/${MXE_TC}/lib/pkgconfig"
 
 qmake CONFIG+=release ${CWD} || exit 1
 make || exit 1
-$STRIP -s release/FusePDF.exe || exit 1
-cd release || exit 1
-7za -m0=lzma2 -mx=9 a $ZIP FusePDF.exe || exit 1
-mv $ZIP .. || exit 1
+mkdir $ZIP $ZIP/platforms $ZIP/opensource || exit 1
+cp -a $CWD/legal/* $ZIP/opensource/ || exit 1
+cp $MXE_TC/qt5/plugins/platforms/qwindows.dll $ZIP/platforms/ || exit 1
+cp $MXE_TC/qt5/bin/{Qt5CoreNettStudio.dll,Qt5GuiNettStudio.dll,Qt5WidgetsNettStudio.dll} $ZIP/ || exit 1
+cp release/FusePDF.exe $ZIP || exit 1
+$STRIP -s $ZIP/*.exe $ZIP/*.dll $ZIP/*/*.dll || exit 1
+zip -r -9 $ZIP.zip $ZIP || exit 1
+mv $ZIP.zip .. || exit 1
 echo "DONE!"

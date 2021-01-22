@@ -23,6 +23,7 @@
 #include <QDragEnterEvent>
 #include <QDropEvent>
 #include <QStyleFactory>
+#include <QSettings>
 
 class FilesTreeWidget : public QTreeWidget
 {
@@ -107,6 +108,7 @@ private slots:
     bool hasFile(const QString &file);
     void loadOptions();
     void saveOptions();
+    bool isNewVersion();
 
 private:
     Ui::FusePDF *ui;
