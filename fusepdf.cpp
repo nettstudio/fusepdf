@@ -264,8 +264,10 @@ const QString FusePDF::findGhost()
     QDirIterator it(programFilesPath + "/gs", QStringList() << "*.*", QDir::Dirs/*, QDirIterator::Subdirectories*/);
     while (it.hasNext()) {
         QString folder = it.next();
-        QString bin = folder + "/bin/gswin64c.exe";
-        if (QFile::exists(bin)) { return bin; }
+        QString bin64 = folder + "/bin/gswin64c.exe";
+        if (QFile::exists(bin64)) { return bin; }
+        QString bin32 = folder + "/bin/gswin32c.exe";
+        if (QFile::exists(bin32)) { return bin; }
     }
     return QString();
 #endif

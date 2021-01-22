@@ -4,11 +4,9 @@
 CWD=`pwd`
 BUILD_DIR=${BUILD_DIR:-"${CWD}/tmp"}
 MXE=${MXE:-"${CWD}/mxe"}
-MXE_TC=${MXE_TC:-x86_64-w64-mingw32.static}
+MXE_TC=${MXE_TC:-i686-w64-mingw32.static}
 STRIP=${MXE_TC}-strip
-TIMESTAMP=${TIMESTAMP:-`date +%Y%m%d%H%M`}
-COMMIT=`git rev-parse --short HEAD`
-ZIP="FusePDF-$TIMESTAMP-$COMMIT-win64.7z"
+ZIP="FusePDF.7z"
 
 if [ ! -d "${MXE}" ]; then
     echo "Please setup MXE!"
@@ -27,5 +25,3 @@ cd release || exit 1
 7za -m0=lzma2 -mx=9 a $ZIP FusePDF.exe || exit 1
 mv $ZIP .. || exit 1
 echo "DONE!"
-#scp ${CWD}/$ZIP gir:/home/media/Cryon/
-#rm -rf $BUILD_DIR $CWD/Cryon.exe
