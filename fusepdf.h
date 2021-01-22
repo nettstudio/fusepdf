@@ -11,9 +11,14 @@
 #include <QDebug>
 #include <QProcess>
 #include <QProcessEnvironment>
-#include<QFileDialog>
+#include <QFileDialog>
 #include <QDesktopServices>
 #include <QMessageBox>
+#include <QDir>
+#include <QFile>
+#include <QDirIterator>
+#include <iostream>
+#include <QTimer>
 
 class FilesTreeWidget : public QTreeWidget
 {
@@ -51,6 +56,7 @@ protected:
                 else { item = new QTreeWidgetItem(this); }
                 item->setText(0, info.fileName());
                 item->setText(1, info.filePath());
+                item->setIcon(0, QIcon(":/fusepdf.png"));
                 emit addedItem();
             }
         }
@@ -105,10 +111,15 @@ private slots:
     void handleAddedItem();
     void handleProcOutput();
     void clearAll();
+    const QString findGhost();
+
+    void on_actionShow_log_triggered();
 
 private:
     Ui::FusePDF *ui;
     QString _cmd;
     QProcess *_proc;
+    QString _lastSaveDir;
+    QString _lastLoadDir;
 };
 #endif // FUSEPDF_H

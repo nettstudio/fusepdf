@@ -1,5 +1,6 @@
 #!/bin/bash
 # convert -background transparent fusepdf.png -define icon:auto-resize=16,32,48,64,128,192,256 fusepdf.ico
+
 CWD=`pwd`
 BUILD_DIR=${BUILD_DIR:-"${CWD}/tmp"}
 MXE=${MXE:-"${CWD}/mxe"}

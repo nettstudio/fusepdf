@@ -35,16 +35,19 @@ void FusePDF::on_actionOpen_triggered()
 void FusePDF::on_actionSave_triggered()
 {
     qDebug() << "on_actionSave_triggered";
+    on_fileButton_clicked();
 }
 
 void FusePDF::on_actionClear_triggered()
 {
     qDebug() << "on_actionClear_triggered";
+    clearAll();
 }
 
 void FusePDF::on_actionQuit_triggered()
 {
     qDebug() << "on_actionQuit_triggered";
+    qApp->quit();
 }
 
 void FusePDF::on_actionAbout_triggered()
@@ -101,6 +104,7 @@ void FusePDF::on_fileButton_clicked()
 void FusePDF::on_clear_clicked()
 {
     qDebug() << "on_clear_clicked";
+    clearAll();
 }
 
 void FusePDF::on_save_clicked()
@@ -112,17 +116,23 @@ void FusePDF::on_save_clicked()
 void FusePDF::makeCommand()
 {
     qDebug() << "makeCommand";
-    QString command = "gs";
-#ifdef Q_OS_WIN
-    command = "bin/gswin64c.exe";
-#endif
+    //QString command = "gs";
+//#ifdef Q_OS_WIN
+    QString command = findGhost(); //"bin/gswin64c.exe";
+//#endif
+    if (command.isEmpty()) {
+        QMessageBox::warning(this, tr("Missing Ghostscript"), tr("Unable to find Ghostscript, please download the latest x86_65 release from https://www.ghostscript.com/download/gsdnld.html"));
+        return;
+    }
     command.append(" -sDEVICE=pdfwrite");
     command.append(QString(" -dCompatibilityLevel=%1").arg(ui->compat->currentText()));
     command.append(QString(" -dPDFSETTINGS=/%1").arg(ui->preset->currentText()));
-    command.append(QString(" -sPAPERSIZE=%1").arg(ui->paper->currentText()));
+    if (!ui->paper->currentText().isEmpty() && ui->paper->currentText() != "default") {
+        command.append(QString(" -sPAPERSIZE=%1").arg(ui->paper->currentText()));
+    }
     command.append(" -dNOPAUSE -dBATCH -dDetectDuplicateImages -dCompressFonts=true");
     if (ui->dpiCheck->isChecked()) {
-        command.append(QString(" -r").arg(ui->dpi->value()));
+        command.append(QString(" -r%1").arg(ui->dpi->value()));
     }
     command.append(QString(" -sOutputFile=\"%1\"").arg(ui->fileName->text()));
     for (int i = 0; i < ui->inputs->topLevelItemCount(); ++i) {
@@ -180,13 +190,13 @@ void FusePDF::populateUI()
     ui->compat->addItem("1.7");
     ui->compat->setCurrentText("1.3");
 
+    ui->paper->addItem("default");
     ui->paper->addItem("letter");
     ui->paper->addItem("legal");
     ui->paper->addItem("a1");
     ui->paper->addItem("a2");
     ui->paper->addItem("a3");
     ui->paper->addItem("a4");
-    ui->paper->setCurrentText("a4");
 
     ui->preset->addItem("default");
     ui->preset->addItem("prepress");
@@ -199,6 +209,13 @@ void FusePDF::loadSettings()
 {
     qDebug() << "loadSettings";
     populateUI();
+
+    if (findGhost().isEmpty()) {
+        QMessageBox::warning(this, tr("Missing Ghostscript"), tr("Unable to find Ghostscript, please download the latest x86_64 installer from https://www.ghostscript.com/download/gsdnld.html"));
+        QTimer::singleShot(100, qApp, SLOT(quit()));
+    }
+
+    ui->logBox->setVisible(ui->actionShow_log->isChecked());
 }
 
 void FusePDF::saveSettings()
@@ -225,4 +242,35 @@ void FusePDF::handleProcOutput()
 void FusePDF::clearAll()
 {
     qDebug() << "clearAll";
+    ui->inputs->clear();
+    ui->compat->clear();
+    ui->cmd->clear();
+    ui->dpiCheck->setChecked(false);
+    ui->dpi->setValue(150);
+    ui->fileName->clear();
+    ui->paper->clear();
+    ui->preset->clear();
+    _cmd.clear();
+    loadSettings();
+}
+
+const QString FusePDF::findGhost()
+{
+#ifdef Q_OS_WIN
+    QString programFilesPath(getenv("PROGRAMFILES"));
+    QDirIterator it(programFilesPath + "/gs", QStringList() << "*.*", QDir::Dirs/*, QDirIterator::Subdirectories*/);
+    while (it.hasNext()) {
+        QString folder = it.next();
+        QString bin = folder + "/bin/gswin64c.exe";
+        if (QFile::exists(bin)) { return bin; }
+    }
+    return QString();
+#endif
+    return QString("gs");
+}
+
+void FusePDF::on_actionShow_log_triggered()
+{
+    qDebug() << "on_actionShow_log_triggered";
+    ui->logBox->setVisible(ui->actionShow_log->isChecked());
 }
