@@ -1,2 +1,3 @@
-# fusepdf
-Fuse Multiple PDF Documents
+# FusePDF
+
+Merge multiple PDF documents.
