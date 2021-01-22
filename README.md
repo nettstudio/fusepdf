@@ -1,3 +1,2 @@
 # FusePDF
-
-Merge multiple PDF documents.
+![logo](fusepdf.png "Logo")
