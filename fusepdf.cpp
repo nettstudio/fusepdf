@@ -31,6 +31,19 @@ FusePDF::~FusePDF()
 void FusePDF::on_actionOpen_triggered()
 {
     qDebug() << "on_actionOpen_triggered";
+    QString dir = QDir::homePath();
+    if (!_lastLoadDir.isEmpty()) { dir = _lastLoadDir; }
+    QStringList files = QFileDialog::getOpenFileNames(this,
+                                                      tr("Open PDF's"),
+                                                      dir,
+                                                      "*.pdf");
+    if (files.size() > 0) {
+        QList<QUrl> urls;
+        for (int i = 0; i < files.size(); ++i) {
+            urls.append(QUrl::fromUserInput(files.at(i)));
+        }
+        if (urls.size() > 0) { handleFoundPDF(urls); }
+    }
 }
 
 void FusePDF::on_actionSave_triggered()
@@ -103,10 +116,7 @@ void FusePDF::on_fileButton_clicked()
         QFileInfo info(ui->fileName->text());
         dir = info.absolutePath();
     } else {
-        if (!_lastSaveDir.isEmpty()) {
-            QFileInfo info(_lastSaveDir);
-            dir = info.absolutePath();
-        }
+        if (!_lastSaveDir.isEmpty()) { dir = _lastSaveDir; }
     }
     QString file = QFileDialog::getSaveFileName(this, tr("Save PDF"), dir, "*.pdf");
     if (file.isEmpty()) {
@@ -360,9 +370,7 @@ void FusePDF::handleFoundPDF(const QList<QUrl> &urls)
                 ui->fileName->setText(outputInfo.absoluteFilePath());
             }
         }
-        if (!info.absolutePath().isEmpty()) {
-            _lastLoadDir = info.absolutePath();
-        }
+        if (!info.absolutePath().isEmpty()) { _lastLoadDir = info.absolutePath(); }
     }
     makeCommand();
 }
