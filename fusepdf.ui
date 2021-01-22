@@ -73,6 +73,12 @@
        </size>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_5">
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
        <item>
         <widget class="QGroupBox" name="groupBox_5">
          <property name="title">
@@ -312,6 +318,7 @@
     <addaction name="actionAbout_Qt"/>
     <addaction name="separator"/>
     <addaction name="actionShow_log"/>
+    <addaction name="actionAuto_Sort"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuHelp"/>
@@ -387,6 +394,17 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+L</string>
+   </property>
+  </action>
+  <action name="actionAuto_Sort">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Auto Sort</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Z</string>
    </property>
   </action>
  </widget>

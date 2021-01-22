@@ -224,6 +224,7 @@ void FusePDF::loadSettings()
     populateUI();
     if (!hasWindowState()) { setGeometry(0, 0, 700, 300); }
     ui->logBox->setVisible(ui->actionShow_log->isChecked());
+    ui->inputs->setSortingEnabled(ui->actionAuto_Sort->isChecked());
 }
 
 void FusePDF::saveSettings()
@@ -311,4 +312,9 @@ void FusePDF::on_inputs_itemDoubleClicked(QTreeWidgetItem *item, int column)
     qDebug() << "on_inputs_itemDoubleClicked";
     if (!item) { return; }
     QDesktopServices::openUrl(QUrl::fromUserInput(item->text(1)));
+}
+
+void FusePDF::on_actionAuto_Sort_triggered()
+{
+    ui->inputs->setSortingEnabled(ui->actionAuto_Sort->isChecked());
 }

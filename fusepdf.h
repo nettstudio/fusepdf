@@ -102,8 +102,8 @@ private slots:
     void on_actionAbout_Qt_triggered();
     bool hasWindowState();
     void handleFoundPDF(const QList<QUrl> &urls);
-
     void on_inputs_itemDoubleClicked(QTreeWidgetItem *item, int column);
+    void on_actionAuto_Sort_triggered();
 
 private:
     Ui::FusePDF *ui;
