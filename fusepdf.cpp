@@ -102,6 +102,11 @@ void FusePDF::on_fileButton_clicked()
     if (!ui->fileName->text().isEmpty()) {
         QFileInfo info(ui->fileName->text());
         dir = info.absolutePath();
+    } else {
+        if (!_lastSaveDir.isEmpty()) {
+            QFileInfo info(_lastSaveDir);
+            dir = info.absolutePath();
+        }
     }
     QString file = QFileDialog::getSaveFileName(this, tr("Save PDF"), dir, "*.pdf");
     if (file.isEmpty()) {
@@ -110,6 +115,8 @@ void FusePDF::on_fileButton_clicked()
     }
     if (!file.endsWith(".pdf")) { file.append(".pdf"); }
     ui->fileName->setText(file);
+    QFileInfo saveFile(file);
+    _lastSaveDir = saveFile.absolutePath();
     makeCommand();
 }
 
@@ -207,6 +214,7 @@ void FusePDF::commandFinished(int exitCode)
 void FusePDF::populateUI()
 {
     qDebug() << "populateUI";
+    ui->compat->clear();
     ui->compat->addItem("1.0");
     ui->compat->addItem("1.1");
     ui->compat->addItem("1.2");
@@ -215,8 +223,8 @@ void FusePDF::populateUI()
     ui->compat->addItem("1.5");
     ui->compat->addItem("1.6");
     ui->compat->addItem("1.7");
-    ui->compat->setCurrentText("1.3");
 
+    ui->paper->clear();
     ui->paper->addItem("default");
     ui->paper->addItem("letter");
     ui->paper->addItem("legal");
@@ -225,6 +233,7 @@ void FusePDF::populateUI()
     ui->paper->addItem("a3");
     ui->paper->addItem("a4");
 
+    ui->preset->clear();
     ui->preset->addItem("default");
     ui->preset->addItem("prepress");
     ui->preset->addItem("ebook");
@@ -237,6 +246,23 @@ void FusePDF::loadSettings()
     if (isNewVersion()) { on_actionAbout_triggered(); }
     qDebug() << "loadSettings";
     if (!hasWindowState()) { setGeometry(100, 100, 700, 300); }
+    QSettings settings;
+    settings.beginGroup("ui");
+    QByteArray lastGeo = settings.value("editor_geometry").toByteArray();
+    if (!lastGeo.isNull()) {
+        restoreGeometry(lastGeo);
+        QApplication::processEvents();
+    }
+    QByteArray lastState = settings.value("editor_state").toByteArray();
+    if (!lastState.isNull()) {
+        restoreState(lastState);
+        QApplication::processEvents();
+    }
+    bool wasMax = settings.value("editor_maximized", false).toBool();
+    if (wasMax) {
+        showMaximized();
+    }
+    settings.endGroup();
     ui->progressBar->setMaximum(100);
     ui->progressBar->setValue(100);
     loadOptions();
@@ -246,6 +272,13 @@ void FusePDF::saveSettings()
 {
     qDebug() << "saveSettings";
     saveOptions();
+    QSettings settings;
+    settings.beginGroup("ui");
+    settings.setValue("editor_state", saveState());
+    settings.setValue("editor_geometry", saveGeometry());
+    settings.setValue("editor_maximized", isMaximized());
+    settings.endGroup();
+    settings.sync();
 }
 
 void FusePDF::handleProcOutput()
@@ -327,6 +360,9 @@ void FusePDF::handleFoundPDF(const QList<QUrl> &urls)
                 ui->fileName->setText(outputInfo.absoluteFilePath());
             }
         }
+        if (!info.absolutePath().isEmpty()) {
+            _lastLoadDir = info.absolutePath();
+        }
     }
     makeCommand();
 }
@@ -361,6 +397,15 @@ void FusePDF::loadOptions()
 
     QSettings settings;
     settings.beginGroup("options");
+    ui->paper->setCurrentText(settings.value("paper", "default").toString());
+    ui->dpi->setValue(settings.value("dpi", 150).toInt());
+    ui->compat->setCurrentText(settings.value("compat", "1.3").toString());
+    ui->preset->setCurrentText(settings.value("preset", "default").toString());
+    ui->actionShow_log->setChecked(settings.value("showLog", false).toBool());
+    ui->actionAuto_Sort->setChecked(settings.value("autoSort", false).toBool());
+    _lastLoadDir = settings.value("lastLoadDir", "").toString();
+    _lastSaveDir = settings.value("lastSaveDir", "").toString();
+    ui->dpiCheck->setChecked(settings.value("checkdpi", false).toBool());
     settings.endGroup();
 
     ui->logBox->setVisible(ui->actionShow_log->isChecked());
@@ -372,6 +417,28 @@ void FusePDF::loadOptions()
 void FusePDF::saveOptions()
 {
     qDebug() << "saveOptions";
+    QSettings settings;
+    settings.beginGroup("options");
+    if (!ui->paper->currentText().isEmpty()) {
+        settings.setValue("paper", ui->paper->currentText());
+    }
+    settings.setValue("dpi", ui->dpi->value());
+    if (!ui->compat->currentText().isEmpty()) {
+        settings.setValue("compat", ui->compat->currentText());
+    }
+    if (!ui->preset->currentText().isEmpty()) {
+        settings.setValue("preset", ui->preset->currentText());
+    }
+    settings.setValue("showLog", ui->actionShow_log->isChecked());
+    settings.setValue("autoSort", ui->actionAuto_Sort->isChecked());
+    settings.setValue("checkdpi", ui->dpiCheck->isChecked());
+    if (!_lastLoadDir.isEmpty()) {
+        settings.setValue("lastLoadDir", _lastLoadDir);
+    }
+    if (!_lastSaveDir.isEmpty()) {
+        settings.setValue("lastSaveDir", _lastSaveDir);
+    }
+    settings.endGroup();
 }
 
 bool FusePDF::isNewVersion()
