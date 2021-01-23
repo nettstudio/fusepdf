@@ -74,7 +74,6 @@ private slots:
     void on_actionClear_triggered();
     void on_actionQuit_triggered();
     void on_actionAbout_triggered();
-    void on_paper_currentIndexChanged(const QString &arg1);
     void on_preset_currentIndexChanged(const QString &arg1);
     void on_compat_currentIndexChanged(const QString &arg1);
     void on_dpi_valueChanged(int arg1);

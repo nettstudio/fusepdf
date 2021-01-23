@@ -78,12 +78,6 @@ void FusePDF::on_actionAbout_triggered()
                           ).arg(VERSION_APP));
 }
 
-void FusePDF::on_paper_currentIndexChanged(const QString &arg1)
-{
-    Q_UNUSED(arg1)
-    makeCommand();
-}
-
 void FusePDF::on_preset_currentIndexChanged(const QString &arg1)
 {
     Q_UNUSED(arg1)
@@ -144,11 +138,10 @@ void FusePDF::makeCommand()
     command = QString("\"%1\"").arg(findGhost());
 #endif
     command.append(" -sDEVICE=pdfwrite");
-    command.append(QString(" -dCompatibilityLevel=%1").arg(ui->compat->currentText()));
-    command.append(QString(" -dPDFSETTINGS=/%1").arg(ui->preset->currentText()));
-    if (!ui->paper->currentText().isEmpty() && ui->paper->currentText() != "default") {
-        command.append(QString(" -sPAPERSIZE=%1").arg(ui->paper->currentText()));
+    if (!ui->compat->currentText().isEmpty() && ui->compat->currentText() != "default") {
+        command.append(QString(" -dCompatibilityLevel=%1").arg(ui->compat->currentText()));
     }
+    command.append(QString(" -dPDFSETTINGS=/%1").arg(ui->preset->currentText()));
     command.append(" -dNOPAUSE -dBATCH -dDetectDuplicateImages -dCompressFonts=true");
     if (ui->dpiCheck->isChecked()) {
         command.append(QString(" -r%1").arg(ui->dpi->value()));
@@ -158,14 +151,11 @@ void FusePDF::makeCommand()
         command.append(QString(" \"%1\"").arg(ui->inputs->topLevelItem(i)->text(1)));
     }
     _cmd = command;
-
-    ui->cmd->setPlainText(_cmd);
     qDebug() << _cmd;
 }
 
 void FusePDF::runCommand()
 {
-    qDebug() << "runCommand";
     if (missingGhost()) { return; }
 
     if (ui->inputs->topLevelItemCount() == 0 || ui->fileName->text().isEmpty()) {
@@ -193,8 +183,6 @@ void FusePDF::runCommand()
 
 void FusePDF::commandStarted()
 {
-    qDebug() << "commandStarted";
-
     ui->save->setDisabled(true);
     ui->actionSave->setDisabled(true);
     ui->progressBar->setMaximum(0);
@@ -203,8 +191,6 @@ void FusePDF::commandStarted()
 
 void FusePDF::commandFinished(int exitCode)
 {
-    qDebug() << "commandfinished" << exitCode;
-
     ui->save->setDisabled(false);
     ui->actionSave->setDisabled(false);
     ui->progressBar->setMaximum(100);
@@ -224,36 +210,29 @@ void FusePDF::commandFinished(int exitCode)
 void FusePDF::populateUI()
 {
     ui->compat->clear();
-    ui->compat->addItem("1.0");
-    ui->compat->addItem("1.1");
-    ui->compat->addItem("1.2");
-    ui->compat->addItem("1.3");
-    ui->compat->addItem("1.4");
-    ui->compat->addItem("1.5");
-    ui->compat->addItem("1.6");
-    ui->compat->addItem("1.7");
-
-    ui->paper->clear();
-    ui->paper->addItem("default");
-    ui->paper->addItem("letter");
-    ui->paper->addItem("legal");
-    ui->paper->addItem("a1");
-    ui->paper->addItem("a2");
-    ui->paper->addItem("a3");
-    ui->paper->addItem("a4");
+    QIcon docIcon(":/icons/fusepdf-document.png");
+    ui->compat->addItem(docIcon, "default");
+    ui->compat->addItem(docIcon, "1.0");
+    ui->compat->addItem(docIcon, "1.1");
+    ui->compat->addItem(docIcon, "1.2");
+    ui->compat->addItem(docIcon, "1.3");
+    ui->compat->addItem(docIcon, "1.4");
+    ui->compat->addItem(docIcon, "1.5");
+    ui->compat->addItem(docIcon, "1.6");
+    ui->compat->addItem(docIcon, "1.7");
 
     ui->preset->clear();
-    ui->preset->addItem("default");
-    ui->preset->addItem("prepress");
-    ui->preset->addItem("ebook");
-    ui->preset->addItem("screen");
-    ui->preset->addItem("printer");
+    ui->preset->addItem(docIcon, "default");
+    ui->preset->addItem(docIcon, "prepress");
+    ui->preset->addItem(docIcon, "ebook");
+    ui->preset->addItem(docIcon, "screen");
+    ui->preset->addItem(docIcon, "printer");
 }
 
 void FusePDF::loadSettings()
 {
     if (isNewVersion()) { on_actionAbout_triggered(); }
-    if (!hasWindowState()) { setGeometry(100, 100, 700, 300); }
+    if (!hasWindowState()) { setGeometry(100, 100, 700, 250); }
 
     QSettings settings;
     settings.beginGroup("ui");
@@ -294,7 +273,7 @@ void FusePDF::handleProcOutput()
     QString log;
     log.append(_proc->readAllStandardError());
     log.append(_proc->readAllStandardOutput());
-    ui->cmd->appendPlainText(log);
+    ui->cmd->appendPlainText(log.simplified());
     qDebug() << log;
 }
 
@@ -326,7 +305,7 @@ const QString FusePDF::findGhost()
 
 void FusePDF::on_actionShow_log_triggered()
 {
-    ui->logBox->setVisible(ui->actionShow_log->isChecked());
+    ui->cmd->setVisible(ui->actionShow_log->isChecked());
 }
 
 void FusePDF::on_actionAbout_Qt_triggered()
@@ -396,9 +375,8 @@ void FusePDF::loadOptions()
 
     QSettings settings;
     settings.beginGroup("options");
-    ui->paper->setCurrentText(settings.value("paper", "default").toString());
     ui->dpi->setValue(settings.value("dpi", 150).toInt());
-    ui->compat->setCurrentText(settings.value("compat", "1.3").toString());
+    ui->compat->setCurrentText(settings.value("compat", "default").toString());
     ui->preset->setCurrentText(settings.value("preset", "default").toString());
     ui->actionShow_log->setChecked(settings.value("showLog", false).toBool());
     ui->actionAuto_Sort->setChecked(settings.value("autoSort", false).toBool());
@@ -407,7 +385,7 @@ void FusePDF::loadOptions()
     ui->dpiCheck->setChecked(settings.value("checkdpi", false).toBool());
     settings.endGroup();
 
-    ui->logBox->setVisible(ui->actionShow_log->isChecked());
+    ui->cmd->setVisible(ui->actionShow_log->isChecked());
     ui->inputs->setSortingEnabled(ui->actionAuto_Sort->isChecked());
 
     missingGhost();
@@ -417,9 +395,6 @@ void FusePDF::saveOptions()
 {
     QSettings settings;
     settings.beginGroup("options");
-    if (!ui->paper->currentText().isEmpty()) {
-        settings.setValue("paper", ui->paper->currentText());
-    }
     settings.setValue("dpi", ui->dpi->value());
     if (!ui->compat->currentText().isEmpty()) {
         settings.setValue("compat", ui->compat->currentText());
@@ -462,6 +437,7 @@ bool FusePDF::missingGhost()
 
 void FusePDF::handleProcessError(QProcess::ProcessError error)
 {
+    _proc->close();
     QString errorMsg;
     switch (error) {
     case QProcess::FailedToStart:
