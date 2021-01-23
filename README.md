@@ -1,6 +1,6 @@
 # FusePDF
 
-![screenshot](fusepdf-screenshot.png "FusePDF screenshot")
+![screenshot](icons/fusepdf-screenshot.png "FusePDF screenshot")
 
 ## Merge multiple PDF documents into one PDF document
 
