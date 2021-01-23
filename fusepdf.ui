@@ -18,7 +18,7 @@
   </property>
   <property name="windowIcon">
    <iconset resource="fusepdf.qrc">
-    <normaloff>:/fusepdf.png</normaloff>:/fusepdf.png</iconset>
+    <normaloff>:/icons/usepdf.png</normaloff>:/icons/fusepdf.png</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
    <property name="acceptDrops">
@@ -92,7 +92,7 @@
          </property>
          <property name="icon">
           <iconset resource="fusepdf.qrc">
-           <normaloff>:/fusepdf.png</normaloff>:/fusepdf.png</iconset>
+           <normaloff>:/icons/fusepdf.png</normaloff>:/icons/fusepdf.png</iconset>
          </property>
          <property name="iconSize">
           <size>
@@ -128,7 +128,7 @@
             </property>
             <property name="icon">
              <iconset resource="fusepdf.qrc">
-              <normaloff>:/fusepdf-open.png</normaloff>:/fusepdf-open.png</iconset>
+              <normaloff>:/icons/fusepdf-open.png</normaloff>:/icons/fusepdf-open.png</iconset>
             </property>
             <property name="iconSize">
              <size>
@@ -282,7 +282,7 @@
            </property>
            <property name="icon">
             <iconset resource="fusepdf.qrc">
-             <normaloff>:/fusepdf-clear.png</normaloff>:/fusepdf-clear.png</iconset>
+             <normaloff>:/icons/fusepdf-clear.png</normaloff>:/icons/fusepdf-clear.png</iconset>
            </property>
            <property name="iconSize">
             <size>
@@ -302,7 +302,7 @@
            </property>
            <property name="icon">
             <iconset resource="fusepdf.qrc">
-             <normaloff>:/fusepdf-save.png</normaloff>:/fusepdf-save.png</iconset>
+             <normaloff>:/icons/fusepdf-save.png</normaloff>:/icons/fusepdf-save.png</iconset>
            </property>
            <property name="iconSize">
             <size>
@@ -355,7 +355,7 @@
   <action name="actionOpen">
    <property name="icon">
     <iconset resource="fusepdf.qrc">
-     <normaloff>:/fusepdf-open.png</normaloff>:/fusepdf-open.png</iconset>
+     <normaloff>:/icons/fusepdf-open.png</normaloff>:/icons/fusepdf-open.png</iconset>
    </property>
    <property name="text">
     <string>Open</string>
@@ -367,7 +367,7 @@
   <action name="actionSave">
    <property name="icon">
     <iconset resource="fusepdf.qrc">
-     <normaloff>:/fusepdf-save.png</normaloff>:/fusepdf-save.png</iconset>
+     <normaloff>:/icons/fusepdf-save.png</normaloff>:/icons/fusepdf-save.png</iconset>
    </property>
    <property name="text">
     <string>Save</string>
@@ -379,7 +379,7 @@
   <action name="actionClear">
    <property name="icon">
     <iconset resource="fusepdf.qrc">
-     <normaloff>:/fusepdf-clear.png</normaloff>:/fusepdf-clear.png</iconset>
+     <normaloff>:/icons/fusepdf-clear.png</normaloff>:/icons/fusepdf-clear.png</iconset>
    </property>
    <property name="text">
     <string>Clear</string>
@@ -391,7 +391,7 @@
   <action name="actionQuit">
    <property name="icon">
     <iconset resource="fusepdf.qrc">
-     <normaloff>:/fusepdf-quit.png</normaloff>:/fusepdf-quit.png</iconset>
+     <normaloff>:/icons/fusepdf-quit.png</normaloff>:/icons/fusepdf-quit.png</iconset>
    </property>
    <property name="text">
     <string>Quit</string>

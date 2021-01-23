@@ -2,8 +2,7 @@ TARGET = FusePDF
 VERSION = 1.0.0
 TEMPLATE = app
 
-QT += core gui
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+QT += core gui widgets
 CONFIG += c++11
 
 DEFINES += QT_DEPRECATED_WARNINGS
@@ -14,7 +13,7 @@ QMAKE_TARGET_COMPANY = "NettStudio AS"
 QMAKE_TARGET_PRODUCT = "FusePDF"
 QMAKE_TARGET_DESCRIPTION = "Merge multiple PDF documents"
 QMAKE_TARGET_COPYRIGHT = "NettStudio AS"
-win32: RC_ICONS += fusepdf.ico
+win32: RC_ICONS += icons/fusepdf.ico
 
 SOURCES += main.cpp fusepdf.cpp
 HEADERS += fusepdf.h

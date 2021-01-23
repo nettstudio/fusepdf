@@ -1,0 +1,2 @@
+#!/bin/bash
+convert -background transparent fusepdf.png -define icon:auto-resize=16,32,48,64,128,192,256 fusepdf.ico
