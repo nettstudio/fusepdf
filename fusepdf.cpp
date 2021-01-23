@@ -352,7 +352,7 @@ void FusePDF::handleFoundPDF(const QList<QUrl> &urls)
         QTreeWidgetItem *item = new QTreeWidgetItem(ui->inputs);
         item->setText(0, info.fileName());
         item->setText(1, info.filePath());
-        item->setIcon(0, QIcon(":/fusepdf-notext.png"));
+        item->setIcon(0, QIcon(":/fusepdf-document.png"));
         item->setFlags(Qt::ItemIsSelectable|Qt::ItemIsDragEnabled|Qt::ItemIsEnabled|Qt::ItemNeverHasChildren);
 
         if (ui->fileName->text().isEmpty()) {

@@ -5,6 +5,6 @@
         <file>fusepdf-open.png</file>
         <file>fusepdf-quit.png</file>
         <file>fusepdf-save.png</file>
-        <file>fusepdf-notext.png</file>
+        <file>fusepdf-document.png</file>
     </qresource>
 </RCC>
