@@ -8,6 +8,13 @@ FusePDF::FusePDF(QWidget *parent)
 {
     ui->setupUi(this);
     qApp->setStyle(QStyleFactory::create("fusion"));
+    QPalette mainPalette = qApp->palette();
+    mainPalette.setColor(QPalette::Highlight, QColor(203,9,0)); // #cb0900
+    mainPalette.setColor(QPalette::Link, QColor(203,9,0));
+    qApp->setPalette(mainPalette);
+    QPalette treePalette = ui->inputs->palette();
+    treePalette.setColor(QPalette::Highlight, QColor(86,75,75)); // #564b4b
+    ui->inputs->setPalette(treePalette);
     setWindowIcon(QIcon(":/icons/fusepdf.png"));
 
     _proc = new QProcess(this);
