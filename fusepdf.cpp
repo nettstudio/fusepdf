@@ -150,6 +150,7 @@ void FusePDF::makeCommand()
     for (int i = 0; i < ui->inputs->topLevelItemCount(); ++i) {
         command.append(QString(" \"%1\"").arg(ui->inputs->topLevelItem(i)->text(1)));
     }
+    command.append(" -c \"[/Creator(FusePDF - fusepdf.nettstudio.no)/DOCINFO pdfmark\"");
     _cmd = command;
     qDebug() << _cmd;
 }
