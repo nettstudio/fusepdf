@@ -18,6 +18,8 @@ FusePDF::FusePDF(QWidget *parent)
             this, SLOT(commandStarted()));
     connect(_proc, SIGNAL(readyReadStandardOutput()),
             this, SLOT(handleProcOutput()));
+    connect(_proc, SIGNAL(errorOccurred(QProcess::ProcessError)),
+            this, SLOT(handleProcessError(QProcess::ProcessError)));
     connect(ui->inputs, SIGNAL(foundPDF(QList<QUrl>)),
             this, SLOT(handleFoundPDF(QList<QUrl>)));
 
@@ -453,4 +455,22 @@ bool FusePDF::missingGhost()
         return true;
     }
     return false;
+}
+
+void FusePDF::handleProcessError(QProcess::ProcessError error)
+{
+    QString errorMsg;
+    switch (error) {
+    case QProcess::FailedToStart:
+        errorMsg = tr("The process failed to start. Either the invoked program is missing, or you may have insufficient permissions to invoke the program (Ghostscript).");
+        break;
+    case QProcess::Crashed:
+        errorMsg = tr("The process crashed some time after starting successfully.");
+        break;
+    default:
+        errorMsg = tr("An unknown error occured. For example, the process may not be running, or it may have closed its input channel.");
+        break;
+    }
+    errorMsg.append(" See log (CTRL+L) for more information");
+    QMessageBox::warning(this, tr("Process failed"), errorMsg);
 }

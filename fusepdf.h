@@ -103,6 +103,7 @@ private slots:
     void saveOptions();
     bool isNewVersion();
     bool missingGhost();
+    void handleProcessError(QProcess::ProcessError error);
 
 private:
     Ui::FusePDF *ui;
