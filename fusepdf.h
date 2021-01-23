@@ -47,19 +47,12 @@ signals:
 protected:
     void dragEnterEvent(QDragEnterEvent *e)
     {
-        qDebug() << "dragEnterEvent" << e;
         e->acceptProposedAction();
     }
     void dropEvent(QDropEvent *e)
     {
-        qDebug() << "dropEvent" << e;
-        if (e->mimeData()->hasUrls()) {
-            qDebug() << "dropped urls" << e->mimeData()->urls();
-            emit foundPDF(e->mimeData()->urls());
-        } else {
-            qDebug() << "Let Qt handle dropEvent";
-            QTreeWidget::dropEvent(e);
-        }
+        if (e->mimeData()->hasUrls()) { emit foundPDF(e->mimeData()->urls()); }
+        else { QTreeWidget::dropEvent(e); }
     }
 };
 

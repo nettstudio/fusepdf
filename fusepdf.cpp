@@ -8,7 +8,10 @@ FusePDF::FusePDF(QWidget *parent)
 {
     ui->setupUi(this);
     qApp->setStyle(QStyleFactory::create("fusion"));
+    setWindowIcon(QIcon(":/fusepdf.png"));
+
     _proc = new QProcess(this);
+
     connect(_proc, SIGNAL(finished(int)),
             this, SLOT(commandFinished(int)));
     connect(_proc, SIGNAL(started()),
@@ -17,7 +20,7 @@ FusePDF::FusePDF(QWidget *parent)
             this, SLOT(handleProcOutput()));
     connect(ui->inputs, SIGNAL(foundPDF(QList<QUrl>)),
             this, SLOT(handleFoundPDF(QList<QUrl>)));
-    setWindowIcon(QIcon(":/fusepdf.png"));
+
     loadSettings();
 }
 
@@ -30,11 +33,10 @@ FusePDF::~FusePDF()
 
 void FusePDF::on_actionOpen_triggered()
 {
-    qDebug() << "on_actionOpen_triggered";
     QString dir = QDir::homePath();
     if (!_lastLoadDir.isEmpty()) { dir = _lastLoadDir; }
     QStringList files = QFileDialog::getOpenFileNames(this,
-                                                      tr("Open PDF's"),
+                                                      tr("Open document(s)"),
                                                       dir,
                                                       "*.pdf");
     if (files.size() > 0) {
@@ -48,25 +50,21 @@ void FusePDF::on_actionOpen_triggered()
 
 void FusePDF::on_actionSave_triggered()
 {
-    qDebug() << "on_actionSave_triggered";
     runCommand();
 }
 
 void FusePDF::on_actionClear_triggered()
 {
-    qDebug() << "on_actionClear_triggered";
     clearAll();
 }
 
 void FusePDF::on_actionQuit_triggered()
 {
-    qDebug() << "on_actionQuit_triggered";
     qApp->quit();
 }
 
 void FusePDF::on_actionAbout_triggered()
 {
-    qDebug() << "on_actionAbout_triggered";
     QMessageBox::about(this,
                        tr("FusePDF"),
                        tr("<h2>FusePDF %1</h2>"
@@ -80,71 +78,65 @@ void FusePDF::on_actionAbout_triggered()
 
 void FusePDF::on_paper_currentIndexChanged(const QString &arg1)
 {
-    qDebug() << "on_paper_currentIndexChanged" << arg1;
+    Q_UNUSED(arg1)
     makeCommand();
 }
 
 void FusePDF::on_preset_currentIndexChanged(const QString &arg1)
 {
-    qDebug() << "on_preset_currentIndexChanged" << arg1;
+    Q_UNUSED(arg1)
     makeCommand();
 }
 
 void FusePDF::on_compat_currentIndexChanged(const QString &arg1)
 {
-    qDebug() << "on_compat_currentIndexChanged" << arg1;
+    Q_UNUSED(arg1)
     makeCommand();
 }
 
 void FusePDF::on_dpi_valueChanged(int arg1)
 {
-    qDebug() << "on_dpi_valueChanged" << arg1;
+    Q_UNUSED(arg1)
     makeCommand();
 }
 
 void FusePDF::on_dpiCheck_stateChanged(int arg1)
 {
-    qDebug() << "on_dpiCheck_stateChanged" << arg1;
+    Q_UNUSED(arg1)
     makeCommand();
 }
 
 void FusePDF::on_fileButton_clicked()
 {
-    qDebug() << "on_fileButton_clicked";
     QString dir = QDir::homePath();
     if (!ui->fileName->text().isEmpty()) {
         QFileInfo info(ui->fileName->text());
         dir = info.absolutePath();
-    } else {
-        if (!_lastSaveDir.isEmpty()) { dir = _lastSaveDir; }
-    }
+    } else { if (!_lastSaveDir.isEmpty()) { dir = _lastSaveDir; } }
+
     QString file = QFileDialog::getSaveFileName(this, tr("Save PDF"), dir, "*.pdf");
-    if (file.isEmpty()) {
-        qDebug() << "no save file";
-        return;
-    }
+    if (file.isEmpty()) { return; }
     if (!file.endsWith(".pdf")) { file.append(".pdf"); }
+
     ui->fileName->setText(file);
     QFileInfo saveFile(file);
     _lastSaveDir = saveFile.absolutePath();
+
     makeCommand();
 }
 
 void FusePDF::on_clear_clicked()
 {
-    qDebug() << "on_clear_clicked";
     clearAll();
 }
 
 void FusePDF::on_save_clicked()
 {
-    qDebug() << "on_save_clicked";
     runCommand();
 }
 
 void FusePDF::makeCommand()
 {
-    qDebug() << "makeCommand";
     QString command = findGhost();
 #ifdef Q_OS_WIN
     command = QString("\"%1\"").arg(findGhost());
@@ -163,15 +155,17 @@ void FusePDF::makeCommand()
     for (int i = 0; i < ui->inputs->topLevelItemCount(); ++i) {
         command.append(QString(" \"%1\"").arg(ui->inputs->topLevelItem(i)->text(1)));
     }
-    qDebug() << command;
     _cmd = command;
+
     ui->cmd->setPlainText(_cmd);
+    qDebug() << _cmd;
 }
 
 void FusePDF::runCommand()
 {
     qDebug() << "runCommand";
     if (missingGhost()) { return; }
+
     if (ui->inputs->topLevelItemCount() == 0 || ui->fileName->text().isEmpty()) {
         QMessageBox::warning(this, tr("Unable to process"), tr("Input and/or output is missing."));
         return;
@@ -184,12 +178,13 @@ void FusePDF::runCommand()
         int ret = QMessageBox::question(this,
                                         tr("File exists"),
                                         tr("File already exists, are you sure you want to overwrite it?"));
-        if (ret == QMessageBox::No) { return; }
+        if (ret != QMessageBox::Yes) { return; }
     }
     if (_proc->isOpen()) {
-        QMessageBox::warning(this, tr("Still active"), tr("FusePDF is still active, please wait until done."));
+        QMessageBox::warning(this, tr("Still active"), tr("FusePDF process is still active, please wait until done."));
         return;
     }
+
     makeCommand();
     _proc->start(_cmd);
 }
@@ -197,6 +192,7 @@ void FusePDF::runCommand()
 void FusePDF::commandStarted()
 {
     qDebug() << "commandStarted";
+
     ui->save->setDisabled(true);
     ui->actionSave->setDisabled(true);
     ui->progressBar->setMaximum(0);
@@ -205,25 +201,26 @@ void FusePDF::commandStarted()
 
 void FusePDF::commandFinished(int exitCode)
 {
-    Q_UNUSED(exitCode)
     qDebug() << "commandfinished" << exitCode;
+
     ui->save->setDisabled(false);
     ui->actionSave->setDisabled(false);
     ui->progressBar->setMaximum(100);
     ui->progressBar->setValue(100);
     _proc->close();
+
     if (exitCode == 0) {
         QDesktopServices::openUrl(ui->fileName->text());
         return;
     }
+
     QMessageBox::warning(this,
                          tr("Failed to save PDF"),
-                         tr("Failed to save PDF, see log for more information"));
+                         tr("Failed to save PDF, see log (CTRL+L) for more information"));
 }
 
 void FusePDF::populateUI()
 {
-    qDebug() << "populateUI";
     ui->compat->clear();
     ui->compat->addItem("1.0");
     ui->compat->addItem("1.1");
@@ -254,25 +251,24 @@ void FusePDF::populateUI()
 void FusePDF::loadSettings()
 {
     if (isNewVersion()) { on_actionAbout_triggered(); }
-    qDebug() << "loadSettings";
     if (!hasWindowState()) { setGeometry(100, 100, 700, 300); }
+
     QSettings settings;
     settings.beginGroup("ui");
-    QByteArray lastGeo = settings.value("editor_geometry").toByteArray();
+    QByteArray lastGeo = settings.value("geometry").toByteArray();
     if (!lastGeo.isNull()) {
         restoreGeometry(lastGeo);
         QApplication::processEvents();
     }
-    QByteArray lastState = settings.value("editor_state").toByteArray();
+    QByteArray lastState = settings.value("state").toByteArray();
     if (!lastState.isNull()) {
         restoreState(lastState);
         QApplication::processEvents();
     }
-    bool wasMax = settings.value("editor_maximized", false).toBool();
-    if (wasMax) {
-        showMaximized();
-    }
+    bool wasMax = settings.value("maximized", false).toBool();
+    if (wasMax) { showMaximized(); }
     settings.endGroup();
+
     ui->progressBar->setMaximum(100);
     ui->progressBar->setValue(100);
     loadOptions();
@@ -280,38 +276,31 @@ void FusePDF::loadSettings()
 
 void FusePDF::saveSettings()
 {
-    qDebug() << "saveSettings";
     saveOptions();
+
     QSettings settings;
     settings.beginGroup("ui");
-    settings.setValue("editor_state", saveState());
-    settings.setValue("editor_geometry", saveGeometry());
-    settings.setValue("editor_maximized", isMaximized());
+    settings.setValue("state", saveState());
+    settings.setValue("geometry", saveGeometry());
+    settings.setValue("maximized", isMaximized());
     settings.endGroup();
     settings.sync();
 }
 
 void FusePDF::handleProcOutput()
 {
-    qDebug() << "handleProcOutput";
     QString log;
     log.append(_proc->readAllStandardError());
     log.append(_proc->readAllStandardOutput());
-    qDebug() << log;
     ui->cmd->appendPlainText(log);
+    qDebug() << log;
 }
 
 void FusePDF::clearAll()
 {
-    qDebug() << "clearAll";
     ui->inputs->clear();
-    ui->compat->clear();
     ui->cmd->clear();
-    ui->dpiCheck->setChecked(false);
-    ui->dpi->setValue(150);
     ui->fileName->clear();
-    ui->paper->clear();
-    ui->preset->clear();
     _cmd.clear();
     loadOptions();
 }
@@ -335,7 +324,6 @@ const QString FusePDF::findGhost()
 
 void FusePDF::on_actionShow_log_triggered()
 {
-    qDebug() << "on_actionShow_log_triggered";
     ui->logBox->setVisible(ui->actionShow_log->isChecked());
 }
 
@@ -351,7 +339,6 @@ bool FusePDF::hasWindowState()
 
 void FusePDF::handleFoundPDF(const QList<QUrl> &urls)
 {
-    qDebug() << "found pdf" << urls;
     for (int i=0;i< urls.size();++i) {
         const QFileInfo info(urls.at(i).toLocalFile());
         if (!info.isFile()) { continue; }
@@ -363,6 +350,7 @@ void FusePDF::handleFoundPDF(const QList<QUrl> &urls)
         item->setText(1, info.filePath());
         item->setIcon(0, QIcon(":/fusepdf-notext.png"));
         item->setFlags(Qt::ItemIsSelectable|Qt::ItemIsDragEnabled|Qt::ItemIsEnabled|Qt::ItemNeverHasChildren);
+
         if (ui->fileName->text().isEmpty()) {
             QString outputFile = info.absolutePath() + "/FusePDF-output.pdf";
             QFileInfo outputInfo(outputFile);
@@ -378,7 +366,6 @@ void FusePDF::handleFoundPDF(const QList<QUrl> &urls)
 void FusePDF::on_inputs_itemDoubleClicked(QTreeWidgetItem *item, int column)
 {
     Q_UNUSED(column)
-    qDebug() << "on_inputs_itemDoubleClicked";
     if (!item) { return; }
     QDesktopServices::openUrl(QUrl::fromUserInput(item->text(1)));
 }
@@ -390,9 +377,9 @@ void FusePDF::on_actionAuto_Sort_triggered()
 
 bool FusePDF::hasFile(const QString &file)
 {
-    qDebug() << "has file?" << file;
     if (!file.isEmpty()) { return false; }
     for (int i = 0; i < ui->inputs->topLevelItemCount(); ++i) {
+        // TODO: use FileInfo!
         if (ui->inputs->topLevelItem(i)->text(1) == file) { return  true; }
     }
     return false;
@@ -400,7 +387,6 @@ bool FusePDF::hasFile(const QString &file)
 
 void FusePDF::loadOptions()
 {
-    qDebug() << "loadOptions";
     populateUI();
 
     QSettings settings;
@@ -424,7 +410,6 @@ void FusePDF::loadOptions()
 
 void FusePDF::saveOptions()
 {
-    qDebug() << "saveOptions";
     QSettings settings;
     settings.beginGroup("options");
     if (!ui->paper->currentText().isEmpty()) {
@@ -464,7 +449,7 @@ bool FusePDF::missingGhost()
     if (findGhost().isEmpty()) {
         QMessageBox::warning(this,
                              tr("Missing Ghostscript"),
-                             tr("Unable to find Ghostscript, please download the latest (x86_64) installer from <a href='https://www.ghostscript.com/download/gsdnld.html'>www.ghostscript.com</a> and install it before running FusePDF again."));
+                             tr("Unable to find Ghostscript, please download the latest installer from <a href='https://www.ghostscript.com/download/gsdnld.html'>www.ghostscript.com</a> and install it before running FusePDF again."));
         return true;
     }
     return false;
