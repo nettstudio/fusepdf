@@ -344,9 +344,11 @@ void FusePDF::handleFoundPDF(const QList<QUrl> &urls)
     for (int i=0;i< urls.size();++i) {
         const QFileInfo info(urls.at(i).toLocalFile());
         if (!info.isFile()) { continue; }
+
         QMimeDatabase db;
         QMimeType type = db.mimeTypeForFile(info.absoluteFilePath());
         if (type.name() != "application/pdf") { continue; }
+
         QTreeWidgetItem *item = new QTreeWidgetItem(ui->inputs);
         item->setText(0, info.fileName());
         item->setText(1, info.filePath());
@@ -379,10 +381,11 @@ void FusePDF::on_actionAuto_Sort_triggered()
 
 bool FusePDF::hasFile(const QString &file)
 {
-    if (!file.isEmpty()) { return false; }
+    if (file.isEmpty()) { return false; }
+    QFileInfo fileInfo(file);
     for (int i = 0; i < ui->inputs->topLevelItemCount(); ++i) {
-        // TODO: use FileInfo!
-        if (ui->inputs->topLevelItem(i)->text(1) == file) { return  true; }
+        QFileInfo inputInfo(ui->inputs->topLevelItem(i)->text(1));
+        if (inputInfo.absoluteFilePath() == fileInfo.absoluteFilePath()) { return  true; }
     }
     return false;
 }
