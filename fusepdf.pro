@@ -19,5 +19,6 @@ SOURCES += main.cpp fusepdf.cpp
 HEADERS += fusepdf.h
 FORMS += fusepdf.ui
 RESOURCES += fusepdf.qrc
+OTHER_FILES += fusepdf.sh icons/mkico.sh README.md
 
 CONFIG(release, debug|release): DEFINES += QT_NO_DEBUG_OUTPUT QT_NO_WARNING_OUTPUT

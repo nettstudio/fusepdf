@@ -1,15 +1,15 @@
 #!/bin/bash
-# convert -background transparent fusepdf.png -define icon:auto-resize=16,32,48,64,128,192,256 fusepdf.ico
 
 CWD=`pwd`
 BUILD_DIR=${BUILD_DIR:-"${CWD}/tmp"}
 MXE=${MXE:-"${CWD}/mxe"}
 MXE_TC=${MXE_TC:-x86_64-w64-mingw32.static}
+BIT=${BIT:-64}
 STRIP=${MXE_TC}-strip
 TIMESTAMP=${TIMESTAMP:-`date +%Y%m%d%H%M`}
 VERSION=`cat $CWD/fusepdf.pro | sed '/VERSION =/!d' | awk '{print $3}'`
 COMMIT=`git rev-parse --short HEAD`
-ZIP="FusePDF-$VERSION-$TIMESTAMP-$COMMIT-Windows-x64"
+ZIP="FusePDF-$VERSION-$TIMESTAMP-$COMMIT-Windows-x$BIT"
 
 if [ ! -d "${MXE}" ]; then
     echo "Please setup MXE!"

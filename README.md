@@ -2,6 +2,6 @@
 
 ![screenshot](icons/fusepdf-screenshot.png "FusePDF screenshot")
 
-## Merge multiple PDF documents into one PDF document
+## Easily merge multiple PDF documents using Ghostscript
 
 Copyright (c)2021 NettStudio AS. All rights reserved.
