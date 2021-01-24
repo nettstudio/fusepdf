@@ -25,7 +25,13 @@ FusePDF::FusePDF(QWidget *parent)
                                    "- PRINTER: selects output similar to the Acrobat Distiller \"Print Optimized\" (up to version X) setting."));
     ui->compatLabel->setToolTip(tr("Select the PDF version this document should be compatible with."));
     ui->dpiCheck->setToolTip(tr("Override resolution for pattern fills, for fonts that must be converted to bitmaps\n and any other rendering required (eg rendering transparent pages for output to PDF versions < 1.4). "));
-    ui->inputs->setToolTip(tr("Drag and drop PDF documents you want to merge here. You can re-arrange after adding documents,\n note that the first document will define the paper size on the final output."));
+    ui->inputs->setToolTip(tr("Drag and drop PDF documents you want to merge here. You can re-arrange after adding them.\n\n"
+                              "Note that the first document will define the paper size on the final output.\n\n"
+                              "You can remove a document with the DEL key."));
+
+    QShortcut *deleteShortcut = new QShortcut(QKeySequence(Qt::Key_Delete), ui->inputs);
+    connect(deleteShortcut, SIGNAL(activated()),
+            this, SLOT(deleteDocumentItem()));
 
     _proc = new QProcess(this);
 
@@ -470,4 +476,10 @@ void FusePDF::handleProcessError(QProcess::ProcessError error)
     }
     errorMsg.append(" See log (CTRL+L) for more information");
     QMessageBox::warning(this, tr("Process failed"), errorMsg);
+}
+
+void FusePDF::deleteDocumentItem()
+{
+    if (ui->inputs->topLevelItemCount() == 0 || ui->inputs->currentItem() == nullptr) { return; }
+    delete ui->inputs->currentItem();
 }

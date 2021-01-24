@@ -24,6 +24,7 @@
 #include <QDropEvent>
 #include <QStyleFactory>
 #include <QSettings>
+#include <QShortcut>
 
 class FilesTreeWidget : public QTreeWidget
 {
@@ -103,6 +104,7 @@ private slots:
     bool isNewVersion();
     bool missingGhost();
     void handleProcessError(QProcess::ProcessError error);
+    void deleteDocumentItem();
 
 private:
     Ui::FusePDF *ui;
