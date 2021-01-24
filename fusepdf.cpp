@@ -7,15 +7,17 @@ FusePDF::FusePDF(QWidget *parent)
     , _proc(nullptr)
 {
     ui->setupUi(this);
+    setWindowIcon(QIcon(":/icons/fusepdf.png"));
     qApp->setStyle(QStyleFactory::create("fusion"));
+
     QPalette mainPalette = qApp->palette();
     mainPalette.setColor(QPalette::Highlight, QColor(203,9,0)); // #cb0900
     mainPalette.setColor(QPalette::Link, QColor(203,9,0));
+
     qApp->setPalette(mainPalette);
     QPalette treePalette = ui->inputs->palette();
     treePalette.setColor(QPalette::Highlight, QColor(86,75,75)); // #564b4b
     ui->inputs->setPalette(treePalette);
-    setWindowIcon(QIcon(":/icons/fusepdf.png"));
 
     ui->presetLabel->setToolTip(tr("Distiller presets\n\n"
                                    "- DEFAULT: selects output intended to be useful across a wide variety of uses, possibly at the expense of a larger output file.\n"
@@ -25,7 +27,7 @@ FusePDF::FusePDF(QWidget *parent)
                                    "- PRINTER: selects output similar to the Acrobat Distiller \"Print Optimized\" (up to version X) setting."));
     ui->compatLabel->setToolTip(tr("Select the PDF version this document should be compatible with."));
     ui->dpiCheck->setToolTip(tr("Override resolution for pattern fills, for fonts that must be converted to bitmaps\n and any other rendering required (eg rendering transparent pages for output to PDF versions < 1.4). "));
-    ui->inputs->setToolTip(tr("Drag and drop PDF documents you want to merge here. You can re-arrange after adding them.\n\n"
+    ui->inputs->setToolTip(tr("Drag and drop PDF documents you want to merge here. You can re-arrange after adding them (if sorting is disabled).\n\n"
                               "Note that the first document will define the paper size on the final output.\n\n"
                               "You can remove a document with the DEL key."));
 
@@ -222,7 +224,9 @@ void FusePDF::commandFinished(int exitCode)
     _proc->close();
 
     if (exitCode == 0) {
-        QDesktopServices::openUrl(ui->fileName->text());
+        if (ui->actionOpen_saved_PDF->isChecked()) {
+            QDesktopServices::openUrl(ui->fileName->text());
+        }
         return;
     }
 
@@ -407,6 +411,7 @@ void FusePDF::loadOptions()
     _lastLoadDir = settings.value("lastLoadDir", "").toString();
     _lastSaveDir = settings.value("lastSaveDir", "").toString();
     ui->dpiCheck->setChecked(settings.value("checkdpi", false).toBool());
+    ui->actionOpen_saved_PDF->setChecked(settings.value("openSavedPDF", true).toBool());
     settings.endGroup();
 
     ui->cmd->setVisible(ui->actionShow_log->isChecked());
@@ -429,6 +434,7 @@ void FusePDF::saveOptions()
     settings.setValue("showLog", ui->actionShow_log->isChecked());
     settings.setValue("autoSort", ui->actionAuto_Sort->isChecked());
     settings.setValue("checkdpi", ui->dpiCheck->isChecked());
+    settings.setValue("openSavedPDF", ui->actionOpen_saved_PDF->isChecked());
     if (!_lastLoadDir.isEmpty()) {
         settings.setValue("lastLoadDir", _lastLoadDir);
     }
@@ -483,3 +489,4 @@ void FusePDF::deleteDocumentItem()
     if (ui->inputs->topLevelItemCount() == 0 || ui->inputs->currentItem() == nullptr) { return; }
     delete ui->inputs->currentItem();
 }
+
