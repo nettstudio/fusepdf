@@ -2,11 +2,11 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "FusePDF"
-#define MyAppVersion "1.0.0-RC3"
+#define MyAppVersion "1.0.0"
 #define MyAppPublisher "NettStudio AS"
 #define MyAppURL "https://fusepdf.nettstudio.no"
 #define MyAppExeName "FusePDF.exe"
-#define MyAppDir "C:\Users\olear\Desktop\FusePDF\FusePDF-1.0.0-RC3"
+#define MyAppDir "C:\Users\olear\Desktop\FusePDF\FusePDF-1.0.0"
 #define MyAppSrc "C:\Users\olear\Documents\fusepdf"
 
 [Setup]
