@@ -1,3 +1,12 @@
+/*
+#
+# FusePDF - https://nettstudio.no
+#
+# Copyright (c) 2021 NettStudio AS. All rights reserved.
+#
+#
+*/
+
 #include "fusepdf.h"
 #include <QApplication>
 

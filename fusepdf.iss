@@ -2,34 +2,30 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "FusePDF"
-#define MyAppVersion "1.0.0"
+#define MyAppVersion "__VERSION__"
 #define MyAppPublisher "NettStudio AS"
-#define MyAppURL "https://fusepdf.nettstudio.no"
+#define MyAppURL "https://nettstudio.no"
 #define MyAppExeName "FusePDF.exe"
-#define MyAppDir "C:\Users\olear\Desktop\FusePDF\FusePDF-1.0.0"
-#define MyAppSrc "C:\Users\olear\Documents\fusepdf"
+#define MyAppDir "tmp\FusePDF-__VERSION__"
 
 [Setup]
-; NOTE: The value of AppId uniquely identifies this application. Do not use the same AppId value in installers for other applications.
-; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
 AppId={{1A5D92A1-F100-48BD-A5CF-558E8D843CA9}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
-;AppVerName={#MyAppName} {#MyAppVersion}
 AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
-DefaultDirName={commonpf64}\{#MyAppName}
+DefaultDirName={__PF__}\{#MyAppName}
 DisableDirPage=yes
 DisableProgramGroupPage=yes
-LicenseFile={#MyAppDir}\LICENSE.TXT
-InfoAfterFile={#MyAppDir}\opensource\README.TXT
+LicenseFile=LICENSE.TXT
+InfoAfterFile=legal\README.TXT
 ; Uncomment the following line to run in non administrative install mode (install for current user only.)
 ;PrivilegesRequired=lowest
-OutputDir={#MyAppDir}
-OutputBaseFilename={#MyAppName}-{#MyAppVersion}-setup
-SetupIconFile={#MyAppSrc}\icons\fusepdf.ico
+OutputDir=tmp
+OutputBaseFilename={#MyAppName}-{#MyAppVersion}-x__BIT__-setup
+SetupIconFile=icons\fusepdf.ico
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
@@ -48,7 +44,6 @@ Source: "{#MyAppDir}\Qt5GuiNettStudio.dll"; DestDir: "{app}"; Flags: ignoreversi
 Source: "{#MyAppDir}\Qt5WidgetsNettStudio.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#MyAppDir}\platforms\*"; DestDir: "{app}\platforms"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "{#MyAppDir}\opensource\*"; DestDir: "{app}\opensource"; Flags: ignoreversion recursesubdirs createallsubdirs
-; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
 Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"

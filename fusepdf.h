@@ -1,3 +1,12 @@
+/*
+#
+# FusePDF - https://nettstudio.no
+#
+# Copyright (c) 2021 NettStudio AS. All rights reserved.
+#
+#
+*/
+
 #ifndef FUSEPDF_H
 #define FUSEPDF_H
 
@@ -29,6 +38,7 @@
 class FilesTreeWidget : public QTreeWidget
 {
     Q_OBJECT
+
 public:
     FilesTreeWidget(QWidget *parent= nullptr):
         QTreeWidget(parent)

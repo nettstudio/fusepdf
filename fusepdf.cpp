@@ -1,3 +1,12 @@
+/*
+#
+# FusePDF - https://nettstudio.no
+#
+# Copyright (c) 2021 NettStudio AS. All rights reserved.
+#
+#
+*/
+
 #include "fusepdf.h"
 #include "ui_fusepdf.h"
 
@@ -13,8 +22,8 @@ FusePDF::FusePDF(QWidget *parent)
     QPalette mainPalette = qApp->palette();
     mainPalette.setColor(QPalette::Highlight, QColor(203,9,0)); // #cb0900
     mainPalette.setColor(QPalette::Link, QColor(203,9,0));
-
     qApp->setPalette(mainPalette);
+
     QPalette treePalette = ui->inputs->palette();
     treePalette.setColor(QPalette::Highlight, QColor(86,75,75)); // #564b4b
     ui->inputs->setPalette(treePalette);
@@ -175,7 +184,7 @@ void FusePDF::makeCommand()
     for (int i = 0; i < ui->inputs->topLevelItemCount(); ++i) {
         command.append(QString(" \"%1\"").arg(ui->inputs->topLevelItem(i)->text(1)));
     }
-    command.append(" -c \"[/Creator(FusePDF - fusepdf.nettstudio.no)/DOCINFO pdfmark\"");
+    command.append(" -c \"[/Creator(FusePDF - nettstudio.no)/DOCINFO pdfmark\"");
     _cmd = command;
     qDebug() << _cmd;
 }
@@ -185,11 +194,15 @@ void FusePDF::runCommand()
     if (missingGhost()) { return; }
 
     if (ui->inputs->topLevelItemCount() == 0 || ui->fileName->text().isEmpty()) {
-        QMessageBox::warning(this, tr("Unable to process"), tr("Input and/or output is missing."));
+        QMessageBox::warning(this,
+                             tr("Unable to process"),
+                             tr("Input and/or output is missing."));
         return;
     }
     if (hasFile(ui->fileName->text())) {
-        QMessageBox::warning(this, tr("Unable to save file"), tr("Unable to save to file, the output file is found in input."));
+        QMessageBox::warning(this,
+                             tr("Unable to save file"),
+                             tr("Unable to save to file, the output file is found in input."));
         return;
     }
     if (QFile::exists(ui->fileName->text())) {
@@ -199,7 +212,9 @@ void FusePDF::runCommand()
         if (ret != QMessageBox::Yes) { return; }
     }
     if (_proc->isOpen()) {
-        QMessageBox::warning(this, tr("Still active"), tr("FusePDF process is still active, please wait until done."));
+        QMessageBox::warning(this,
+                             tr("Still active"),
+                             tr("FusePDF process is still active, please wait until done."));
         return;
     }
 
@@ -378,7 +393,9 @@ void FusePDF::on_inputs_itemDoubleClicked(QTreeWidgetItem *item, int column)
 {
     Q_UNUSED(column)
     if (!item) { return; }
-    QDesktopServices::openUrl(QUrl::fromUserInput(item->text(1)));
+    QString file = item->text(1);
+    if (!QFile::exists(file)) { return; }
+    QDesktopServices::openUrl(QUrl::fromUserInput(file));
 }
 
 void FusePDF::on_actionAuto_Sort_triggered()
