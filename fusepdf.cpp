@@ -25,17 +25,26 @@ FusePDF::FusePDF(QWidget *parent)
     qApp->setPalette(mainPalette);
 
     QPalette treePalette = ui->inputs->palette();
-    treePalette.setColor(QPalette::Highlight, QColor(86,75,75)); // #564b4b
+    treePalette.setColor(QPalette::Highlight, QColor(124,124,124)); // #7c7c7c
     ui->inputs->setPalette(treePalette);
 
+    ui->metaTitleLabel->setToolTip(tr("Set document title"));
+    ui->metaTitle->setToolTip(ui->metaTitleLabel->toolTip());
+    ui->metaAuthorLabel->setToolTip(tr("Set document author"));
+    ui->metaAuthor->setToolTip(ui->metaAuthorLabel->toolTip());
+    ui->metaSubjectLabel->setToolTip(tr("Set document subject"));
+    ui->metaSubject->setToolTip(ui->metaSubjectLabel->toolTip());
     ui->presetLabel->setToolTip(tr("Distiller presets\n\n"
                                    "- DEFAULT: selects output intended to be useful across a wide variety of uses, possibly at the expense of a larger output file.\n"
                                    "- PREPRESS: selects output similar to Acrobat Distiller \"Prepress Optimized\" (up to version X) setting.\n"
                                    "- EBOOK: selects medium-resolution output similar to the Acrobat Distiller (up to version X) \"eBook\" setting.\n"
                                    "- SCREEN: selects low-resolution output similar to the Acrobat Distiller (up to version X) \"Screen Optimized\" setting.\n"
                                    "- PRINTER: selects output similar to the Acrobat Distiller \"Print Optimized\" (up to version X) setting."));
+    ui->preset->setToolTip(ui->presetLabel->toolTip());
     ui->compatLabel->setToolTip(tr("Select the PDF version this document should be compatible with."));
+    ui->compat->setToolTip(ui->compatLabel->toolTip());
     ui->dpiCheck->setToolTip(tr("Override resolution for pattern fills, for fonts that must be converted to bitmaps\n and any other rendering required (eg rendering transparent pages for output to PDF versions < 1.4). "));
+    ui->dpi->setToolTip(ui->dpiCheck->toolTip());
     ui->inputs->setToolTip(tr("Drag and drop PDF documents you want to merge here. You can re-arrange after adding them (if sorting is disabled).\n\n"
                               "Note that the first document will define the paper size on the final output.\n\n"
                               "You can remove a document with the DEL key."));
@@ -184,7 +193,19 @@ void FusePDF::makeCommand()
     for (int i = 0; i < ui->inputs->topLevelItemCount(); ++i) {
         command.append(QString(" \"%1\"").arg(ui->inputs->topLevelItem(i)->text(1)));
     }
-    command.append(" -c \"[/Creator(FusePDF - nettstudio.no)/DOCINFO pdfmark\"");
+
+    QString title = ui->metaTitle->text();
+    QString subject = ui->metaSubject->text();
+    QString author = ui->metaAuthor->text();
+
+    QString marks;
+    marks.append("/Creator(FusePDF - nettstudio.no)");
+    if (!title.isEmpty()) { marks.append(QString("/Title(%1)").arg(title)); }
+    if (!subject.isEmpty()) { marks.append(QString("/Subject(%1)").arg(subject)); }
+    if (!author.isEmpty()) { marks.append(QString("/Author(%1)").arg(author)); }
+
+    command.append(QString(" -c \"[%1/DOCINFO pdfmark\"").arg(marks));
+
     _cmd = command;
     qDebug() << _cmd;
 }
@@ -325,6 +346,9 @@ void FusePDF::clearAll()
     ui->inputs->clear();
     ui->cmd->clear();
     ui->fileName->clear();
+    ui->metaTitle->clear();
+    ui->metaAuthor->clear();
+    ui->metaSubject->clear();
     _cmd.clear();
     loadOptions();
 }
@@ -378,7 +402,7 @@ void FusePDF::handleFoundPDF(const QList<QUrl> &urls)
         item->setFlags(Qt::ItemIsSelectable|Qt::ItemIsDragEnabled|Qt::ItemIsEnabled|Qt::ItemNeverHasChildren);
 
         if (ui->fileName->text().isEmpty()) {
-            QString outputFile = info.absolutePath() + "/FusePDF-output.pdf";
+            QString outputFile = info.absolutePath() + "/document.pdf";
             QFileInfo outputInfo(outputFile);
             if (!QFile::exists(outputInfo.absoluteFilePath())) {
                 ui->fileName->setText(outputInfo.absoluteFilePath());
@@ -425,14 +449,28 @@ void FusePDF::loadOptions()
     ui->preset->setCurrentText(settings.value("preset", "default").toString());
     ui->actionShow_log->setChecked(settings.value("showLog", false).toBool());
     ui->actionAuto_Sort->setChecked(settings.value("autoSort", false).toBool());
+    ui->actionRemember_meta_author->setChecked(settings.value("metaAuthor", true).toBool());
+    ui->actionRemember_meta_subject->setChecked(settings.value("metaSubject", true).toBool());
+    ui->actionRemember_meta_title->setChecked(settings.value("metaTitle", true).toBool());
     _lastLoadDir = settings.value("lastLoadDir", "").toString();
     _lastSaveDir = settings.value("lastSaveDir", "").toString();
     ui->dpiCheck->setChecked(settings.value("checkdpi", false).toBool());
     ui->actionOpen_saved_PDF->setChecked(settings.value("openSavedPDF", true).toBool());
-    settings.endGroup();
-
     ui->cmd->setVisible(ui->actionShow_log->isChecked());
     ui->inputs->setSortingEnabled(ui->actionAuto_Sort->isChecked());
+    if (ui->actionRemember_meta_author->isChecked()) {
+        QString author = settings.value("metaAuthorText").toString();
+        if (!author.isEmpty()) { ui->metaAuthor->setText(author); }
+    }
+    if (ui->actionRemember_meta_subject->isChecked()) {
+        QString subject = settings.value("metaSubjectText").toString();
+        if (!subject.isEmpty()) { ui->metaSubject->setText(subject); }
+    }
+    if (ui->actionRemember_meta_title->isChecked()) {
+        QString title = settings.value("metaTitleText").toString();
+        if (!title.isEmpty()) { ui->metaTitle->setText(title); }
+    }
+    settings.endGroup();
 
     missingGhost();
 }
@@ -452,6 +490,18 @@ void FusePDF::saveOptions()
     settings.setValue("autoSort", ui->actionAuto_Sort->isChecked());
     settings.setValue("checkdpi", ui->dpiCheck->isChecked());
     settings.setValue("openSavedPDF", ui->actionOpen_saved_PDF->isChecked());
+    settings.setValue("metaAuthor", ui->actionRemember_meta_author->isChecked());
+    settings.setValue("metaSubject", ui->actionRemember_meta_subject->isChecked());
+    settings.setValue("metaTitle", ui->actionRemember_meta_title->isChecked());
+    if (ui->actionRemember_meta_author->isChecked()) {
+        settings.setValue("metaAuthorText", ui->metaAuthor->text());
+    }
+    if (ui->actionRemember_meta_subject->isChecked()) {
+        settings.setValue("metaSubjectText", ui->metaSubject->text());
+    }
+    if (ui->actionRemember_meta_title->isChecked()) {
+        settings.setValue("metaTitleText", ui->metaTitle->text());
+    }
     if (!_lastLoadDir.isEmpty()) {
         settings.setValue("lastLoadDir", _lastLoadDir);
     }
@@ -507,3 +557,21 @@ void FusePDF::deleteDocumentItem()
     delete ui->inputs->currentItem();
 }
 
+
+void FusePDF::on_metaTitle_textChanged(const QString &arg1)
+{
+    Q_UNUSED(arg1)
+    makeCommand();
+}
+
+void FusePDF::on_metaSubject_textChanged(const QString &arg1)
+{
+    Q_UNUSED(arg1)
+    makeCommand();
+}
+
+void FusePDF::on_metaAuthor_textChanged(const QString &arg1)
+{
+    Q_UNUSED(arg1)
+    makeCommand();
+}

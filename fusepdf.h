@@ -115,6 +115,9 @@ private slots:
     bool missingGhost();
     void handleProcessError(QProcess::ProcessError error);
     void deleteDocumentItem();
+    void on_metaTitle_textChanged(const QString &arg1);
+    void on_metaSubject_textChanged(const QString &arg1);
+    void on_metaAuthor_textChanged(const QString &arg1);
 
 private:
     Ui::FusePDF *ui;

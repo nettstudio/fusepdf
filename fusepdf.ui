@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>556</width>
-    <height>556</height>
+    <width>565</width>
+    <height>507</height>
    </rect>
   </property>
   <property name="acceptDrops">
@@ -24,7 +24,7 @@
    <property name="acceptDrops">
     <bool>true</bool>
    </property>
-   <layout class="QHBoxLayout" name="horizontalLayout">
+   <layout class="QHBoxLayout" name="horizontalLayout_7">
     <item>
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <property name="spacing">
@@ -57,7 +57,7 @@
          </size>
         </property>
         <attribute name="headerVisible">
-         <bool>false</bool>
+         <bool>true</bool>
         </attribute>
         <attribute name="headerShowSortIndicator" stdset="0">
          <bool>true</bool>
@@ -90,6 +90,43 @@
          <bool>true</bool>
         </property>
        </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_9">
+        <item>
+         <widget class="QLineEdit" name="fileName">
+          <property name="toolTip">
+           <string>Select output PDF document</string>
+          </property>
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+          <property name="placeholderText">
+           <string>Select output PDF document</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="fileButton">
+          <property name="toolTip">
+           <string>Select output file</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset resource="fusepdf.qrc">
+            <normaloff>:/icons/fusepdf-open.png</normaloff>:/icons/fusepdf-open.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>24</width>
+            <height>24</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
      </layout>
     </item>
@@ -135,40 +172,82 @@
         </widget>
        </item>
        <item>
-        <widget class="QGroupBox" name="groupBox_5">
-         <property name="toolTip">
-          <string>Select output PDF document</string>
-         </property>
+        <widget class="QGroupBox" name="meta">
          <property name="title">
-          <string>Output</string>
+          <string>Meta</string>
          </property>
-         <layout class="QHBoxLayout" name="horizontalLayout_7">
+         <layout class="QVBoxLayout" name="verticalLayout_3">
           <item>
-           <widget class="QLineEdit" name="fileName">
-            <property name="readOnly">
-             <bool>true</bool>
-            </property>
-           </widget>
+           <layout class="QHBoxLayout" name="horizontalLayout">
+            <item>
+             <widget class="QLabel" name="metaTitleLabel">
+              <property name="text">
+               <string>Title</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="metaTitle">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="placeholderText">
+               <string>Optional</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </item>
           <item>
-           <widget class="QPushButton" name="fileButton">
-            <property name="toolTip">
-             <string>Select output file</string>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="icon">
-             <iconset resource="fusepdf.qrc">
-              <normaloff>:/icons/fusepdf-open.png</normaloff>:/icons/fusepdf-open.png</iconset>
-            </property>
-            <property name="iconSize">
-             <size>
-              <width>24</width>
-              <height>24</height>
-             </size>
-            </property>
-           </widget>
+           <layout class="QHBoxLayout" name="horizontalLayout_4">
+            <item>
+             <widget class="QLabel" name="metaSubjectLabel">
+              <property name="text">
+               <string>Subject</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="metaSubject">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="placeholderText">
+               <string>Optional</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_8">
+            <item>
+             <widget class="QLabel" name="metaAuthorLabel">
+              <property name="text">
+               <string>Author</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="metaAuthor">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="placeholderText">
+               <string>Optional</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </item>
          </layout>
         </widget>
@@ -317,7 +396,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>556</width>
+     <width>565</width>
      <height>22</height>
     </rect>
    </property>
@@ -343,6 +422,10 @@
     <addaction name="actionAuto_Sort"/>
     <addaction name="separator"/>
     <addaction name="actionOpen_saved_PDF"/>
+    <addaction name="separator"/>
+    <addaction name="actionRemember_meta_author"/>
+    <addaction name="actionRemember_meta_subject"/>
+    <addaction name="actionRemember_meta_title"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuHelp"/>
@@ -442,7 +525,7 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Enable Sorting</string>
+    <string>Enable sorting</string>
    </property>
    <property name="toolTip">
     <string>Enable Sorting of items. Note that this will disable manual order.</string>
@@ -455,11 +538,54 @@
    <property name="checkable">
     <bool>true</bool>
    </property>
+   <property name="icon">
+    <iconset resource="fusepdf.qrc">
+     <normaloff>:/icons/fusepdf-open.png</normaloff>:/icons/fusepdf-open.png</iconset>
+   </property>
    <property name="text">
     <string>Open saved PDF</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+P</string>
+   </property>
+  </action>
+  <action name="actionRemember_meta_author">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="fusepdf.qrc">
+     <normaloff>:/icons/fusepdf-document.png</normaloff>:/icons/fusepdf-document.png</iconset>
+   </property>
+   <property name="text">
+    <string>Remember meta author</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+M</string>
+   </property>
+  </action>
+  <action name="actionRemember_meta_subject">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="fusepdf.qrc">
+     <normaloff>:/icons/fusepdf-document.png</normaloff>:/icons/fusepdf-document.png</iconset>
+   </property>
+   <property name="text">
+    <string>Remember meta subject</string>
+   </property>
+  </action>
+  <action name="actionRemember_meta_title">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="fusepdf.qrc">
+     <normaloff>:/icons/fusepdf-document.png</normaloff>:/icons/fusepdf-document.png</iconset>
+   </property>
+   <property name="text">
+    <string>Remember meta title</string>
    </property>
   </action>
  </widget>
