@@ -350,6 +350,9 @@
    <property name="text">
     <string>Open</string>
    </property>
+   <property name="toolTip">
+    <string>Add PDF doucments you want to merge, you can select multiple documents.</string>
+   </property>
    <property name="shortcut">
     <string>Ctrl+O</string>
    </property>
@@ -361,6 +364,9 @@
    </property>
    <property name="text">
     <string>Save</string>
+   </property>
+   <property name="toolTip">
+    <string>Save to PDF</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+S</string>
@@ -374,6 +380,9 @@
    <property name="text">
     <string>Clear</string>
    </property>
+   <property name="toolTip">
+    <string>Clear All</string>
+   </property>
    <property name="shortcut">
     <string>Ctrl+C</string>
    </property>
@@ -385,6 +394,9 @@
    </property>
    <property name="text">
     <string>Quit</string>
+   </property>
+   <property name="toolTip">
+    <string>Quit FusePDF</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Q</string>
@@ -410,6 +422,9 @@
    <property name="text">
     <string>Show log</string>
    </property>
+   <property name="toolTip">
+    <string>Show Ghostscript output</string>
+   </property>
    <property name="shortcut">
     <string>Ctrl+L</string>
    </property>
@@ -420,6 +435,9 @@
    </property>
    <property name="text">
     <string>Enable Sorting</string>
+   </property>
+   <property name="toolTip">
+    <string>Enable Sorting of items. Note that this will disable manual order.</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Z</string>
