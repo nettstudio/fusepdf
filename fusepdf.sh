@@ -10,11 +10,12 @@ STRIP=${MXE_TC}-strip
 TIMESTAMP=${TIMESTAMP:-`date +%Y%m%d%H%M`}
 VERSION=`cat $CWD/fusepdf.pro | sed '/VERSION =/!d' | awk '{print $3}'`
 COMMIT=`git rev-parse --short HEAD`
-ZIP="FusePDF-$VERSION-$TIMESTAMP-$COMMIT-Windows-x${BIT}.zip"
-FOLDER="FusePDF-$VERSION-$TIMESTAMP-$COMMIT"
+TAG=${TAG:-${TIMESTAMP}-${COMMIT}}
+ZIP="FusePDF-$VERSION-$TAG-portable.zip"
+FOLDER="FusePDF-$VERSION-$TAG"
 
 if [ "$SNAPSHOT" = 0 ]; then
-    ZIP="FusePDF-$VERSION-Windows-x$BIT.zip"
+    ZIP="FusePDF-$VERSION-portable.zip"
     FOLDER="FusePDF-$VERSION"
 fi
 
@@ -35,6 +36,7 @@ cp -a $CWD/legal/* $FOLDER/opensource/ || exit 1
 cp $MXE/usr/$MXE_TC/qt5/plugins/platforms/qwindows.dll $FOLDER/platforms/ || exit 1
 cp $MXE/usr/$MXE_TC/qt5/bin/{Qt5CoreNettStudio.dll,Qt5GuiNettStudio.dll,Qt5WidgetsNettStudio.dll} $FOLDER/ || exit 1
 cp release/FusePDF.exe $FOLDER || exit 1
+cp $CWD/LICENSE.TXT $FOLDER/ || exit 1
 $STRIP -s $FOLDER/*.exe $FOLDER/*.dll $FOLDER/*/*.dll || exit 1
 zip -r -9 $ZIP $FOLDER || exit 1
 mv $ZIP .. || exit 1
