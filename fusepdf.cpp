@@ -17,6 +17,16 @@ FusePDF::FusePDF(QWidget *parent)
     ui->inputs->setPalette(treePalette);
     setWindowIcon(QIcon(":/icons/fusepdf.png"));
 
+    ui->presetLabel->setToolTip(tr("Distiller presets\n\n"
+                                   "- DEFAULT: selects output intended to be useful across a wide variety of uses, possibly at the expense of a larger output file.\n"
+                                   "- PREPRESS: selects output similar to Acrobat Distiller \"Prepress Optimized\" (up to version X) setting.\n"
+                                   "- EBOOK: selects medium-resolution output similar to the Acrobat Distiller (up to version X) \"eBook\" setting.\n"
+                                   "- SCREEN: selects low-resolution output similar to the Acrobat Distiller (up to version X) \"Screen Optimized\" setting.\n"
+                                   "- PRINTER: selects output similar to the Acrobat Distiller \"Print Optimized\" (up to version X) setting."));
+    ui->compatLabel->setToolTip(tr("Select the PDF version this document should be compatible with."));
+    ui->dpiCheck->setToolTip(tr("Override resolution for pattern fills, for fonts that must be converted to bitmaps\n and any other rendering required (eg rendering transparent pages for output to PDF versions < 1.4). "));
+    ui->inputs->setToolTip(tr("Drag and drop PDF documents you want to merge here. You can re-arrange after adding documents,\n note that the first document will define the paper size on the final output."));
+
     _proc = new QProcess(this);
 
     connect(_proc, SIGNAL(finished(int)),
@@ -383,8 +393,8 @@ void FusePDF::loadOptions()
 
     QSettings settings;
     settings.beginGroup("options");
-    ui->dpi->setValue(settings.value("dpi", 150).toInt());
-    ui->compat->setCurrentText(settings.value("compat", "default").toString());
+    ui->dpi->setValue(settings.value("dpi", 720).toInt());
+    ui->compat->setCurrentText(settings.value("compat", "1.5").toString());
     ui->preset->setCurrentText(settings.value("preset", "default").toString());
     ui->actionShow_log->setChecked(settings.value("showLog", false).toBool());
     ui->actionAuto_Sort->setChecked(settings.value("autoSort", false).toBool());

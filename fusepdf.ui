@@ -57,7 +57,7 @@
          </size>
         </property>
         <attribute name="headerVisible">
-         <bool>true</bool>
+         <bool>false</bool>
         </attribute>
         <attribute name="headerShowSortIndicator" stdset="0">
          <bool>true</bool>
@@ -136,6 +136,9 @@
        </item>
        <item>
         <widget class="QGroupBox" name="groupBox_5">
+         <property name="toolTip">
+          <string>Select output PDF document</string>
+         </property>
          <property name="title">
           <string>Output</string>
          </property>
@@ -179,7 +182,7 @@
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_6">
             <item>
-             <widget class="QLabel" name="label_3">
+             <widget class="QLabel" name="presetLabel">
               <property name="text">
                <string>Preset</string>
               </property>
@@ -193,7 +196,7 @@
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_2">
             <item>
-             <widget class="QLabel" name="label_2">
+             <widget class="QLabel" name="compatLabel">
               <property name="text">
                <string>Compatibility</string>
               </property>
