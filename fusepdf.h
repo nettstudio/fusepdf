@@ -121,10 +121,11 @@ private slots:
 
     QByteArray toUtf16Hex(QString str)
     {
-       str.prepend(QChar::ByteOrderMark);
-       // It is OK to use `fromRawData` since toHex copies it.
-       return QByteArray::fromRawData(
-                reinterpret_cast<const char*>(str.constData()), (str.size()+1)*2).toHex();
+        // https://stackoverflow.com/a/38831604
+        str.prepend(QChar::ByteOrderMark);
+        // It is OK to use `fromRawData` since toHex copies it.
+        return QByteArray::fromRawData(reinterpret_cast<const char*>(str.constData()),
+                                       (str.size()+1)*2).toHex();
     }
 
 private:

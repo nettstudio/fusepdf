@@ -538,10 +538,6 @@
    <property name="checkable">
     <bool>true</bool>
    </property>
-   <property name="icon">
-    <iconset resource="fusepdf.qrc">
-     <normaloff>:/icons/fusepdf-open.png</normaloff>:/icons/fusepdf-open.png</iconset>
-   </property>
    <property name="text">
     <string>Open saved PDF</string>
    </property>
@@ -552,10 +548,6 @@
   <action name="actionRemember_meta_author">
    <property name="checkable">
     <bool>true</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="fusepdf.qrc">
-     <normaloff>:/icons/fusepdf-document.png</normaloff>:/icons/fusepdf-document.png</iconset>
    </property>
    <property name="text">
     <string>Remember meta author</string>
@@ -568,10 +560,6 @@
    <property name="checkable">
     <bool>true</bool>
    </property>
-   <property name="icon">
-    <iconset resource="fusepdf.qrc">
-     <normaloff>:/icons/fusepdf-document.png</normaloff>:/icons/fusepdf-document.png</iconset>
-   </property>
    <property name="text">
     <string>Remember meta subject</string>
    </property>
@@ -579,10 +567,6 @@
   <action name="actionRemember_meta_title">
    <property name="checkable">
     <bool>true</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="fusepdf.qrc">
-     <normaloff>:/icons/fusepdf-document.png</normaloff>:/icons/fusepdf-document.png</iconset>
    </property>
    <property name="text">
     <string>Remember meta title</string>
