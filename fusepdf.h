@@ -119,6 +119,14 @@ private slots:
     void on_metaSubject_textChanged(const QString &arg1);
     void on_metaAuthor_textChanged(const QString &arg1);
 
+    QByteArray toUtf16Hex(QString str)
+    {
+       str.prepend(QChar::ByteOrderMark);
+       // It is OK to use `fromRawData` since toHex copies it.
+       return QByteArray::fromRawData(
+                reinterpret_cast<const char*>(str.constData()), (str.size()+1)*2).toHex();
+    }
+
 private:
     Ui::FusePDF *ui;
     QString _cmd;

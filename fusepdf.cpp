@@ -200,9 +200,10 @@ void FusePDF::makeCommand()
 
     QString marks;
     marks.append("/Creator(FusePDF - nettstudio.no)");
-    if (!title.isEmpty()) { marks.append(QString("/Title(%1)").arg(title)); }
-    if (!subject.isEmpty()) { marks.append(QString("/Subject(%1)").arg(subject)); }
-    if (!author.isEmpty()) { marks.append(QString("/Author(%1)").arg(author)); }
+
+    if (!title.isEmpty()) { marks.append(QString("/Title<%1>").arg(QString(toUtf16Hex(title)).toUpper())); }
+    if (!subject.isEmpty()) { marks.append(QString("/Subject<%1>").arg(QString(toUtf16Hex(subject)).toUpper())); }
+    if (!author.isEmpty()) { marks.append(QString("/Author<%1>").arg(QString(toUtf16Hex(author)).toUpper())); }
 
     command.append(QString(" -c \"[%1/DOCINFO pdfmark\"").arg(marks));
 
