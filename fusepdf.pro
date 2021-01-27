@@ -6,7 +6,7 @@
 #
 
 TARGET = FusePDF
-VERSION = 1.1.0
+VERSION = 1.2.0
 TEMPLATE = app
 
 QT += core gui widgets
