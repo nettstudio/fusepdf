@@ -53,6 +53,9 @@ FusePDF::FusePDF(QWidget *parent)
     connect(deleteShortcut, SIGNAL(activated()),
             this, SLOT(deleteDocumentItem()));
 
+    ui->progressBar->setMaximumWidth(100);
+    ui->statusBar->addPermanentWidget(ui->progressBar);
+
     _proc = new QProcess(this);
 
     connect(_proc, SIGNAL(finished(int)),
@@ -100,7 +103,7 @@ void FusePDF::on_actionSave_triggered()
 
 void FusePDF::on_actionClear_triggered()
 {
-    clearAll();
+    clearInput();
 }
 
 void FusePDF::on_actionQuit_triggered()
@@ -166,7 +169,7 @@ void FusePDF::on_fileButton_clicked()
 
 void FusePDF::on_clear_clicked()
 {
-    clearAll();
+    clearInput();
 }
 
 void FusePDF::on_save_clicked()
@@ -246,7 +249,7 @@ void FusePDF::runCommand()
 
 void FusePDF::commandStarted()
 {
-    ui->save->setDisabled(true);
+    //ui->save->setDisabled(true);
     ui->actionSave->setDisabled(true);
     ui->progressBar->setMaximum(0);
     ui->progressBar->setValue(0);
@@ -254,7 +257,7 @@ void FusePDF::commandStarted()
 
 void FusePDF::commandFinished(int exitCode)
 {
-    ui->save->setDisabled(false);
+    //ui->save->setDisabled(false);
     ui->actionSave->setDisabled(false);
     ui->progressBar->setMaximum(100);
     ui->progressBar->setValue(100);
@@ -340,18 +343,15 @@ void FusePDF::handleProcOutput()
     log.append(_proc->readAllStandardOutput());
     ui->cmd->appendPlainText(log.simplified());
     qDebug() << log;
+    ui->statusBar->showMessage(log.simplified(), 1000);
 }
 
-void FusePDF::clearAll()
+void FusePDF::clearInput()
 {
     ui->inputs->clear();
     ui->cmd->clear();
     ui->fileName->clear();
-    ui->metaTitle->clear();
-    ui->metaAuthor->clear();
-    ui->metaSubject->clear();
     _cmd.clear();
-    loadOptions();
 }
 
 const QString FusePDF::findGhost()

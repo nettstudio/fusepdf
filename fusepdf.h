@@ -34,6 +34,7 @@
 #include <QStyleFactory>
 #include <QSettings>
 #include <QShortcut>
+#include <QScrollBar>
 
 class FilesTreeWidget : public QTreeWidget
 {
@@ -100,7 +101,7 @@ private slots:
     void loadSettings();
     void saveSettings();
     void handleProcOutput();
-    void clearAll();
+    void clearInput();
     const QString findGhost();
     void on_actionShow_log_triggered();
     void on_actionAbout_Qt_triggered();
