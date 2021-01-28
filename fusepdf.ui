@@ -520,9 +520,6 @@
    <property name="toolTip">
     <string>Remember author properties</string>
    </property>
-   <property name="shortcut">
-    <string>Ctrl+M</string>
-   </property>
   </action>
   <action name="actionRemember_meta_subject">
    <property name="checkable">

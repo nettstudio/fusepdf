@@ -11,8 +11,12 @@ Requires [Ghostscript](https://www.ghostscript.com/download/gsdnld.html) install
 
 ## Changes
 
+  * 1.2.0
+    * Better UI
+    * More options
+    * Code cleanup (simplify)
   * 1.1.0
-    * Support for meta data (Ttile/Subject/Author)
+    * Support for meta data (Tile/Subject/Author)
     * More options
     * Better UX
   * 1.0.0
