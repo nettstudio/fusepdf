@@ -100,8 +100,8 @@ void FusePDF::on_actionSave_triggered()
                                                 tr("Save document"),
                                                 !_lastSaveDir.isEmpty()?_lastSaveDir:QDir::homePath(),
                                                 "*.pdf");
-    if (!file.endsWith(".pdf", Qt::CaseInsensitive)) { file.append(".pdf"); }
     if (file.isEmpty()) { return; }
+    if (!file.endsWith(".pdf", Qt::CaseInsensitive)) { file.append(".pdf"); }
     runCommand(file);
 }
 
