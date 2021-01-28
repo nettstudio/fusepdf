@@ -86,15 +86,8 @@ private slots:
     void on_actionClear_triggered();
     void on_actionQuit_triggered();
     void on_actionAbout_triggered();
-    void on_preset_currentIndexChanged(const QString &arg1);
-    void on_compat_currentIndexChanged(const QString &arg1);
-    void on_dpi_valueChanged(int arg1);
-    void on_dpiCheck_stateChanged(int arg1);
-    void on_fileButton_clicked();
-    void on_clear_clicked();
-    void on_save_clicked();
-    void makeCommand();
-    void runCommand();
+    const QString makeCommand(const QString &filename);
+    void runCommand(const QString &filename);
     void commandStarted();
     void commandFinished(int exitCode);
     void populateUI();
@@ -116,9 +109,6 @@ private slots:
     bool missingGhost();
     void handleProcessError(QProcess::ProcessError error);
     void deleteDocumentItem();
-    void on_metaTitle_textChanged(const QString &arg1);
-    void on_metaSubject_textChanged(const QString &arg1);
-    void on_metaAuthor_textChanged(const QString &arg1);
 
     QByteArray toUtf16Hex(QString str)
     {
@@ -131,9 +121,9 @@ private slots:
 
 private:
     Ui::FusePDF *ui;
-    QString _cmd;
-    QProcess *_proc;
+    QString _output;
     QString _lastSaveDir;
     QString _lastLoadDir;
+    QProcess *_proc;
 };
 #endif // FUSEPDF_H
