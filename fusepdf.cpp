@@ -149,7 +149,7 @@ const QString FusePDF::makeCommand(const QString &filename)
     if (!ui->compat->currentText().isEmpty() && ui->compat->currentText() != "default") {
         command.append(QString(" -dCompatibilityLevel=%1").arg(ui->compat->currentText()));
     }
-    command.append(QString(" -dPDFSETTINGS=/%1").arg(ui->preset->currentText()));
+    command.append(QString(" -dPDFSETTINGS=/%1").arg(ui->preset->currentText().toLower()));
     command.append(" -dNOPAUSE -dBATCH -dDetectDuplicateImages -dCompressFonts=true");
     /*if (ui->dpiCheck->isChecked()) {
         command.append(QString(" -r%1").arg(ui->dpi->value()));
@@ -172,6 +172,7 @@ const QString FusePDF::makeCommand(const QString &filename)
 
     command.append(QString(" -c \"[%1/DOCINFO pdfmark\"").arg(marks));
 
+    qDebug() << command;
     return command;
 }
 
@@ -250,7 +251,7 @@ void FusePDF::populateUI()
 {
     ui->compat->clear();
     QIcon docIcon(":/icons/document.png");
-    ui->compat->addItem(docIcon, "default");
+    //ui->compat->addItem(docIcon, "default");
     ui->compat->addItem(docIcon, "1.0");
     ui->compat->addItem(docIcon, "1.1");
     ui->compat->addItem(docIcon, "1.2");
@@ -261,11 +262,11 @@ void FusePDF::populateUI()
     ui->compat->addItem(docIcon, "1.7");
 
     ui->preset->clear();
-    ui->preset->addItem(docIcon, "default");
-    ui->preset->addItem(docIcon, "prepress");
-    ui->preset->addItem(docIcon, "ebook");
-    ui->preset->addItem(docIcon, "screen");
-    ui->preset->addItem(docIcon, "printer");
+    ui->preset->addItem(docIcon, "Default");
+    ui->preset->addItem(docIcon, "Prepress");
+    ui->preset->addItem(docIcon, "eBook");
+    ui->preset->addItem(docIcon, "Screen");
+    ui->preset->addItem(docIcon, "Printer");
 }
 
 void FusePDF::loadSettings()
@@ -408,7 +409,7 @@ void FusePDF::loadOptions()
     settings.beginGroup("options");
     //ui->dpi->setValue(settings.value("dpi", 720).toInt());
     ui->compat->setCurrentText(settings.value("compat", "1.5").toString());
-    ui->preset->setCurrentText(settings.value("preset", "default").toString());
+    ui->preset->setCurrentText(settings.value("preset", "Default").toString());
     ui->actionShow_log->setChecked(settings.value("showLog", false).toBool());
     ui->actionAuto_Sort->setChecked(settings.value("autoSort", false).toBool());
     ui->actionRemember_meta_author->setChecked(settings.value("metaAuthor", true).toBool());
