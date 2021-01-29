@@ -6,5 +6,6 @@
         <file>icons/fusepdf-quit.png</file>
         <file>icons/fusepdf-save.png</file>
         <file>icons/fusepdf-document.png</file>
+        <file>icons/document.png</file>
     </qresource>
 </RCC>

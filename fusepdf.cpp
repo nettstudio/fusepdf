@@ -249,7 +249,7 @@ void FusePDF::commandFinished(int exitCode)
 void FusePDF::populateUI()
 {
     ui->compat->clear();
-    QIcon docIcon(":/icons/fusepdf-document.png");
+    QIcon docIcon(":/icons/document.png");
     ui->compat->addItem(docIcon, "default");
     ui->compat->addItem(docIcon, "1.0");
     ui->compat->addItem(docIcon, "1.1");
