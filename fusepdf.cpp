@@ -29,6 +29,15 @@ FusePDF::FusePDF(QWidget *parent)
     ui->inputs->setPalette(treePalette);
     ui->inputs->header()->setVisible(true); // designer bug
 
+    QWidget *spacer = new QWidget(this);
+    spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+
+    ui->toolBar->addWidget(spacer);
+    ui->toolBar->addSeparator();
+    ui->toolBar->addWidget(ui->presetWidget);
+    //ui->toolBar->addSeparator();
+    ui->toolBar->addWidget(ui->compatWidget);
+
     ui->metaTitleLabel->setToolTip(tr("Set document title"));
     ui->metaTitle->setToolTip(ui->metaTitleLabel->toolTip());
     ui->metaAuthorLabel->setToolTip(tr("Set document author"));
@@ -44,8 +53,8 @@ FusePDF::FusePDF(QWidget *parent)
     ui->preset->setToolTip(ui->presetLabel->toolTip());
     ui->compatLabel->setToolTip(tr("Select the PDF version this document should be compatible with."));
     ui->compat->setToolTip(ui->compatLabel->toolTip());
-    ui->dpiCheck->setToolTip(tr("Override resolution for pattern fills, for fonts that must be converted to bitmaps\n and any other rendering required (eg rendering transparent pages for output to PDF versions < 1.4). "));
-    ui->dpi->setToolTip(ui->dpiCheck->toolTip());
+    //ui->dpiCheck->setToolTip(tr("Override resolution for pattern fills, for fonts that must be converted to bitmaps\n and any other rendering required (eg rendering transparent pages for output to PDF versions < 1.4). "));
+    //ui->dpi->setToolTip(ui->dpiCheck->toolTip());
     ui->inputs->setToolTip(tr("Drag and drop PDF documents you want to merge here. You can re-arrange after adding them (if sorting is disabled).\n\n"
                               "Note that the first document will define the paper size on the final output.\n\n"
                               "You can remove a document with the DEL key."));
@@ -142,9 +151,9 @@ const QString FusePDF::makeCommand(const QString &filename)
     }
     command.append(QString(" -dPDFSETTINGS=/%1").arg(ui->preset->currentText()));
     command.append(" -dNOPAUSE -dBATCH -dDetectDuplicateImages -dCompressFonts=true");
-    if (ui->dpiCheck->isChecked()) {
+    /*if (ui->dpiCheck->isChecked()) {
         command.append(QString(" -r%1").arg(ui->dpi->value()));
-    }
+    }*/
     command.append(QString(" -sOutputFile=\"%1\"").arg(filename));
     for (int i = 0; i < ui->inputs->topLevelItemCount(); ++i) {
         command.append(QString(" \"%1\"").arg(ui->inputs->topLevelItem(i)->text(1)));
@@ -397,7 +406,7 @@ void FusePDF::loadOptions()
 
     QSettings settings;
     settings.beginGroup("options");
-    ui->dpi->setValue(settings.value("dpi", 720).toInt());
+    //ui->dpi->setValue(settings.value("dpi", 720).toInt());
     ui->compat->setCurrentText(settings.value("compat", "1.5").toString());
     ui->preset->setCurrentText(settings.value("preset", "default").toString());
     ui->actionShow_log->setChecked(settings.value("showLog", false).toBool());
@@ -407,7 +416,7 @@ void FusePDF::loadOptions()
     ui->actionRemember_meta_title->setChecked(settings.value("metaTitle", true).toBool());
     _lastLoadDir = settings.value("lastLoadDir", "").toString();
     _lastSaveDir = settings.value("lastSaveDir", "").toString();
-    ui->dpiCheck->setChecked(settings.value("checkdpi", false).toBool());
+    //ui->dpiCheck->setChecked(settings.value("checkdpi", false).toBool());
     ui->actionOpen_saved_PDF->setChecked(settings.value("openSavedPDF", true).toBool());
     ui->cmd->setVisible(ui->actionShow_log->isChecked());
     ui->inputs->setSortingEnabled(ui->actionAuto_Sort->isChecked());
@@ -432,7 +441,7 @@ void FusePDF::saveOptions()
 {
     QSettings settings;
     settings.beginGroup("options");
-    settings.setValue("dpi", ui->dpi->value());
+    //settings.setValue("dpi", ui->dpi->value());
     if (!ui->compat->currentText().isEmpty()) {
         settings.setValue("compat", ui->compat->currentText());
     }
@@ -441,7 +450,7 @@ void FusePDF::saveOptions()
     }
     settings.setValue("showLog", ui->actionShow_log->isChecked());
     settings.setValue("autoSort", ui->actionAuto_Sort->isChecked());
-    settings.setValue("checkdpi", ui->dpiCheck->isChecked());
+    //settings.setValue("checkdpi", ui->dpiCheck->isChecked());
     settings.setValue("openSavedPDF", ui->actionOpen_saved_PDF->isChecked());
     settings.setValue("metaAuthor", ui->actionRemember_meta_author->isChecked());
     settings.setValue("metaSubject", ui->actionRemember_meta_subject->isChecked());
