@@ -1,11 +1,11 @@
 <RCC>
     <qresource prefix="/">
-        <file>icons/fusepdf.png</file>
-        <file>icons/fusepdf-clear.png</file>
-        <file>icons/fusepdf-open.png</file>
-        <file>icons/fusepdf-quit.png</file>
-        <file>icons/fusepdf-save.png</file>
-        <file>icons/fusepdf-document.png</file>
-        <file>icons/document.png</file>
+        <file>assets/fusepdf.png</file>
+        <file>assets/fusepdf-clear.png</file>
+        <file>assets/fusepdf-open.png</file>
+        <file>assets/fusepdf-quit.png</file>
+        <file>assets/fusepdf-save.png</file>
+        <file>assets/fusepdf-document.png</file>
+        <file>assets/document.png</file>
     </qresource>
 </RCC>

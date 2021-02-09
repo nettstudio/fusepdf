@@ -16,7 +16,7 @@ FusePDF::FusePDF(QWidget *parent)
     , _proc(nullptr)
 {
     ui->setupUi(this);
-    setWindowIcon(QIcon(":/icons/fusepdf.png"));
+    setWindowIcon(QIcon(":/assets/fusepdf.png"));
     qApp->setStyle(QStyleFactory::create("fusion"));
 
     QPalette mainPalette = qApp->palette();
@@ -27,7 +27,7 @@ FusePDF::FusePDF(QWidget *parent)
     QPalette treePalette = ui->inputs->palette();
     treePalette.setColor(QPalette::Highlight, QColor(124,124,124)); // #7c7c7c
     ui->inputs->setPalette(treePalette);
-    ui->inputs->header()->setVisible(true); // designer bug
+    ui->inputs->header()->setVisible(true); // bypass designer bug
 
     QWidget *spacer = new QWidget(this);
     spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
@@ -146,10 +146,12 @@ const QString FusePDF::makeCommand(const QString &filename)
     command = QString("\"%1\"").arg(findGhost());
 #endif
     command.append(" -sDEVICE=pdfwrite");
-    if (!ui->compat->currentText().isEmpty() && ui->compat->currentText() != "default") {
+    if (!ui->compat->currentText().isEmpty() && ui->compat->currentText().toLower() != "default") {
         command.append(QString(" -dCompatibilityLevel=%1").arg(ui->compat->currentText()));
     }
-    command.append(QString(" -dPDFSETTINGS=/%1").arg(ui->preset->currentText().toLower()));
+    if (!ui->preset->currentText().isEmpty() && ui->preset->currentText().toLower() != "none") {
+        command.append(QString(" -dPDFSETTINGS=/%1").arg(ui->preset->currentText().toLower()));
+    }
     command.append(" -dNOPAUSE -dBATCH -dDetectDuplicateImages -dCompressFonts=true");
     /*if (ui->dpiCheck->isChecked()) {
         command.append(QString(" -r%1").arg(ui->dpi->value()));
@@ -250,8 +252,7 @@ void FusePDF::commandFinished(int exitCode)
 void FusePDF::populateUI()
 {
     ui->compat->clear();
-    QIcon docIcon(":/icons/document.png");
-    //ui->compat->addItem(docIcon, "default");
+    QIcon docIcon(":/assets/document.png");
     ui->compat->addItem(docIcon, "1.0");
     ui->compat->addItem(docIcon, "1.1");
     ui->compat->addItem(docIcon, "1.2");
@@ -262,6 +263,7 @@ void FusePDF::populateUI()
     ui->compat->addItem(docIcon, "1.7");
 
     ui->preset->clear();
+    ui->preset->addItem(docIcon, "None");
     ui->preset->addItem(docIcon, "Default");
     ui->preset->addItem(docIcon, "Prepress");
     ui->preset->addItem(docIcon, "eBook");
@@ -370,7 +372,7 @@ void FusePDF::handleFoundPDF(const QList<QUrl> &urls)
         QTreeWidgetItem *item = new QTreeWidgetItem(ui->inputs);
         item->setText(0, info.fileName());
         item->setText(1, info.filePath());
-        item->setIcon(0, QIcon(":/icons/fusepdf-document.png"));
+        item->setIcon(0, QIcon(":/assets/fusepdf-document.png"));
         item->setFlags(Qt::ItemIsSelectable|Qt::ItemIsDragEnabled|Qt::ItemIsEnabled|Qt::ItemNeverHasChildren);
         if (!info.absolutePath().isEmpty()) { _lastLoadDir = info.absolutePath(); }
     }

@@ -20,12 +20,13 @@ QMAKE_TARGET_COMPANY = "NettStudio AS"
 QMAKE_TARGET_PRODUCT = "FusePDF"
 QMAKE_TARGET_DESCRIPTION = "Merge multiple PDF documents"
 QMAKE_TARGET_COPYRIGHT = "NettStudio AS"
-win32: RC_ICONS += icons/fusepdf.ico
+win32: RC_ICONS += assets/fusepdf.ico
 
-SOURCES += main.cpp fusepdf.cpp
-HEADERS += fusepdf.h
-FORMS += fusepdf.ui
+INCLUDEPATH += src
+SOURCES += src/main.cpp src/fusepdf.cpp
+HEADERS += src/fusepdf.h
+FORMS += assets/fusepdf.ui
 RESOURCES += fusepdf.qrc
-OTHER_FILES += fusepdf.sh fusepdf.iss icons/mkico.sh README.md
+OTHER_FILES += README.md
 
 CONFIG(release, debug|release): DEFINES += QT_NO_DEBUG_OUTPUT QT_NO_WARNING_OUTPUT

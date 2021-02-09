@@ -18,7 +18,7 @@
   </property>
   <property name="windowIcon">
    <iconset>
-    <normaloff>:/icons/usepdf.png</normaloff>:/icons/usepdf.png</iconset>
+    <normaloff>:/assets/fusepdf.png</normaloff>:/assets/fusepdf.png</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
    <property name="acceptDrops">
@@ -124,7 +124,7 @@
          </property>
          <property name="icon">
           <iconset resource="fusepdf.qrc">
-           <normaloff>:/icons/fusepdf.png</normaloff>:/icons/fusepdf.png</iconset>
+           <normaloff>:/assets/fusepdf.png</normaloff>:/assets/fusepdf.png</iconset>
          </property>
          <property name="iconSize">
           <size>
@@ -413,7 +413,7 @@
   <action name="actionOpen">
    <property name="icon">
     <iconset resource="fusepdf.qrc">
-     <normaloff>:/icons/fusepdf-open.png</normaloff>:/icons/fusepdf-open.png</iconset>
+     <normaloff>:/assets/fusepdf-open.png</normaloff>:/assets/fusepdf-open.png</iconset>
    </property>
    <property name="text">
     <string>Open</string>
@@ -428,7 +428,7 @@
   <action name="actionSave">
    <property name="icon">
     <iconset resource="fusepdf.qrc">
-     <normaloff>:/icons/fusepdf-save.png</normaloff>:/icons/fusepdf-save.png</iconset>
+     <normaloff>:/assets/fusepdf-save.png</normaloff>:/assets/fusepdf-save.png</iconset>
    </property>
    <property name="text">
     <string>Save</string>
@@ -443,7 +443,7 @@
   <action name="actionClear">
    <property name="icon">
     <iconset resource="fusepdf.qrc">
-     <normaloff>:/icons/fusepdf-clear.png</normaloff>:/icons/fusepdf-clear.png</iconset>
+     <normaloff>:/assets/fusepdf-clear.png</normaloff>:/assets/fusepdf-clear.png</iconset>
    </property>
    <property name="text">
     <string>Clear</string>
@@ -458,7 +458,7 @@
   <action name="actionQuit">
    <property name="icon">
     <iconset resource="fusepdf.qrc">
-     <normaloff>:/icons/fusepdf-quit.png</normaloff>:/icons/fusepdf-quit.png</iconset>
+     <normaloff>:/assets/fusepdf-quit.png</normaloff>:/assets/fusepdf-quit.png</iconset>
    </property>
    <property name="text">
     <string>Quit</string>
