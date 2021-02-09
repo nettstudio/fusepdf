@@ -1,6 +1,6 @@
 # FusePDF
 
-![screenshot](icons/fusepdf-screenshot.png "FusePDF screenshot")
+![screenshot](assets/fusepdf-screenshot.png "FusePDF screenshot")
 
 ## Easily merge multiple PDF documents
 
