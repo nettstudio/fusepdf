@@ -32,6 +32,8 @@ QMAKE_TARGET_COMPANY = "NettStudio AS"
 QMAKE_TARGET_PRODUCT = "FusePDF"
 QMAKE_TARGET_DESCRIPTION = "Merge multiple PDF documents"
 QMAKE_TARGET_COPYRIGHT = "NettStudio AS"
+
+# convert -background transparent fusepdf.png -define icon:auto-resize=16,32,48,64,128,192,256 fusepdf.ico
 win32: RC_ICONS += assets/fusepdf.ico
 
 INCLUDEPATH += src
