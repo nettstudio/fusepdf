@@ -17,7 +17,7 @@
    <string>FusePDF</string>
   </property>
   <property name="windowIcon">
-   <iconset>
+   <iconset resource="../fusepdf.qrc">
     <normaloff>:/assets/fusepdf.png</normaloff>:/assets/fusepdf.png</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
@@ -123,7 +123,7 @@
           <string/>
          </property>
          <property name="icon">
-          <iconset resource="fusepdf.qrc">
+          <iconset resource="../fusepdf.qrc">
            <normaloff>:/assets/fusepdf.png</normaloff>:/assets/fusepdf.png</iconset>
          </property>
          <property name="iconSize">
@@ -390,7 +390,7 @@
     </size>
    </property>
    <property name="toolButtonStyle">
-    <enum>Qt::ToolButtonTextBesideIcon</enum>
+    <enum>Qt::ToolButtonIconOnly</enum>
    </property>
    <property name="floatable">
     <bool>false</bool>
@@ -412,7 +412,7 @@
   </widget>
   <action name="actionOpen">
    <property name="icon">
-    <iconset resource="fusepdf.qrc">
+    <iconset resource="../fusepdf.qrc">
      <normaloff>:/assets/fusepdf-open.png</normaloff>:/assets/fusepdf-open.png</iconset>
    </property>
    <property name="text">
@@ -427,7 +427,7 @@
   </action>
   <action name="actionSave">
    <property name="icon">
-    <iconset resource="fusepdf.qrc">
+    <iconset resource="../fusepdf.qrc">
      <normaloff>:/assets/fusepdf-save.png</normaloff>:/assets/fusepdf-save.png</iconset>
    </property>
    <property name="text">
@@ -442,7 +442,7 @@
   </action>
   <action name="actionClear">
    <property name="icon">
-    <iconset resource="fusepdf.qrc">
+    <iconset resource="../fusepdf.qrc">
      <normaloff>:/assets/fusepdf-clear.png</normaloff>:/assets/fusepdf-clear.png</iconset>
    </property>
    <property name="text">
@@ -457,7 +457,7 @@
   </action>
   <action name="actionQuit">
    <property name="icon">
-    <iconset resource="fusepdf.qrc">
+    <iconset resource="../fusepdf.qrc">
      <normaloff>:/assets/fusepdf-quit.png</normaloff>:/assets/fusepdf-quit.png</iconset>
    </property>
    <property name="text">
@@ -519,10 +519,10 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Open generated PDF</string>
+    <string>Open merged PDF</string>
    </property>
    <property name="toolTip">
-    <string>Open generated PDF</string>
+    <string>Open merged PDF</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+P</string>
@@ -570,7 +570,7 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="fusepdf.qrc"/>
+  <include location="../fusepdf.qrc"/>
  </resources>
  <connections/>
 </ui>
