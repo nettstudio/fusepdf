@@ -30,12 +30,14 @@ Copyright (c) 2021 NettStudio AS. All rights reserved.
 
 ## Open Source
 
-Build and package FusePDF from source (on Linux):
+This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 3 of the License, or (at your option) any later version.
+
 ```
 git clone https://github.com/nettstudio/fusepdf
 cd fusepdf
 mkdir build && cd build
 qmake CONFIG+=release PREFIX=/usr .. && make
-make INSTALL_ROOT=`pwd`/pkg install
+sudo make install
 ```
+
 Note that FusePDF requires Ghostscript (``gs``) available during runtime.
