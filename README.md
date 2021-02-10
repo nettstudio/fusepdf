@@ -10,22 +10,6 @@ FusePDF is an simple application with one purpose, to merge PDF documents.
 
 Requires [Ghostscript](https://www.ghostscript.com/download/gsdnld.html) installed prior to usage.
 
-## Changes
-
-  * 1.2.0
-    * Better UI
-    * More options
-    * Code cleanup (simplify)
-    * Changed license to GPLv3
-  * 1.1.0
-    * Support for meta data (Tile/Subject/Author)
-    * More options
-    * Better UX
-  * 1.0.0
-    * First stable release
-
-Written by Ole-André Rodlie for NettStudio AS.
-
 Copyright (c) 2021 NettStudio AS. All rights reserved.
 
 ## Open Source
@@ -40,4 +24,4 @@ qmake CONFIG+=release PREFIX=/usr .. && make
 sudo make install
 ```
 
-Note that FusePDF requires Ghostscript (``gs``) available during runtime.
+Note that FusePDF requires Ghostscript (``gs``) available during runtime (install through your package manager if not already installed).
