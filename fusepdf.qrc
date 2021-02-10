@@ -7,5 +7,6 @@
         <file>assets/fusepdf-save.png</file>
         <file>assets/fusepdf-document.png</file>
         <file>assets/document.png</file>
+        <file>assets/nettstudio.png</file>
     </qresource>
 </RCC>
