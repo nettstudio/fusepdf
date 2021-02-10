@@ -38,23 +38,4 @@ mkdir build && cd build
 qmake CONFIG+=release PREFIX=/usr .. && make
 make INSTALL_ROOT=`pwd`/pkg install
 ```
-```
-pkg
-└── usr
-    └── local
-        ├── bin
-        │   └── FusePDF
-        └── share
-            ├── applications
-            │   └── fusepdf.desktop
-            ├── doc
-            │   └── FusePDF-1.2.0
-            │       ├── COPYING
-            │       └── README.md
-            └── icons
-                └── hicolor
-                    └── 512x512
-                        └── apps
-                            └── fusepdf.png
-```
 Note that FusePDF requires Ghostscript (``gs``) available during runtime.

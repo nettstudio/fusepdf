@@ -49,8 +49,8 @@ INSTALLS += target docs desktop hicolor
 
 desktop.path = $${PREFIX}/share/applications
 desktop.files = assets/fusepdf.desktop
-hicolor.path = $${PREFIX}/share/icons/hicolor/512x512/apps
-hicolor.files = assets/fusepdf.png
+hicolor.path = $${PREFIX}/share/icons
+hicolor.files = assets/hicolor
 docs.path = $${PREFIX}/share/doc/$${TARGET}-$${VERSION}
 docs.files = COPYING README.md
 target.path = $${PREFIX}/bin
