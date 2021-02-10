@@ -75,4 +75,5 @@ Thumbs.db
 tmp
 mxe
 *.zip
-setup.iss
+*.iss
+build

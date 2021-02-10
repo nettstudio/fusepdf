@@ -24,6 +24,9 @@ TEMPLATE = app
 QT += core gui widgets
 CONFIG += c++11
 
+CONFIG(release, debug|release): DEFINES += QT_NO_DEBUG_OUTPUT QT_NO_WARNING_OUTPUT
+isEmpty(PREFIX): PREFIX = /usr/local
+
 DEFINES += QT_DEPRECATED_WARNINGS
 DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000
 DEFINES += VERSION_APP=\\\"$${VERSION}\\\"
@@ -42,5 +45,12 @@ HEADERS += src/fusepdf.h
 FORMS += assets/fusepdf.ui
 RESOURCES += fusepdf.qrc
 OTHER_FILES += README.md
+INSTALLS += target docs desktop hicolor
 
-CONFIG(release, debug|release): DEFINES += QT_NO_DEBUG_OUTPUT QT_NO_WARNING_OUTPUT
+desktop.path = $${PREFIX}/share/applications
+desktop.files = assets/fusepdf.desktop
+hicolor.path = $${PREFIX}/share/icons/hicolor/512x512/apps
+hicolor.files = assets/fusepdf.png
+docs.path = $${PREFIX}/share/doc/$${TARGET}-$${VERSION}
+docs.files = COPYING README.md
+target.path = $${PREFIX}/bin
