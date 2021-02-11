@@ -24,4 +24,4 @@ qmake CONFIG+=release PREFIX=/usr .. && make
 sudo make install
 ```
 
-Note that FusePDF requires Ghostscript (``gs``) available during runtime (install through your package manager if not already installed).
+Note that FusePDF requires Ghostscript (``gs``) available during runtime (install it through your package manager if not already installed).
