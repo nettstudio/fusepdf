@@ -429,7 +429,7 @@ void FusePDF::loadOptions()
     settings.beginGroup("options");
     //ui->dpi->setValue(settings.value("dpi", 720).toInt());
     ui->compat->setCurrentText(settings.value("compat", "1.5").toString());
-    ui->preset->setCurrentText(settings.value("preset", "default").toString());
+    ui->preset->setCurrentText(settings.value("preset", "Default").toString());
     ui->actionShow_log->setChecked(settings.value("showLog", false).toBool());
     ui->actionAuto_Sort->setChecked(settings.value("autoSort", false).toBool());
     ui->actionRemember_meta_author->setChecked(settings.value("metaAuthor", true).toBool());
