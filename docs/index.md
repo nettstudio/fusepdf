@@ -3,3 +3,7 @@
 FusePDF is an simple application with one purpose, to merge PDF documents.
 
 Copyright (c) 2021 [NettStudio AS](https://nettstudio.no). All rights reserved.
+
+![GitHub](https://img.shields.io/github/license/nettstudio/fusepdf) ![GitHub last commit](https://img.shields.io/github/last-commit/nettstudio/fusepdf) ![GitHub issues](https://img.shields.io/github/issues/nettstudio/fusepdf)
+
+![GitHub Repo stars](https://img.shields.io/github/stars/nettstudio/fusepdf?style=social)
