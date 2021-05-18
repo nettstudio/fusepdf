@@ -44,6 +44,10 @@ FusePDF::FusePDF(QWidget *parent)
     QWidget *spacer = new QWidget(this);
     spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 
+    ui->inputs->header()->setStretchLastSection(false);
+    ui->inputs->header()->setSectionResizeMode(0, QHeaderView::Stretch);
+    ui->inputs->header()->setSectionResizeMode(1, QHeaderView::Fixed);
+
     ui->toolBar->addWidget(spacer);
     ui->toolBar->addSeparator();
     ui->toolBar->addWidget(ui->presetWidget);
@@ -176,7 +180,7 @@ const QString FusePDF::makeCommand(const QString &filename)
     }*/
     command.append(QString(" -sOutputFile=\"%1\"").arg(filename));
     for (int i = 0; i < ui->inputs->topLevelItemCount(); ++i) {
-        command.append(QString(" \"%1\"").arg(ui->inputs->topLevelItem(i)->text(1)));
+        command.append(QString(" \"%1\"").arg(ui->inputs->topLevelItem(i)->data(0, FUSEPDF_PATH_ROLE).toString()));
     }
 
     QString title = ui->metaTitle->text();
@@ -387,9 +391,12 @@ void FusePDF::handleFoundPDF(const QList<QUrl> &urls)
         QMimeType type = db.mimeTypeForFile(info.absoluteFilePath());
         if (type.name() != "application/pdf") { continue; }
 
+        int pages = getPageCount(info.filePath());
         QTreeWidgetItem *item = new QTreeWidgetItem(ui->inputs);
+        item->setData(0, FUSEPDF_PATH_ROLE, info.filePath());
+        item->setData(0, FUSEPDF_PAGES_ROLE, pages);
         item->setText(0, info.fileName());
-        item->setText(1, info.filePath());
+        item->setText(1, QString::number(pages));
         item->setIcon(0, QIcon(":/assets/fusepdf-document.png"));
         item->setFlags(Qt::ItemIsSelectable|Qt::ItemIsDragEnabled|Qt::ItemIsEnabled|Qt::ItemNeverHasChildren);
         if (!info.absolutePath().isEmpty()) { _lastLoadDir = info.absolutePath(); }
@@ -400,9 +407,12 @@ void FusePDF::on_inputs_itemDoubleClicked(QTreeWidgetItem *item, int column)
 {
     Q_UNUSED(column)
     if (!item) { return; }
-    QString file = item->text(1);
-    if (!QFile::exists(file)) { return; }
-    QDesktopServices::openUrl(QUrl::fromUserInput(file));
+    QString filename = item->data(0, FUSEPDF_PATH_ROLE).toString();
+    int pages = item->data(0, FUSEPDF_PAGES_ROLE).toInt();
+    qDebug() << filename << pages;
+    //QString file = item->text(1);
+    //if (!QFile::exists(file)) { return; }
+    //QDesktopServices::openUrl(QUrl::fromUserInput(file));
 }
 
 void FusePDF::on_actionAuto_Sort_triggered()
@@ -415,7 +425,7 @@ bool FusePDF::hasFile(const QString &file)
     if (file.isEmpty()) { return false; }
     QFileInfo fileInfo(file);
     for (int i = 0; i < ui->inputs->topLevelItemCount(); ++i) {
-        QFileInfo inputInfo(ui->inputs->topLevelItem(i)->text(1));
+        QFileInfo inputInfo(ui->inputs->topLevelItem(i)->data(0, FUSEPDF_PATH_ROLE).toString());
         if (inputInfo.absoluteFilePath() == fileInfo.absoluteFilePath()) { return  true; }
     }
     return false;
@@ -538,4 +548,25 @@ void FusePDF::deleteDocumentItem()
 {
     if (ui->inputs->topLevelItemCount() == 0 || ui->inputs->currentItem() == nullptr) { return; }
     delete ui->inputs->currentItem();
+}
+
+int FusePDF::getPageCount(const QString &filename)
+{
+    int result = 0;
+    if (filename.isEmpty()) { return result; }
+
+    QString command = findGhost();
+#ifdef Q_OS_WIN
+    command = QString("\"%1\"").arg(findGhost());
+#endif
+
+    command.append(QString(" -q -dNODISPLAY -dNOSAFER -c \"/pdffile (%1) (r) file runpdfbegin (PageCount: ) print pdfpagecount = quit\"").arg(filename));
+
+    QProcess proc;
+    proc.start(command);
+    proc.waitForFinished();
+    result = proc.readAll().replace("PageCount:", "").simplified().toInt();
+    proc.close();
+
+    return result;
 }

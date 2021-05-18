@@ -47,6 +47,11 @@
 #include <QSettings>
 #include <QShortcut>
 #include <QScrollBar>
+#include <QHeaderView>
+
+#define FUSEPDF_PATH_ROLE Qt::UserRole+1
+#define FUSEPDF_PAGES_ROLE Qt::UserRole+2
+#define FUSEPDF_SELECTED_ROLE Qt::UserRole+3
 
 class FilesTreeWidget : public QTreeWidget
 {
@@ -130,6 +135,8 @@ private slots:
         return QByteArray::fromRawData(reinterpret_cast<const char*>(str.constData()),
                                        (str.size()+1)*2).toHex();
     }
+
+    int getPageCount(const QString &filename);
 
 private:
     Ui::FusePDF *ui;
