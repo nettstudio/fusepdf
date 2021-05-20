@@ -314,6 +314,12 @@ void FusePDF::loadSettings()
     ui->progressBar->setMaximum(100);
     ui->progressBar->setValue(100);
     loadOptions();
+
+    if (getCachePath().isEmpty()) {
+        QMessageBox::warning(this,
+                             tr("Missing cache folder"),
+                             tr("Unable to create the cache folder, please check your system permissions."));
+    }
 }
 
 void FusePDF::saveSettings()
@@ -392,12 +398,7 @@ void FusePDF::handleFoundPDF(const QList<QUrl> &urls)
 {
     for (int i=0;i< urls.size();++i) {
         const QFileInfo info(urls.at(i).toLocalFile());
-        if (!info.isFile()) { continue; }
-
-        QMimeDatabase db;
-        QMimeType type = db.mimeTypeForFile(info.absoluteFilePath());
-        if (type.name() != "application/pdf") { continue; }
-
+        if (!isPDF(info.filePath())) { continue; }
         int pages = getPageCount(info.filePath());
         QTreeWidgetItem *item = new QTreeWidgetItem(ui->inputs);
         item->setData(0, FUSEPDF_PATH_ROLE, info.filePath());
@@ -560,7 +561,7 @@ void FusePDF::deleteDocumentItem()
 int FusePDF::getPageCount(const QString &filename)
 {
     int result = 0;
-    if (filename.isEmpty()) { return result; }
+    if (!isPDF(filename)) { return result; }
     QString command = findGhost();
 #ifdef Q_OS_WIN
     command = QString("\"%1\"").arg(findGhost());
@@ -572,4 +573,22 @@ int FusePDF::getPageCount(const QString &filename)
     result = proc.readAll().replace("PageCount:", "").simplified().toInt();
     proc.close();
     return result;
+}
+
+bool FusePDF::isPDF(const QString &filename)
+{
+    QMimeDatabase db;
+    QMimeType type = db.mimeTypeForFile(filename);
+    return (type.name() == "application/pdf");
+}
+
+const QString FusePDF::getCachePath()
+{
+    QString path = QDir::tempPath();
+    path.append("/fusepdf");
+    if (!QFile::exists(path)) {
+        QDir dir(path);
+        if (!dir.mkpath(path)) { return "";}
+    }
+    return path;
 }

@@ -70,11 +70,11 @@ public:
     {
         setViewMode(QListView::IconMode);
         setIconSize(QSize(128, 128));
-        setGridSize(QSize(128, 128));
+        setGridSize(QSize(192, 192));
         setUniformItemSizes(true);
         setWrapping(true);
         for (int i = 1; i <= _pages; ++i) {
-            QListWidgetItem *item = new QListWidgetItem(QIcon(":/assets/document.png"),
+            QListWidgetItem *item = new QListWidgetItem(QIcon(":/assets/fusepdf.png"),
                                                         QString::number(i),
                                                         this);
             item->setData(FUSEPDF_PAGE_ROLE, i);
@@ -178,6 +178,8 @@ private slots:
     }
 
     int getPageCount(const QString &filename);
+    bool isPDF(const QString &filename);
+    const QString getCachePath();
 
 private:
     Ui::FusePDF *ui;
