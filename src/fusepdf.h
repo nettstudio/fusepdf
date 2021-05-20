@@ -48,17 +48,59 @@
 #include <QShortcut>
 #include <QScrollBar>
 #include <QHeaderView>
+#include <QListWidget>
+#include <QListWidgetItem>
 
-#define FUSEPDF_PATH_ROLE Qt::UserRole+1
-#define FUSEPDF_PAGES_ROLE Qt::UserRole+2
-#define FUSEPDF_SELECTED_ROLE Qt::UserRole+3
+#define FUSEPDF_PATH_ROLE Qt::UserRole + 1
+#define FUSEPDF_PAGES_ROLE Qt::UserRole + 2
+#define FUSEPDF_PAGE_ROLE Qt::UserRole + 3
+#define FUSEPDF_SELECTED_ROLE Qt::UserRole + 4
+
+class PagesListWidget : public QListWidget
+{
+    Q_OBJECT
+
+public:
+    PagesListWidget(QWidget *parent = nullptr,
+                    const QString &filename = QString(),
+                    int pages = 0):
+        QListWidget(parent)
+      , _filename(filename)
+      , _pages(pages)
+    {
+        setViewMode(QListView::IconMode);
+        setIconSize(QSize(128, 128));
+        setGridSize(QSize(128, 128));
+        setUniformItemSizes(true);
+        setWrapping(true);
+        for (int i = 1; i <= _pages; ++i) {
+            QListWidgetItem *item = new QListWidgetItem(QIcon(":/assets/document.png"),
+                                                        QString::number(i),
+                                                        this);
+            item->setData(FUSEPDF_PAGE_ROLE, i);
+            item->setCheckState(Qt::Checked);
+        }
+    }
+
+    const QString getFilename() {
+        return _filename;
+    }
+
+    int getPageCount() {
+        return _pages;
+    }
+
+private:
+    QString _filename;
+    int _pages;
+};
 
 class FilesTreeWidget : public QTreeWidget
 {
     Q_OBJECT
 
 public:
-    FilesTreeWidget(QWidget *parent= nullptr):
+    FilesTreeWidget(QWidget *parent = nullptr):
         QTreeWidget(parent)
     {
         setSortingEnabled(false);
@@ -131,7 +173,6 @@ private slots:
     {
         // https://stackoverflow.com/a/38831604
         str.prepend(QChar::ByteOrderMark);
-        // It is OK to use `fromRawData` since toHex copies it.
         return QByteArray::fromRawData(reinterpret_cast<const char*>(str.constData()),
                                        (str.size()+1)*2).toHex();
     }

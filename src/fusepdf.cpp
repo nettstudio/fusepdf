@@ -29,6 +29,8 @@ FusePDF::FusePDF(QWidget *parent)
 {
     ui->setupUi(this);
     setWindowIcon(QIcon(":/assets/fusepdf.png"));
+
+#ifndef Q_OS_MAC
     qApp->setStyle(QStyleFactory::create("fusion"));
 
     QPalette mainPalette = qApp->palette();
@@ -39,6 +41,7 @@ FusePDF::FusePDF(QWidget *parent)
     QPalette treePalette = ui->inputs->palette();
     treePalette.setColor(QPalette::Highlight, QColor(124,124,124)); // #7c7c7c
     ui->inputs->setPalette(treePalette);
+#endif
     ui->inputs->header()->setVisible(true); // bypass designer bug
 
     QWidget *spacer = new QWidget(this);
@@ -51,7 +54,6 @@ FusePDF::FusePDF(QWidget *parent)
     ui->toolBar->addWidget(spacer);
     ui->toolBar->addSeparator();
     ui->toolBar->addWidget(ui->presetWidget);
-    //ui->toolBar->addSeparator();
     ui->toolBar->addWidget(ui->compatWidget);
 
     ui->metaTitleLabel->setToolTip(tr("Set document title"));
@@ -69,8 +71,6 @@ FusePDF::FusePDF(QWidget *parent)
     ui->preset->setToolTip(ui->presetLabel->toolTip());
     ui->compatLabel->setToolTip(tr("Select the PDF version this document should be compatible with."));
     ui->compat->setToolTip(ui->compatLabel->toolTip());
-    //ui->dpiCheck->setToolTip(tr("Override resolution for pattern fills, for fonts that must be converted to bitmaps\n and any other rendering required (eg rendering transparent pages for output to PDF versions < 1.4). "));
-    //ui->dpi->setToolTip(ui->dpiCheck->toolTip());
     ui->inputs->setToolTip(tr("Drag and drop PDF documents you want to merge here. You can re-arrange after adding them (if sorting is disabled).\n\n"
                               "Note that the first document will define the paper size on the final output.\n\n"
                               "You can remove a document with the DEL key."));
@@ -175,9 +175,6 @@ const QString FusePDF::makeCommand(const QString &filename)
         command.append(QString(" -dPDFSETTINGS=/%1").arg(ui->preset->currentText().toLower()));
     }
     command.append(" -dNOPAUSE -dBATCH -dDetectDuplicateImages -dCompressFonts=true");
-    /*if (ui->dpiCheck->isChecked()) {
-        command.append(QString(" -r%1").arg(ui->dpi->value()));
-    }*/
     command.append(QString(" -sOutputFile=\"%1\"").arg(filename));
     for (int i = 0; i < ui->inputs->topLevelItemCount(); ++i) {
         command.append(QString(" \"%1\"").arg(ui->inputs->topLevelItem(i)->data(0, FUSEPDF_PATH_ROLE).toString()));
@@ -345,6 +342,10 @@ void FusePDF::handleProcOutput()
 void FusePDF::clearInput()
 {
     ui->inputs->clear();
+    //
+    ui->tabs->clear();
+    ui->tabs->addTab(ui->tabInputs, tr("Documents"));
+    //
     ui->cmd->clear();
     _output.clear();
 }
@@ -361,6 +362,12 @@ const QString FusePDF::findGhost()
         QString bin32 = folder + "/bin/gswin32c.exe";
         if (QFile::exists(bin32)) { return bin32; }
     }
+    return QString();
+#endif
+#ifdef Q_OS_MAC
+    QStringList gs;
+    gs << "/opt/local/bin/gs" << "/usr/local/bin/gs";
+    for (int i = 0; i < gs.size(); ++i) { if (QFile::exists(gs.at(i))) { return gs.at(i); } }
     return QString();
 #endif
     return QString("gs");
@@ -398,8 +405,11 @@ void FusePDF::handleFoundPDF(const QList<QUrl> &urls)
         item->setText(0, info.fileName());
         item->setText(1, QString::number(pages));
         item->setIcon(0, QIcon(":/assets/fusepdf-document.png"));
-        item->setFlags(Qt::ItemIsSelectable|Qt::ItemIsDragEnabled|Qt::ItemIsEnabled|Qt::ItemNeverHasChildren);
+        item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsDragEnabled | Qt::ItemIsEnabled | Qt::ItemNeverHasChildren);
         if (!info.absolutePath().isEmpty()) { _lastLoadDir = info.absolutePath(); }
+        ui->tabs->addTab(new PagesListWidget(this, info.filePath(), pages),
+                         QIcon(":/assets/document.png"),
+                         info.fileName());
     }
 }
 
@@ -437,7 +447,6 @@ void FusePDF::loadOptions()
 
     QSettings settings;
     settings.beginGroup("options");
-    //ui->dpi->setValue(settings.value("dpi", 720).toInt());
     ui->compat->setCurrentText(settings.value("compat", "1.5").toString());
     ui->preset->setCurrentText(settings.value("preset", "Default").toString());
     ui->actionShow_log->setChecked(settings.value("showLog", false).toBool());
@@ -447,7 +456,6 @@ void FusePDF::loadOptions()
     ui->actionRemember_meta_title->setChecked(settings.value("metaTitle", true).toBool());
     _lastLoadDir = settings.value("lastLoadDir", "").toString();
     _lastSaveDir = settings.value("lastSaveDir", "").toString();
-    //ui->dpiCheck->setChecked(settings.value("checkdpi", false).toBool());
     ui->actionOpen_saved_PDF->setChecked(settings.value("openSavedPDF", true).toBool());
     ui->cmd->setVisible(ui->actionShow_log->isChecked());
     ui->inputs->setSortingEnabled(ui->actionAuto_Sort->isChecked());
@@ -472,7 +480,6 @@ void FusePDF::saveOptions()
 {
     QSettings settings;
     settings.beginGroup("options");
-    //settings.setValue("dpi", ui->dpi->value());
     if (!ui->compat->currentText().isEmpty()) {
         settings.setValue("compat", ui->compat->currentText());
     }
@@ -481,7 +488,6 @@ void FusePDF::saveOptions()
     }
     settings.setValue("showLog", ui->actionShow_log->isChecked());
     settings.setValue("autoSort", ui->actionAuto_Sort->isChecked());
-    //settings.setValue("checkdpi", ui->dpiCheck->isChecked());
     settings.setValue("openSavedPDF", ui->actionOpen_saved_PDF->isChecked());
     settings.setValue("metaAuthor", ui->actionRemember_meta_author->isChecked());
     settings.setValue("metaSubject", ui->actionRemember_meta_subject->isChecked());
@@ -547,6 +553,7 @@ void FusePDF::handleProcessError(QProcess::ProcessError error)
 void FusePDF::deleteDocumentItem()
 {
     if (ui->inputs->topLevelItemCount() == 0 || ui->inputs->currentItem() == nullptr) { return; }
+    // TODO also remove associated tab
     delete ui->inputs->currentItem();
 }
 
@@ -554,19 +561,15 @@ int FusePDF::getPageCount(const QString &filename)
 {
     int result = 0;
     if (filename.isEmpty()) { return result; }
-
     QString command = findGhost();
 #ifdef Q_OS_WIN
     command = QString("\"%1\"").arg(findGhost());
 #endif
-
     command.append(QString(" -q -dNODISPLAY -dNOSAFER -c \"/pdffile (%1) (r) file runpdfbegin (PageCount: ) print pdfpagecount = quit\"").arg(filename));
-
     QProcess proc;
     proc.start(command);
     proc.waitForFinished();
     result = proc.readAll().replace("PageCount:", "").simplified().toInt();
     proc.close();
-
     return result;
 }
