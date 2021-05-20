@@ -151,6 +151,7 @@ void FusePDF::on_actionAbout_triggered()
     QMessageBox::about(this,
                        tr("FusePDF"),
                        tr("<h2>FusePDF %1</h2>"
+                          "<p>Written by <a href=\"https://github.com/rodlie\">Ole-André Rodlie</a> for <a href=\"https://nettstudio.no\">NettStudio AS</a>.</p>"
                           "<p>Copyright &copy;2021 <a href='https://nettstudio.no'>NettStudio AS</a>. All rights reserved.</p>"
                           "<p style=\"font-size:small;\">This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 3 of the License, or (at your option) any later version.</p>"
                           "<p style=\"font-size:small;\">This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.</p>"
@@ -412,6 +413,10 @@ void FusePDF::handleFoundPDF(const QList<QUrl> &urls)
         ui->tabs->addTab(new PagesListWidget(this, info.filePath(), pages),
                          QIcon(":/assets/document.png"),
                          info.fileName());
+        //qDebug() << "image?" << getPagePreview(info.filePath(), 1);
+        connect(this, SIGNAL(foundPagePreview(QString,QString,int)),
+                getTab(info.filePath()), SLOT(setPageIcon(QString,QString,int)));
+        QtConcurrent::run(this, &FusePDF::getPagePreviews, info.filePath(), pages);
     }
 }
 
@@ -598,6 +603,13 @@ bool FusePDF::isPDF(const QString &filename)
     return (type.name() == "application/pdf");
 }
 
+bool FusePDF::isJPG(const QString &filename)
+{
+    QMimeDatabase db;
+    QMimeType type = db.mimeTypeForFile(filename);
+    return (type.name() == "image/jpeg");
+}
+
 const QString FusePDF::getCachePath()
 {
     QString path = QDir::tempPath();
@@ -635,4 +647,32 @@ int FusePDF::getTabIndex(const QString &filename)
         if (tab && tab->getFilename() == filename) { return i; }
     }
     return result;
+}
+
+const QString FusePDF::getPagePreview(const QString &filename, int page, int quality)
+{
+    QString cache = getCachePath();
+    if (!isPDF(filename) || cache.isEmpty()) { return  QString(); }
+    QString image = QString("%1/%2-page-%3.jpg").arg(cache).arg(QFileInfo(filename).fileName()).arg(page);
+    QString command = findGhost();
+#ifdef Q_OS_WIN
+    command = QString("\"%1\"").arg(findGhost());
+#endif
+    command.append(QString(" -q -sDEVICE=jpeg -o \"%2\" -dFirstPage=%3 -dLastPage=%3 -dJPEGQ=%4 -r72x72 \"%1\"").arg(filename).arg(image).arg(page).arg(quality));
+    qDebug() << command;
+    QProcess proc;
+    proc.start(command);
+    proc.waitForFinished();
+    proc.close();
+    if (isJPG(image)) { return image; }
+    return QString();
+}
+
+void FusePDF::getPagePreviews(const QString &filename, int pages)
+{
+    if (!isPDF(filename) || pages < 1) { return; }
+    for (int i = 1; i <= pages; ++i) {
+        QString image = getPagePreview(filename, i);
+        if (!image.isEmpty()) { emit foundPagePreview(filename, image, i); }
+    }
 }

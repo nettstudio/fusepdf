@@ -21,7 +21,7 @@ TARGET = FusePDF
 VERSION = 2.0.0
 TEMPLATE = app
 
-QT += core gui widgets
+QT += core gui widgets concurrent
 CONFIG += c++11
 
 CONFIG(release, debug|release): DEFINES += QT_NO_DEBUG_OUTPUT QT_NO_WARNING_OUTPUT

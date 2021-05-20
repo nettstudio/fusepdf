@@ -50,11 +50,15 @@
 #include <QHeaderView>
 #include <QListWidget>
 #include <QListWidgetItem>
+#include <QtConcurrent/QtConcurrentRun>
+#include <QPixmap>
+#include <QPainter>
 
 #define FUSEPDF_PATH_ROLE Qt::UserRole + 1
 #define FUSEPDF_PAGES_ROLE Qt::UserRole + 2
 #define FUSEPDF_PAGE_ROLE Qt::UserRole + 3
 #define FUSEPDF_SELECTED_ROLE Qt::UserRole + 4
+#define FUSEPDF_PAGE_ICON_SIZE 320
 
 class PagesListWidget : public QListWidget
 {
@@ -69,17 +73,22 @@ public:
       , _pages(pages)
     {
         setViewMode(QListView::IconMode);
-        setIconSize(QSize(128, 128));
-        setGridSize(QSize(192, 192));
+        setIconSize(QSize(FUSEPDF_PAGE_ICON_SIZE, FUSEPDF_PAGE_ICON_SIZE));
+        //setGridSize(QSize(356, 356));
         setUniformItemSizes(true);
         setWrapping(true);
+        setResizeMode(QListView::Adjust);
         for (int i = 1; i <= _pages; ++i) {
             QListWidgetItem *item = new QListWidgetItem(QIcon(":/assets/fusepdf.png"),
                                                         QString::number(i),
                                                         this);
             item->setData(FUSEPDF_PAGE_ROLE, i);
             item->setCheckState(Qt::Checked);
+            //item->setBackgroundColor(QColor(50, 50, 50));
         }
+
+        connect(this, SIGNAL(itemClicked(QListWidgetItem*)),
+                this, SLOT(handleItemClicked(QListWidgetItem*)));
     }
 
     const QString getFilename() {
@@ -88,6 +97,41 @@ public:
 
     int getPageCount() {
         return _pages;
+    }
+
+public slots:
+    void setPageIcon(const QString &filename, const QString &image, int page)
+    {
+        if (filename != _filename || page > _pages || page < 1) { return; }
+        for (int i = 0; i < count(); ++i) {
+            QListWidgetItem *item = this->item(i);
+            if (!item) { continue; }
+            if (item->data(FUSEPDF_PAGE_ROLE).toInt() != page) { continue; }
+            QPixmap pix(FUSEPDF_PAGE_ICON_SIZE, FUSEPDF_PAGE_ICON_SIZE);
+            pix.fill(QColor(Qt::transparent));
+            QPainter p(&pix);
+            QPixmap ppix = QPixmap::fromImage(QImage(image)).scaledToHeight(FUSEPDF_PAGE_ICON_SIZE,
+                                                                            Qt::SmoothTransformation);
+            ppix = ppix.copy(0, 0, FUSEPDF_PAGE_ICON_SIZE, FUSEPDF_PAGE_ICON_SIZE);
+            QPainter pp(&ppix);
+            QPainterPath ppath;
+            ppath.addRect(0, 0, ppix.width(), ppix.height());
+            QPen ppen(Qt::black, 2);
+            pp.setPen(ppen);
+            pp.drawPath(ppath);
+            p.drawPixmap((pix.width()/2)-(ppix.width()/2), 0, ppix);
+            item->setIcon(pix);
+            break;
+        }
+    }
+
+private slots:
+    void handleItemClicked(QListWidgetItem *item)
+    {
+        if (!item) { return; }
+        if (item->checkState() == Qt::Checked) {
+            item->setCheckState(Qt::Unchecked);
+        } else { item->setCheckState(Qt::Checked); }
     }
 
 private:
@@ -139,6 +183,9 @@ public:
     FusePDF(QWidget *parent = nullptr);
     ~FusePDF();
 
+signals:
+    void foundPagePreview(const QString &filename, const QString &image, int page);
+
 private slots:
     void on_actionOpen_triggered();
     void on_actionSave_triggered();
@@ -154,7 +201,7 @@ private slots:
     void saveSettings();
     void handleProcOutput();
     void clearInput();
-    const QString findGhost();
+    static const QString findGhost();
     void on_actionShow_log_triggered();
     void on_actionAbout_Qt_triggered();
     bool hasWindowState();
@@ -170,11 +217,14 @@ private slots:
     void deleteDocumentItem();
     QByteArray toUtf16Hex(QString str);
     int getPageCount(const QString &filename);
-    bool isPDF(const QString &filename);
-    const QString getCachePath();
+    static bool isPDF(const QString &filename);
+    static bool isJPG(const QString &filename);
+    static const QString getCachePath();
     PagesListWidget* getTab(const QString &filename);
     bool hasTab(const QString &filename);
     int getTabIndex(const QString &filename);
+    static const QString getPagePreview(const QString &filename, int page, int quality = 30);
+    void getPagePreviews(const QString &filename, int pages);
 
 private:
     Ui::FusePDF *ui;
