@@ -168,18 +168,13 @@ private slots:
     bool missingGhost();
     void handleProcessError(QProcess::ProcessError error);
     void deleteDocumentItem();
-
-    QByteArray toUtf16Hex(QString str)
-    {
-        // https://stackoverflow.com/a/38831604
-        str.prepend(QChar::ByteOrderMark);
-        return QByteArray::fromRawData(reinterpret_cast<const char*>(str.constData()),
-                                       (str.size()+1)*2).toHex();
-    }
-
+    QByteArray toUtf16Hex(QString str);
     int getPageCount(const QString &filename);
     bool isPDF(const QString &filename);
     const QString getCachePath();
+    PagesListWidget* getTab(const QString &filename);
+    bool hasTab(const QString &filename);
+    int getTabIndex(const QString &filename);
 
 private:
     Ui::FusePDF *ui;

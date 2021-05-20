@@ -408,6 +408,7 @@ void FusePDF::handleFoundPDF(const QList<QUrl> &urls)
         item->setIcon(0, QIcon(":/assets/fusepdf-document.png"));
         item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsDragEnabled | Qt::ItemIsEnabled | Qt::ItemNeverHasChildren);
         if (!info.absolutePath().isEmpty()) { _lastLoadDir = info.absolutePath(); }
+        if (hasTab(info.filePath())) { continue; }
         ui->tabs->addTab(new PagesListWidget(this, info.filePath(), pages),
                          QIcon(":/assets/document.png"),
                          info.fileName());
@@ -554,8 +555,23 @@ void FusePDF::handleProcessError(QProcess::ProcessError error)
 void FusePDF::deleteDocumentItem()
 {
     if (ui->inputs->topLevelItemCount() == 0 || ui->inputs->currentItem() == nullptr) { return; }
-    // TODO also remove associated tab
+    QString filename = ui->inputs->currentItem()->data(0, FUSEPDF_PATH_ROLE).toString();
     delete ui->inputs->currentItem();
+
+    int index = getTabIndex(filename);
+    if (index < 0) { return; }
+    PagesListWidget *tab = getTab(filename);
+    if (!tab) { return; }
+    ui->tabs->removeTab(index);
+    tab->deleteLater();
+}
+
+QByteArray FusePDF::toUtf16Hex(QString str)
+{
+    // https://stackoverflow.com/a/38831604
+    str.prepend(QChar::ByteOrderMark);
+    return QByteArray::fromRawData(reinterpret_cast<const char*>(str.constData()),
+                                   (str.size()+1)*2).toHex();
 }
 
 int FusePDF::getPageCount(const QString &filename)
@@ -591,4 +607,32 @@ const QString FusePDF::getCachePath()
         if (!dir.mkpath(path)) { return "";}
     }
     return path;
+}
+
+PagesListWidget *FusePDF::getTab(const QString &filename)
+{
+    if (filename.isEmpty()) { return nullptr; }
+    for (int i = 0; i < ui->tabs->count(); ++i) {
+        PagesListWidget *tab = qobject_cast<PagesListWidget*>(ui->tabs->widget(i));
+        if (tab && tab->getFilename() == filename) { return tab; }
+    }
+    return nullptr;
+}
+
+bool FusePDF::hasTab(const QString &filename)
+{
+    PagesListWidget *tab = getTab(filename);
+    if (tab && tab->getFilename() == filename) { return true; }
+    return false;
+}
+
+int FusePDF::getTabIndex(const QString &filename)
+{
+    int result = -1;
+    if (filename.isEmpty()) { return  result; }
+    for (int i = 0; i < ui->tabs->count(); ++i) {
+        PagesListWidget *tab = qobject_cast<PagesListWidget*>(ui->tabs->widget(i));
+        if (tab && tab->getFilename() == filename) { return i; }
+    }
+    return result;
 }
