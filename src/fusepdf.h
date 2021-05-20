@@ -137,8 +137,6 @@ private slots:
     }
 
     int getPageCount(const QString &filename);
-    bool isPDF(const QString &filename);
-    const QString getCachePath();
 
 private:
     Ui::FusePDF *ui;

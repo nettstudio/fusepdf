@@ -151,7 +151,7 @@
        <item>
         <widget class="QGroupBox" name="meta">
          <property name="title">
-          <string>Output Properties</string>
+          <string>Properties</string>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_3">
           <item>
