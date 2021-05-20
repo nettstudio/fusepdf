@@ -51,10 +51,10 @@ FusePDF::FusePDF(QWidget *parent)
     ui->inputs->header()->setSectionResizeMode(0, QHeaderView::Stretch);
     ui->inputs->header()->setSectionResizeMode(1, QHeaderView::Fixed);
 
-    ui->toolBar->addWidget(spacer);
+    /*ui->toolBar->addWidget(spacer);
     ui->toolBar->addSeparator();
     ui->toolBar->addWidget(ui->presetWidget);
-    ui->toolBar->addWidget(ui->compatWidget);
+    ui->toolBar->addWidget(ui->compatWidget);*/
 
     ui->metaTitleLabel->setToolTip(tr("Set document title"));
     ui->metaTitle->setToolTip(ui->metaTitleLabel->toolTip());
