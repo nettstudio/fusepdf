@@ -53,6 +53,7 @@
 #include <QtConcurrent/QtConcurrentRun>
 #include <QPixmap>
 #include <QPainter>
+#include <QPainterPath>
 
 #define FUSEPDF_PATH_ROLE Qt::UserRole + 1
 #define FUSEPDF_PAGES_ROLE Qt::UserRole + 2
@@ -223,7 +224,7 @@ private slots:
     PagesListWidget* getTab(const QString &filename);
     bool hasTab(const QString &filename);
     int getTabIndex(const QString &filename);
-    static const QString getPagePreview(const QString &filename, int page, int quality = 30);
+    static const QString getPagePreview(const QString &filename, int page, int quality = 50);
     void getPagePreviews(const QString &filename, int pages);
 
 private:

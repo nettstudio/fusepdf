@@ -44,17 +44,13 @@ FusePDF::FusePDF(QWidget *parent)
 #endif
     ui->inputs->header()->setVisible(true); // bypass designer bug
 
-    QWidget *spacer = new QWidget(this);
+    /*QWidget *spacer = new QWidget(this);
     spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    ui->toolBar->addWidget(spacer);*/
 
     ui->inputs->header()->setStretchLastSection(false);
     ui->inputs->header()->setSectionResizeMode(0, QHeaderView::Stretch);
     ui->inputs->header()->setSectionResizeMode(1, QHeaderView::Fixed);
-
-    /*ui->toolBar->addWidget(spacer);
-    ui->toolBar->addSeparator();
-    ui->toolBar->addWidget(ui->presetWidget);
-    ui->toolBar->addWidget(ui->compatWidget);*/
 
     ui->metaTitleLabel->setToolTip(tr("Set document title"));
     ui->metaTitle->setToolTip(ui->metaTitleLabel->toolTip());
