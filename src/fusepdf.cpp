@@ -289,7 +289,7 @@ void FusePDF::populateUI()
 void FusePDF::loadSettings()
 {
     if (isNewVersion()) { on_actionAbout_triggered(); }
-    if (!hasWindowState()) { setGeometry(100, 100, 700, 250); }
+    //if (!hasWindowState()) { setGeometry(100, 100, 700, 250); } // ???
 
     QSettings settings;
     settings.beginGroup("ui");
@@ -396,19 +396,20 @@ void FusePDF::handleFoundPDF(const QList<QUrl> &urls)
         const QFileInfo info(urls.at(i).toLocalFile());
         if (!isPDF(info.filePath())) { continue; }
         int pages = getPageCount(info.filePath());
+        QString checksum = getChecksum(info.filePath());
         QTreeWidgetItem *item = new QTreeWidgetItem(ui->inputs);
         item->setData(0, FUSEPDF_PATH_ROLE, info.filePath());
         item->setData(0, FUSEPDF_PAGES_ROLE, pages);
+        item->setData(0, FUSEPDF_CHECKSUM_ROLE, checksum);
         item->setText(0, info.fileName());
         item->setText(1, QString::number(pages));
         item->setIcon(0, QIcon(":/assets/fusepdf-document.png"));
         item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsDragEnabled | Qt::ItemIsEnabled | Qt::ItemNeverHasChildren);
         if (!info.absolutePath().isEmpty()) { _lastLoadDir = info.absolutePath(); }
         if (hasTab(info.filePath())) { continue; }
-        ui->tabs->addTab(new PagesListWidget(this, info.filePath(), pages),
+        ui->tabs->addTab(new PagesListWidget(this, info.filePath(), checksum, pages),
                          QIcon(":/assets/document.png"),
                          info.fileName());
-        //qDebug() << "image?" << getPagePreview(info.filePath(), 1);
         connect(this, SIGNAL(foundPagePreview(QString,QString,int)),
                 getTab(info.filePath()), SLOT(setPageIcon(QString,QString,int)));
         QtConcurrent::run(this, &FusePDF::getPagePreviews, info.filePath(), pages);
@@ -670,4 +671,17 @@ void FusePDF::getPagePreviews(const QString &filename, int pages)
         QString image = getPagePreview(filename, i);
         if (!image.isEmpty()) { emit foundPagePreview(filename, image, i); }
     }
+}
+
+const QString FusePDF::getChecksum(const QString &filename)
+{
+    if (!isPDF(filename)) { return QString(); }
+    QFile file(filename);
+    QString result;
+    if (file.open(QFile::ReadOnly)) {
+        QCryptographicHash hash(QCryptographicHash::Sha256);
+        if (hash.addData(&file)) { result = hash.result().toHex(); }
+        file.close();
+    }
+    return result;
 }

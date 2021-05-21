@@ -54,11 +54,13 @@
 #include <QPixmap>
 #include <QPainter>
 #include <QPainterPath>
+#include <QCryptographicHash>
 
 #define FUSEPDF_PATH_ROLE Qt::UserRole + 1
 #define FUSEPDF_PAGES_ROLE Qt::UserRole + 2
 #define FUSEPDF_PAGE_ROLE Qt::UserRole + 3
 #define FUSEPDF_SELECTED_ROLE Qt::UserRole + 4
+#define FUSEPDF_CHECKSUM_ROLE Qt::UserRole + 5
 #define FUSEPDF_PAGE_ICON_SIZE 320
 
 class PagesListWidget : public QListWidget
@@ -68,17 +70,20 @@ class PagesListWidget : public QListWidget
 public:
     PagesListWidget(QWidget *parent = nullptr,
                     const QString &filename = QString(),
+                    const QString &checksum = QString(),
                     int pages = 0):
         QListWidget(parent)
       , _filename(filename)
+      , _checksum(checksum)
       , _pages(pages)
     {
         setViewMode(QListView::IconMode);
         setIconSize(QSize(FUSEPDF_PAGE_ICON_SIZE, FUSEPDF_PAGE_ICON_SIZE));
-        //setGridSize(QSize(356, 356));
         setUniformItemSizes(true);
         setWrapping(true);
         setResizeMode(QListView::Adjust);
+        setFrameShape(QFrame::NoFrame);
+
         for (int i = 1; i <= _pages; ++i) {
             QListWidgetItem *item = new QListWidgetItem(QIcon(":/assets/fusepdf.png"),
                                                         QString::number(i),
@@ -94,6 +99,10 @@ public:
 
     const QString getFilename() {
         return _filename;
+    }
+
+    const QString getChecksum() {
+        return _checksum;
     }
 
     int getPageCount() {
@@ -137,6 +146,7 @@ private slots:
 
 private:
     QString _filename;
+    QString _checksum;
     int _pages;
 };
 
@@ -226,6 +236,7 @@ private slots:
     int getTabIndex(const QString &filename);
     static const QString getPagePreview(const QString &filename, int page, int quality = 50);
     void getPagePreviews(const QString &filename, int pages);
+    const QString getChecksum(const QString &filename);
 
 private:
     Ui::FusePDF *ui;
