@@ -85,7 +85,7 @@ public:
                                                         this);
             item->setData(FUSEPDF_PAGE_ROLE, i);
             item->setCheckState(Qt::Checked);
-            //item->setBackgroundColor(QColor(50, 50, 50));
+            item->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
         }
 
         connect(this, SIGNAL(itemClicked(QListWidgetItem*)),

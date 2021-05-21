@@ -6,8 +6,6 @@ Requires [Ghostscript](https://www.ghostscript.com/download/gsdnld.html) install
 
 Copyright (c) 2021 NettStudio AS. All rights reserved.
 
-## Open Source
-
 This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 3 of the License, or (at your option) any later version.
 
 ```
@@ -17,5 +15,3 @@ mkdir build && cd build
 qmake CONFIG+=release PREFIX=/usr .. && make
 sudo make install
 ```
-
-Note that FusePDF requires Ghostscript (``gs``) available during runtime (install it through your package manager if not already installed).
