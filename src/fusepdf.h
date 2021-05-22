@@ -62,6 +62,7 @@
 #define FUSEPDF_SELECTED_ROLE Qt::UserRole + 4
 #define FUSEPDF_CHECKSUM_ROLE Qt::UserRole + 5
 #define FUSEPDF_PAGE_ICON_SIZE 320
+#define FUSEPDF_CACHE_JPEG "%1/%2-%3.jpg"
 
 class PagesListWidget : public QListWidget
 {
@@ -96,22 +97,24 @@ public:
         connect(this, SIGNAL(itemClicked(QListWidgetItem*)),
                 this, SLOT(handleItemClicked(QListWidgetItem*)));
     }
-
     const QString getFilename() {
         return _filename;
     }
-
     const QString getChecksum() {
         return _checksum;
     }
-
     int getPageCount() {
         return _pages;
     }
 
 public slots:
-    void setPageIcon(const QString &filename, const QString &image, int page)
+    void setPageIcon(const QString &filename,
+                     const QString &checksum,
+                     const QString &image,
+                     int page)
     {
+        qDebug() << "setPageIcon" << filename << checksum << image << page;
+        Q_UNUSED(checksum)
         if (filename != _filename || page > _pages || page < 1) { return; }
         for (int i = 0; i < count(); ++i) {
             QListWidgetItem *item = this->item(i);
@@ -195,7 +198,10 @@ public:
     ~FusePDF();
 
 signals:
-    void foundPagePreview(const QString &filename, const QString &image, int page);
+    void foundPagePreview(const QString &filename,
+                          const QString &checksum,
+                          const QString &image,
+                          int page);
 
 private slots:
     void on_actionOpen_triggered();
@@ -234,8 +240,11 @@ private slots:
     PagesListWidget* getTab(const QString &filename);
     bool hasTab(const QString &filename);
     int getTabIndex(const QString &filename);
-    static const QString getPagePreview(const QString &filename, int page, int quality = 50);
-    void getPagePreviews(const QString &filename, int pages);
+    static const QString getPagePreview(const QString &filename,
+                                        const QString &checksum,
+                                        int page,
+                                        int quality = 50);
+    void getPagePreviews(const QString &filename, const QString &checksum, int pages);
     const QString getChecksum(const QString &filename);
 
 private:

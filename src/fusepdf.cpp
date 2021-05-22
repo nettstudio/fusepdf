@@ -410,9 +410,9 @@ void FusePDF::handleFoundPDF(const QList<QUrl> &urls)
         ui->tabs->addTab(new PagesListWidget(this, info.filePath(), checksum, pages),
                          QIcon(":/assets/document.png"),
                          info.fileName());
-        connect(this, SIGNAL(foundPagePreview(QString,QString,int)),
-                getTab(info.filePath()), SLOT(setPageIcon(QString,QString,int)));
-        QtConcurrent::run(this, &FusePDF::getPagePreviews, info.filePath(), pages);
+        connect(this, SIGNAL(foundPagePreview(QString,QString,QString,int)),
+                getTab(info.filePath()), SLOT(setPageIcon(QString,QString,QString,int)));
+        QtConcurrent::run(this, &FusePDF::getPagePreviews, info.filePath(), checksum, pages);
     }
 }
 
@@ -645,11 +645,11 @@ int FusePDF::getTabIndex(const QString &filename)
     return result;
 }
 
-const QString FusePDF::getPagePreview(const QString &filename, int page, int quality)
+const QString FusePDF::getPagePreview(const QString &filename, const QString &checksum, int page, int quality)
 {
     QString cache = getCachePath();
     if (!isPDF(filename) || cache.isEmpty()) { return  QString(); }
-    QString image = QString("%1/%2-page-%3.jpg").arg(cache).arg(QFileInfo(filename).fileName()).arg(page);
+    QString image = QString(FUSEPDF_CACHE_JPEG).arg(cache).arg(checksum).arg(page);
     QString command = findGhost();
 #ifdef Q_OS_WIN
     command = QString("\"%1\"").arg(findGhost());
@@ -664,12 +664,17 @@ const QString FusePDF::getPagePreview(const QString &filename, int page, int qua
     return QString();
 }
 
-void FusePDF::getPagePreviews(const QString &filename, int pages)
+void FusePDF::getPagePreviews(const QString &filename, const QString &checksum, int pages)
 {
-    if (!isPDF(filename) || pages < 1) { return; }
+    QString cache = getCachePath();
+    if (!isPDF(filename) || pages < 1 || cache.isEmpty()) { return; }
     for (int i = 1; i <= pages; ++i) {
-        QString image = getPagePreview(filename, i);
-        if (!image.isEmpty()) { emit foundPagePreview(filename, image, i); }
+        QString image = QString(FUSEPDF_CACHE_JPEG).arg(cache).arg(checksum).arg(i);
+        if (!QFile::exists(image)) {
+            qDebug() << "cache not found, get new" << filename << i;
+            image = getPagePreview(filename, checksum, i);
+        }
+        if (!image.isEmpty()) { emit foundPagePreview(filename, checksum, image, i); }
     }
 }
 
