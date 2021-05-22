@@ -28,7 +28,7 @@ FusePDF::FusePDF(QWidget *parent)
     , _proc(nullptr)
 {
     ui->setupUi(this);
-    setWindowIcon(QIcon(":/assets/fusepdf.png"));
+    setWindowIcon(QIcon(FUSEPDF_ICON_LOGO));
 
 #ifndef Q_OS_MAC
     qApp->setStyle(QStyleFactory::create("fusion"));
@@ -43,10 +43,6 @@ FusePDF::FusePDF(QWidget *parent)
     ui->inputs->setPalette(treePalette);
 #endif
     ui->inputs->header()->setVisible(true); // bypass designer bug
-
-    /*QWidget *spacer = new QWidget(this);
-    spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-    ui->toolBar->addWidget(spacer);*/
 
     ui->inputs->header()->setStretchLastSection(false);
     ui->inputs->header()->setSectionResizeMode(0, QHeaderView::Stretch);
@@ -267,7 +263,7 @@ void FusePDF::commandFinished(int exitCode)
 void FusePDF::populateUI()
 {
     ui->compat->clear();
-    QIcon docIcon(":/assets/document.png");
+    QIcon docIcon(FUSEPDF_ICON_DOC);
     ui->compat->addItem(docIcon, "1.0");
     ui->compat->addItem(docIcon, "1.1");
     ui->compat->addItem(docIcon, "1.2");
@@ -344,10 +340,13 @@ void FusePDF::handleProcOutput()
 void FusePDF::clearInput()
 {
     ui->inputs->clear();
-    //
+    for (int i = 0; i < ui->tabs->count(); ++i) {
+        PagesListWidget *tab = qobject_cast<PagesListWidget*>(ui->tabs->widget(i));
+        if (!tab) { continue; }
+        tab->deleteLater();
+    }
     ui->tabs->clear();
-    ui->tabs->addTab(ui->tabInputs, tr("Documents"));
-    //
+    ui->tabs->addTab(ui->tabInputs, QIcon(FUSEPDF_ICON_MAIN), tr("Documents"));
     ui->cmd->clear();
     _output.clear();
 }
@@ -403,16 +402,20 @@ void FusePDF::handleFoundPDF(const QList<QUrl> &urls)
         item->setData(0, FUSEPDF_CHECKSUM_ROLE, checksum);
         item->setText(0, info.fileName());
         item->setText(1, QString::number(pages));
-        item->setIcon(0, QIcon(":/assets/fusepdf-document.png"));
+        item->setIcon(0, QIcon(FUSEPDF_ICON_MAIN));
         item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsDragEnabled | Qt::ItemIsEnabled | Qt::ItemNeverHasChildren);
         if (!info.absolutePath().isEmpty()) { _lastLoadDir = info.absolutePath(); }
         if (hasTab(info.filePath())) { continue; }
         ui->tabs->addTab(new PagesListWidget(this, info.filePath(), checksum, pages),
-                         QIcon(":/assets/document.png"),
+                         QIcon(FUSEPDF_ICON_DOC),
                          info.fileName());
         connect(this, SIGNAL(foundPagePreview(QString,QString,QString,int)),
                 getTab(info.filePath()), SLOT(setPageIcon(QString,QString,QString,int)));
-        QtConcurrent::run(this, &FusePDF::getPagePreviews, info.filePath(), checksum, pages);
+        QtConcurrent::run(this,
+                          &FusePDF::getPagePreviews,
+                          info.filePath(),
+                          checksum,
+                          pages);
     }
 }
 
@@ -583,7 +586,7 @@ int FusePDF::getPageCount(const QString &filename)
 #ifdef Q_OS_WIN
     command = QString("\"%1\"").arg(findGhost());
 #endif
-    command.append(QString(" -q -dNODISPLAY -dNOSAFER -c \"/pdffile (%1) (r) file runpdfbegin (PageCount: ) print pdfpagecount = quit\"").arg(filename));
+    command.append(QString(FUSEPDF_GS_COUNT).arg(filename));
     QProcess proc;
     proc.start(command);
     proc.waitForFinished();
@@ -645,7 +648,10 @@ int FusePDF::getTabIndex(const QString &filename)
     return result;
 }
 
-const QString FusePDF::getPagePreview(const QString &filename, const QString &checksum, int page, int quality)
+const QString FusePDF::getPagePreview(const QString &filename,
+                                      const QString &checksum,
+                                      int page,
+                                      int quality)
 {
     QString cache = getCachePath();
     if (!isPDF(filename) || cache.isEmpty()) { return  QString(); }
@@ -654,8 +660,7 @@ const QString FusePDF::getPagePreview(const QString &filename, const QString &ch
 #ifdef Q_OS_WIN
     command = QString("\"%1\"").arg(findGhost());
 #endif
-    command.append(QString(" -q -sDEVICE=jpeg -o \"%2\" -dFirstPage=%3 -dLastPage=%3 -dJPEGQ=%4 -r72x72 \"%1\"").arg(filename).arg(image).arg(page).arg(quality));
-    qDebug() << command;
+    command.append(QString(FUSEPDF_GS_PREVIEW).arg(filename).arg(image).arg(page).arg(quality));
     QProcess proc;
     proc.start(command);
     proc.waitForFinished();

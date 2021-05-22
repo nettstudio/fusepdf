@@ -63,6 +63,12 @@
 #define FUSEPDF_CHECKSUM_ROLE Qt::UserRole + 5
 #define FUSEPDF_PAGE_ICON_SIZE 320
 #define FUSEPDF_CACHE_JPEG "%1/%2-%3.jpg"
+#define FUSEPDF_CACHE_PDF "%1/%2-%3.pdf"
+#define FUSEPDF_ICON_MAIN ":/assets/fusepdf-document.png"
+#define FUSEPDF_ICON_DOC ":/assets/document.png"
+#define FUSEPDF_ICON_LOGO ":/assets/fusepdf.png"
+#define FUSEPDF_GS_PREVIEW " -q -sDEVICE=jpeg -o \"%2\" -dFirstPage=%3 -dLastPage=%3 -dJPEGQ=%4 -r72x72 \"%1\""
+#define FUSEPDF_GS_COUNT " -q -dNODISPLAY -dNOSAFER -c \"/pdffile (%1) (r) file runpdfbegin (PageCount: ) print pdfpagecount = quit\""
 
 class PagesListWidget : public QListWidget
 {
@@ -113,7 +119,6 @@ public slots:
                      const QString &image,
                      int page)
     {
-        qDebug() << "setPageIcon" << filename << checksum << image << page;
         Q_UNUSED(checksum)
         if (filename != _filename || page > _pages || page < 1) { return; }
         for (int i = 0; i < count(); ++i) {
@@ -244,7 +249,9 @@ private slots:
                                         const QString &checksum,
                                         int page,
                                         int quality = 50);
-    void getPagePreviews(const QString &filename, const QString &checksum, int pages);
+    void getPagePreviews(const QString &filename,
+                         const QString &checksum,
+                         int pages);
     const QString getChecksum(const QString &filename);
 
 private:
