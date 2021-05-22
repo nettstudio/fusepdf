@@ -55,6 +55,7 @@
 #include <QPainter>
 #include <QPainterPath>
 #include <QCryptographicHash>
+#include <QVector>
 
 #define FUSEPDF_PATH_ROLE Qt::UserRole + 1
 #define FUSEPDF_PAGES_ROLE Qt::UserRole + 2
@@ -92,7 +93,7 @@ public:
         setFrameShape(QFrame::NoFrame);
 
         for (int i = 1; i <= _pages; ++i) {
-            QListWidgetItem *item = new QListWidgetItem(QIcon(":/assets/fusepdf.png"),
+            QListWidgetItem *item = new QListWidgetItem(QIcon(FUSEPDF_ICON_LOGO),
                                                         QString::number(i),
                                                         this);
             item->setData(FUSEPDF_PAGE_ROLE, i);
@@ -111,6 +112,27 @@ public:
     }
     int getPageCount() {
         return _pages;
+    }
+    bool isModified() {
+        for (int i = 0; i < count(); ++i) {
+            QListWidgetItem *item = this->item(i);
+            if (!item) { continue; }
+            if (item->checkState() == Qt::Unchecked) { return true; }
+        }
+        return false;
+    }
+    QVector<int> getPagesState(Qt::CheckState state)
+    {
+        QVector<int> result;
+        if (state == Qt::PartiallyChecked) { return result; }
+        for (int i = 0; i < count(); ++i) {
+            QListWidgetItem *item = this->item(i);
+            if (!item) { continue; }
+            if (item->checkState() == state) {
+                result.append(item->data(FUSEPDF_PAGE_ROLE).toInt());
+            }
+        }
+        return result;
     }
 
 public slots:
