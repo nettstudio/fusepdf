@@ -169,7 +169,23 @@ const QString FusePDF::makeCommand(const QString &filename)
     command.append(" -dNOPAUSE -dBATCH -dDetectDuplicateImages -dCompressFonts=true");
     command.append(QString(" -sOutputFile=\"%1\"").arg(filename));
     for (int i = 0; i < ui->inputs->topLevelItemCount(); ++i) {
-        command.append(QString(" \"%1\"").arg(ui->inputs->topLevelItem(i)->data(0, FUSEPDF_PATH_ROLE).toString()));
+        QString filename = ui->inputs->topLevelItem(i)->data(0, FUSEPDF_PATH_ROLE).toString();
+        PagesListWidget *tab = getTab(filename);
+        bool modified = false;
+        if (tab && tab->isModified()) {
+            modified = true;
+            QVector<int> pages = tab->getPagesState(Qt::Checked);
+            qDebug() << "extract pages from" << filename << pages;
+            for (int i = 0; i < pages.count(); ++i) {
+                QString extracted = extractPDF(filename, getChecksum(filename), pages.at(i));
+                if (!extracted.isEmpty()) {
+                    command.append(QString(" \"%1\"").arg(extracted));
+                }
+            }
+        }
+        if (!modified) {
+            command.append(QString(" \"%1\"").arg(filename));
+        }
     }
 
     QString title = ui->metaTitle->text();
@@ -694,4 +710,25 @@ const QString FusePDF::getChecksum(const QString &filename)
         file.close();
     }
     return result;
+}
+
+const QString FusePDF::extractPDF(const QString &filename,
+                                  const QString &checksum,
+                                  int page)
+{
+    qDebug() << "extractPDF" << filename << checksum << page;
+    QString cache = getCachePath();
+    QString command = findGhost();
+#ifdef Q_OS_WIN
+    command = QString("\"%1\"").arg(findGhost());
+#endif
+    if (cache.isEmpty()) { return QString(); }
+    cache = QString(FUSEPDF_CACHE_PDF).arg(cache).arg(checksum).arg(page);
+    command.append(QString(FUSEPDF_GS_EXTRACT).arg(filename).arg(cache).arg(page));
+    QProcess proc;
+    proc.start(command);
+    proc.waitForFinished();
+    proc.close();
+    if (isPDF(cache)) { return cache; }
+    return QString();
 }

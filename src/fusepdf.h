@@ -70,6 +70,7 @@
 #define FUSEPDF_ICON_LOGO ":/assets/fusepdf.png"
 #define FUSEPDF_GS_PREVIEW " -q -sDEVICE=jpeg -o \"%2\" -dFirstPage=%3 -dLastPage=%3 -dJPEGQ=%4 -r72x72 \"%1\""
 #define FUSEPDF_GS_COUNT " -q -dNODISPLAY -dNOSAFER -c \"/pdffile (%1) (r) file runpdfbegin (PageCount: ) print pdfpagecount = quit\""
+#define FUSEPDF_GS_EXTRACT " -q -dNOPAUSE -dBATCH -sOutputFile=\"%2\" -dFirstPage=%3 -dLastPage=%3 -sDEVICE=pdfwrite \"%1\""
 
 class PagesListWidget : public QListWidget
 {
@@ -275,6 +276,9 @@ private slots:
                          const QString &checksum,
                          int pages);
     const QString getChecksum(const QString &filename);
+    const QString extractPDF(const QString &filename,
+                             const QString &checksum,
+                             int page);
 
 private:
     Ui::FusePDF *ui;
