@@ -532,6 +532,13 @@ void FusePDF::clearInput()
 const QString FusePDF::findGhost()
 {
 #ifdef Q_OS_WIN
+    QString appDir = QString("%1/gs").arg(qApp->applicationDirPath());
+    if (QFile::exists(appDir)) {
+        QString bin64 = appDir + "/bin/gswin64c.exe";
+        if (QFile::exists(bin64)) { return bin64; }
+        QString bin32 = appDir + "/bin/gswin32c.exe";
+        if (QFile::exists(bin32)) { return bin32; }
+    }
     QString programFilesPath(getenv("PROGRAMFILES"));
     QDirIterator it(programFilesPath + "/gs", QStringList() << "*.*", QDir::Dirs/*, QDirIterator::Subdirectories*/);
     while (it.hasNext()) {
