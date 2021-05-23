@@ -22,6 +22,113 @@
 #include "fusepdf.h"
 #include "ui_fusepdf.h"
 
+PagesListWidget::PagesListWidget(QWidget *parent,
+                                 const QString &filename,
+                                 const QString &checksum,
+                                 int pages):
+    QListWidget(parent)
+  , _filename(filename)
+  , _checksum(checksum)
+  , _pages(pages)
+{
+    setViewMode(QListView::IconMode);
+    setIconSize(QSize(FUSEPDF_PAGE_ICON_SIZE, FUSEPDF_PAGE_ICON_SIZE));
+    setUniformItemSizes(true);
+    setWrapping(true);
+    setResizeMode(QListView::Adjust);
+    setFrameShape(QFrame::NoFrame);
+
+    for (int i = 1; i <= _pages; ++i) {
+        QListWidgetItem *item = new QListWidgetItem(QIcon(FUSEPDF_ICON_LOGO),
+                                                    QString::number(i),
+                                                    this);
+        item->setData(FUSEPDF_PAGE_ROLE, i);
+        item->setCheckState(Qt::Checked);
+        item->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
+    }
+
+    connect(this, SIGNAL(itemClicked(QListWidgetItem*)),
+            this, SLOT(handleItemClicked(QListWidgetItem*)));
+}
+
+bool PagesListWidget::isModified() {
+    for (int i = 0; i < count(); ++i) {
+        QListWidgetItem *item = this->item(i);
+        if (!item) { continue; }
+        if (item->checkState() == Qt::Unchecked) { return true; }
+    }
+    return false;
+}
+
+QVector<int> PagesListWidget::getPagesState(Qt::CheckState state)
+{
+    QVector<int> result;
+    if (state == Qt::PartiallyChecked) { return result; }
+    for (int i = 0; i < count(); ++i) {
+        QListWidgetItem *item = this->item(i);
+        if (!item) { continue; }
+        if (item->checkState() == state) {
+            result.append(item->data(FUSEPDF_PAGE_ROLE).toInt());
+        }
+    }
+    return result;
+}
+
+void PagesListWidget::setPageIcon(const QString &filename,
+                                  const QString &checksum,
+                                  const QString &image,
+                                  int page)
+{
+    Q_UNUSED(checksum)
+    if (filename != _filename || page > _pages || page < 1) { return; }
+    for (int i = 0; i < count(); ++i) {
+        QListWidgetItem *item = this->item(i);
+        if (!item) { continue; }
+        if (item->data(FUSEPDF_PAGE_ROLE).toInt() != page) { continue; }
+        QPixmap pix(FUSEPDF_PAGE_ICON_SIZE, FUSEPDF_PAGE_ICON_SIZE);
+        pix.fill(QColor(Qt::transparent));
+        QPainter p(&pix);
+        QPixmap ppix = QPixmap::fromImage(QImage(image)).scaledToHeight(FUSEPDF_PAGE_ICON_SIZE,
+                                                                        Qt::SmoothTransformation);
+        ppix = ppix.copy(0, 0, FUSEPDF_PAGE_ICON_SIZE, FUSEPDF_PAGE_ICON_SIZE);
+        QPainter pp(&ppix);
+        QPainterPath ppath;
+        ppath.addRect(0, 0, ppix.width(), ppix.height());
+        QPen ppen(Qt::black, 2);
+        pp.setPen(ppen);
+        pp.drawPath(ppath);
+        p.drawPixmap((pix.width()/2)-(ppix.width()/2), 0, ppix);
+        item->setIcon(pix);
+        break;
+    }
+}
+
+void PagesListWidget::handleItemClicked(QListWidgetItem *item)
+{
+    if (!item) { return; }
+    if (item->checkState() == Qt::Checked) {
+        item->setCheckState(Qt::Unchecked);
+    } else { item->setCheckState(Qt::Checked); }
+}
+
+FilesTreeWidget::FilesTreeWidget(QWidget *parent):
+    QTreeWidget(parent)
+{
+    setSortingEnabled(false);
+    setAcceptDrops(true);
+    viewport()->setAcceptDrops(true);
+    setDragEnabled(true);
+    setDragDropMode(QAbstractItemView::InternalMove);
+    setDropIndicatorShown(false);
+    setIconSize(QSize(32, 32));
+}
+
+void FilesTreeWidget::dropEvent(QDropEvent *e)
+{
+    if (e->mimeData()->hasUrls()) { emit foundPDF(e->mimeData()->urls()); }
+    else { QTreeWidget::dropEvent(e); }
+}
+
 FusePDF::FusePDF(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::FusePDF)
@@ -86,6 +193,10 @@ FusePDF::FusePDF(QWidget *parent)
             this, SLOT(handleProcessError(QProcess::ProcessError)));
     connect(ui->inputs, SIGNAL(foundPDF(QList<QUrl>)),
             this, SLOT(handleFoundPDF(QList<QUrl>)));
+    connect(this, SIGNAL(commandReady(QString,QString)),
+            this, SLOT(runCommand(QString,QString)));
+    connect(this, SIGNAL(statusMessage(QString,int)),
+            statusBar(), SLOT(showMessage(QString,int)));
 
     loadSettings();
 }
@@ -125,7 +236,10 @@ void FusePDF::on_actionSave_triggered()
                                                 "*.pdf");
     if (file.isEmpty()) { return; }
     if (!file.endsWith(".pdf", Qt::CaseInsensitive)) { file.append(".pdf"); }
-    runCommand(file);
+
+    //runCommand(file);
+    showProgress(true);
+    QtConcurrent::run(this, &FusePDF::prepCommand, file);
 }
 
 void FusePDF::on_actionClear_triggered()
@@ -143,7 +257,7 @@ void FusePDF::on_actionAbout_triggered()
     QMessageBox::about(this,
                        tr("FusePDF"),
                        tr("<h2>FusePDF %1</h2>"
-                          "<p>Copyright &copy;2021 <a href='https://nettstudio.no'>NettStudio AS</a><br>All rights reserved.</p>"
+                          "<p>Copyright &copy;2021 <a href='https://nettstudio.no'>NettStudio AS</a>. All rights reserved.</p>"
                           "<p style=\"font-size:small;\">This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 3 of the License, or (at your option) any later version.</p>"
                           "<p style=\"font-size:small;\">This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.</p>"
                           "<p style=\"font-size:small;\">You should have received a copy of the GNU General Public License along with this program.  If not, see <a href=\"https://www.gnu.org/licenses\">www.gnu.org/licenses</a>.</p>"
@@ -151,8 +265,21 @@ void FusePDF::on_actionAbout_triggered()
                           ).arg(VERSION_APP));
 }
 
+void FusePDF::prepCommand(const QString &filename)
+{
+    QString command = makeCommand(filename);
+    if (!command.isEmpty()) { emit commandReady(filename, command); }
+    else {
+        showProgress(false);
+        QMessageBox::warning(this,
+                             tr("Failed to make process"),
+                             tr("Failed to make process, this should not happen, please contact support."));
+    }
+}
+
 const QString FusePDF::makeCommand(const QString &filename)
 {
+    qDebug() << "makeCommand" << filename;
     if (filename.isEmpty()) { return QString(); }
 
     QString command = findGhost();
@@ -175,7 +302,6 @@ const QString FusePDF::makeCommand(const QString &filename)
         if (tab && tab->isModified()) {
             modified = true;
             QVector<int> pages = tab->getPagesState(Qt::Checked);
-            qDebug() << "extract pages from" << filename << pages;
             for (int i = 0; i < pages.count(); ++i) {
                 QString extracted = extractPDF(filename, getChecksum(filename), pages.at(i));
                 if (!extracted.isEmpty()) {
@@ -205,8 +331,10 @@ const QString FusePDF::makeCommand(const QString &filename)
     return command;
 }
 
-void FusePDF::runCommand(const QString &filename)
+void FusePDF::runCommand(const QString &filename,
+                         const QString &command)
 {
+    showProgress(false);
     if (missingGhost()) { return; }
 
     if (ui->inputs->topLevelItemCount() == 0 || filename.isEmpty()) {
@@ -234,7 +362,6 @@ void FusePDF::runCommand(const QString &filename)
         return;
     }
 
-    QString command = makeCommand(filename);
     if (command.isEmpty()) {
         QMessageBox::warning(this,
                              tr("Failed to make process"),
@@ -249,15 +376,13 @@ void FusePDF::commandStarted()
 {
     ui->cmd->clear();
     ui->actionSave->setDisabled(true);
-    ui->progressBar->setMaximum(0);
-    ui->progressBar->setValue(0);
+    showProgress(true);
 }
 
 void FusePDF::commandFinished(int exitCode)
 {
     ui->actionSave->setDisabled(false);
-    ui->progressBar->setMaximum(100);
-    ui->progressBar->setValue(100);
+    showProgress(false);
     _proc->close();
 
     if (exitCode == 0) {
@@ -669,6 +794,7 @@ const QString FusePDF::getPagePreview(const QString &filename,
                                       int page,
                                       int quality)
 {
+    emit statusMessage(tr("Generating preview for page %1 ...").arg(page), 1000);
     QString cache = getCachePath();
     if (!isPDF(filename) || cache.isEmpty()) { return  QString(); }
     QString image = QString(FUSEPDF_CACHE_JPEG).arg(cache).arg(checksum).arg(page);
@@ -692,7 +818,6 @@ void FusePDF::getPagePreviews(const QString &filename, const QString &checksum, 
     for (int i = 1; i <= pages; ++i) {
         QString image = QString(FUSEPDF_CACHE_JPEG).arg(cache).arg(checksum).arg(i);
         if (!QFile::exists(image)) {
-            qDebug() << "cache not found, get new" << filename << i;
             image = getPagePreview(filename, checksum, i);
         }
         if (!image.isEmpty()) { emit foundPagePreview(filename, checksum, image, i); }
@@ -716,7 +841,7 @@ const QString FusePDF::extractPDF(const QString &filename,
                                   const QString &checksum,
                                   int page)
 {
-    qDebug() << "extractPDF" << filename << checksum << page;
+    emit statusMessage(tr("Extracting page %1 from document ...").arg(page), 1000);
     QString cache = getCachePath();
     QString command = findGhost();
 #ifdef Q_OS_WIN
@@ -731,4 +856,15 @@ const QString FusePDF::extractPDF(const QString &filename,
     proc.close();
     if (isPDF(cache)) { return cache; }
     return QString();
+}
+
+void FusePDF::showProgress(bool progress)
+{
+    ui->progressBar->setMaximum(progress?0:100);
+    ui->progressBar->setValue(progress?0:100);
+}
+
+void FusePDF::on_actionOpen_cache_folder_triggered()
+{
+    QDesktopServices::openUrl(QUrl::fromUserInput(getCachePath()));
 }

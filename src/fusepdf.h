@@ -80,31 +80,7 @@ public:
     PagesListWidget(QWidget *parent = nullptr,
                     const QString &filename = QString(),
                     const QString &checksum = QString(),
-                    int pages = 0):
-        QListWidget(parent)
-      , _filename(filename)
-      , _checksum(checksum)
-      , _pages(pages)
-    {
-        setViewMode(QListView::IconMode);
-        setIconSize(QSize(FUSEPDF_PAGE_ICON_SIZE, FUSEPDF_PAGE_ICON_SIZE));
-        setUniformItemSizes(true);
-        setWrapping(true);
-        setResizeMode(QListView::Adjust);
-        setFrameShape(QFrame::NoFrame);
-
-        for (int i = 1; i <= _pages; ++i) {
-            QListWidgetItem *item = new QListWidgetItem(QIcon(FUSEPDF_ICON_LOGO),
-                                                        QString::number(i),
-                                                        this);
-            item->setData(FUSEPDF_PAGE_ROLE, i);
-            item->setCheckState(Qt::Checked);
-            item->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
-        }
-
-        connect(this, SIGNAL(itemClicked(QListWidgetItem*)),
-                this, SLOT(handleItemClicked(QListWidgetItem*)));
-    }
+                    int pages = 0);
     const QString getFilename() {
         return _filename;
     }
@@ -114,66 +90,17 @@ public:
     int getPageCount() {
         return _pages;
     }
-    bool isModified() {
-        for (int i = 0; i < count(); ++i) {
-            QListWidgetItem *item = this->item(i);
-            if (!item) { continue; }
-            if (item->checkState() == Qt::Unchecked) { return true; }
-        }
-        return false;
-    }
-    QVector<int> getPagesState(Qt::CheckState state)
-    {
-        QVector<int> result;
-        if (state == Qt::PartiallyChecked) { return result; }
-        for (int i = 0; i < count(); ++i) {
-            QListWidgetItem *item = this->item(i);
-            if (!item) { continue; }
-            if (item->checkState() == state) {
-                result.append(item->data(FUSEPDF_PAGE_ROLE).toInt());
-            }
-        }
-        return result;
-    }
+    bool isModified();
+    QVector<int> getPagesState(Qt::CheckState state);
 
 public slots:
     void setPageIcon(const QString &filename,
                      const QString &checksum,
                      const QString &image,
-                     int page)
-    {
-        Q_UNUSED(checksum)
-        if (filename != _filename || page > _pages || page < 1) { return; }
-        for (int i = 0; i < count(); ++i) {
-            QListWidgetItem *item = this->item(i);
-            if (!item) { continue; }
-            if (item->data(FUSEPDF_PAGE_ROLE).toInt() != page) { continue; }
-            QPixmap pix(FUSEPDF_PAGE_ICON_SIZE, FUSEPDF_PAGE_ICON_SIZE);
-            pix.fill(QColor(Qt::transparent));
-            QPainter p(&pix);
-            QPixmap ppix = QPixmap::fromImage(QImage(image)).scaledToHeight(FUSEPDF_PAGE_ICON_SIZE,
-                                                                            Qt::SmoothTransformation);
-            ppix = ppix.copy(0, 0, FUSEPDF_PAGE_ICON_SIZE, FUSEPDF_PAGE_ICON_SIZE);
-            QPainter pp(&ppix);
-            QPainterPath ppath;
-            ppath.addRect(0, 0, ppix.width(), ppix.height());
-            QPen ppen(Qt::black, 2);
-            pp.setPen(ppen);
-            pp.drawPath(ppath);
-            p.drawPixmap((pix.width()/2)-(ppix.width()/2), 0, ppix);
-            item->setIcon(pix);
-            break;
-        }
-    }
+                     int page);
 
 private slots:
-    void handleItemClicked(QListWidgetItem *item)
-    {
-        if (!item) { return; }
-        if (item->checkState() == Qt::Checked) {
-            item->setCheckState(Qt::Unchecked);
-        } else { item->setCheckState(Qt::Checked); }
-    }
+    void handleItemClicked(QListWidgetItem *item);
 
 private:
     QString _filename;
@@ -186,17 +113,7 @@ class FilesTreeWidget : public QTreeWidget
     Q_OBJECT
 
 public:
-    FilesTreeWidget(QWidget *parent = nullptr):
-        QTreeWidget(parent)
-    {
-        setSortingEnabled(false);
-        setAcceptDrops(true);
-        viewport()->setAcceptDrops(true);
-        setDragEnabled(true);
-        setDragDropMode(QAbstractItemView::InternalMove);
-        setDropIndicatorShown(false);
-        setIconSize(QSize(32, 32));
-    }
+    FilesTreeWidget(QWidget *parent = nullptr);
 
 signals:
     void foundPDF(const QList<QUrl> &urls);
@@ -206,11 +123,7 @@ protected:
     {
         e->acceptProposedAction();
     }
-    void dropEvent(QDropEvent *e)
-    {
-        if (e->mimeData()->hasUrls()) { emit foundPDF(e->mimeData()->urls()); }
-        else { QTreeWidget::dropEvent(e); }
-    }
+    void dropEvent(QDropEvent *e);
 };
 
 QT_BEGIN_NAMESPACE
@@ -230,6 +143,10 @@ signals:
                           const QString &checksum,
                           const QString &image,
                           int page);
+    void commandReady(const QString &filename,
+                      const QString &command);
+    void statusMessage(const QString &message,
+                       int timeout);
 
 private slots:
     void on_actionOpen_triggered();
@@ -237,8 +154,10 @@ private slots:
     void on_actionClear_triggered();
     void on_actionQuit_triggered();
     void on_actionAbout_triggered();
+    void prepCommand(const QString &filename);
     const QString makeCommand(const QString &filename);
-    void runCommand(const QString &filename);
+    void runCommand(const QString &filename,
+                    const QString &command);
     void commandStarted();
     void commandFinished(int exitCode);
     void populateUI();
@@ -268,10 +187,10 @@ private slots:
     PagesListWidget* getTab(const QString &filename);
     bool hasTab(const QString &filename);
     int getTabIndex(const QString &filename);
-    static const QString getPagePreview(const QString &filename,
-                                        const QString &checksum,
-                                        int page,
-                                        int quality = 50);
+    const QString getPagePreview(const QString &filename,
+                                 const QString &checksum,
+                                 int page,
+                                 int quality = 50);
     void getPagePreviews(const QString &filename,
                          const QString &checksum,
                          int pages);
@@ -279,6 +198,9 @@ private slots:
     const QString extractPDF(const QString &filename,
                              const QString &checksum,
                              int page);
+    void showProgress(bool progress);
+
+    void on_actionOpen_cache_folder_triggered();
 
 private:
     Ui::FusePDF *ui;

@@ -432,6 +432,8 @@
     <addaction name="actionRemember_meta_author"/>
     <addaction name="actionRemember_meta_subject"/>
     <addaction name="actionRemember_meta_title"/>
+    <addaction name="separator"/>
+    <addaction name="actionOpen_cache_folder"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuHelp"/>
@@ -628,6 +630,11 @@
    </property>
    <property name="toolTip">
     <string>Remember title properties</string>
+   </property>
+  </action>
+  <action name="actionOpen_cache_folder">
+   <property name="text">
+    <string>Open cache folder</string>
    </property>
   </action>
  </widget>
