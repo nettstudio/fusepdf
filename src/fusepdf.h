@@ -101,6 +101,10 @@ public slots:
 
 private slots:
     void handleItemClicked(QListWidgetItem *item);
+    void handleContextMenu(QPoint pos);
+    void selectAllPages();
+    void selectNoPages();
+    void setCheckedState(Qt::CheckState state);
 
 private:
     QString _filename;

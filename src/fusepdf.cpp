@@ -37,6 +37,7 @@ PagesListWidget::PagesListWidget(QWidget *parent,
     setWrapping(true);
     setResizeMode(QListView::Adjust);
     setFrameShape(QFrame::NoFrame);
+    setContextMenuPolicy(Qt::CustomContextMenu);
 
     for (int i = 1; i <= _pages; ++i) {
         QListWidgetItem *item = new QListWidgetItem(QIcon(FUSEPDF_ICON_LOGO),
@@ -49,6 +50,8 @@ PagesListWidget::PagesListWidget(QWidget *parent,
 
     connect(this, SIGNAL(itemClicked(QListWidgetItem*)),
             this, SLOT(handleItemClicked(QListWidgetItem*)));
+    connect(this, SIGNAL(customContextMenuRequested(QPoint)),
+            this, SLOT(handleContextMenu(QPoint)));
 }
 
 bool PagesListWidget::isModified() {
@@ -109,6 +112,41 @@ void PagesListWidget::handleItemClicked(QListWidgetItem *item)
     if (item->checkState() == Qt::Checked) {
         item->setCheckState(Qt::Unchecked);
     } else { item->setCheckState(Qt::Checked); }
+}
+
+void PagesListWidget::handleContextMenu(QPoint pos)
+{
+    QMenu menu;
+    QAction selectAllAction;
+    QAction selectNoneAction;
+    selectAllAction.setText(tr("Select all"));
+    selectNoneAction.setText(tr("Select none"));
+    connect(&selectAllAction, SIGNAL(triggered(bool)),
+            this, SLOT(selectAllPages()));
+    connect(&selectNoneAction, SIGNAL(triggered(bool)),
+            this, SLOT(selectNoPages()));
+    menu.addAction(&selectAllAction);
+    menu.addAction(&selectNoneAction);
+    menu.exec(viewport()->mapToGlobal(pos));
+}
+
+void PagesListWidget::selectAllPages()
+{
+    setCheckedState(Qt::Checked);
+}
+
+void PagesListWidget::selectNoPages()
+{
+    setCheckedState(Qt::Unchecked);
+}
+
+void PagesListWidget::setCheckedState(Qt::CheckState state)
+{
+    for (int i = 0; i < count(); ++i) {
+        QListWidgetItem *item = this->item(i);
+        if (!item) { continue; }
+        item->setCheckState(state);
+    }
 }
 
 FilesTreeWidget::FilesTreeWidget(QWidget *parent):
@@ -237,7 +275,6 @@ void FusePDF::on_actionSave_triggered()
     if (file.isEmpty()) { return; }
     if (!file.endsWith(".pdf", Qt::CaseInsensitive)) { file.append(".pdf"); }
 
-    //runCommand(file);
     showProgress(true);
     QtConcurrent::run(this, &FusePDF::prepCommand, file);
 }
@@ -299,7 +336,7 @@ const QString FusePDF::makeCommand(const QString &filename)
         QString filename = ui->inputs->topLevelItem(i)->data(0, FUSEPDF_PATH_ROLE).toString();
         PagesListWidget *tab = getTab(filename);
         bool modified = false;
-        if (tab && tab->isModified()) {
+        if (tab && tab->isModified() && tab->getPagesState(Qt::Checked).size() > 0) {
             modified = true;
             QVector<int> pages = tab->getPagesState(Qt::Checked);
             for (int i = 0; i < pages.count(); ++i) {
