@@ -175,9 +175,10 @@ FusePDF::FusePDF(QWidget *parent)
     ui->setupUi(this);
     setWindowIcon(QIcon(FUSEPDF_ICON_LOGO));
 
-#ifndef Q_OS_MAC
-    qApp->setStyle(QStyleFactory::create("fusion"));
 
+    qApp->setStyle(QStyleFactory::create("fusion"));
+    // don't set palette on macos as it breaks dark mode
+#ifndef Q_OS_MAC
     QPalette mainPalette = qApp->palette();
     mainPalette.setColor(QPalette::Highlight, QColor(203,9,0)); // #cb0900
     mainPalette.setColor(QPalette::Link, QColor(203,9,0));
