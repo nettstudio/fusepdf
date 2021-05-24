@@ -56,6 +56,11 @@
 #include <QPainterPath>
 #include <QCryptographicHash>
 #include <QVector>
+#include <QDialog>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
+#include <QComboBox>
+#include <QPushButton>
 
 #define FUSEPDF_RELEASES_URL "https://github.com/nettstudio/fusepdf/releases"
 #define FUSEPDF_ISSUE_URL "https://github.com/nettstudio/fusepdf/issues"
@@ -64,6 +69,8 @@
 #define FUSEPDF_PAGE_ROLE Qt::UserRole + 3
 #define FUSEPDF_SELECTED_ROLE Qt::UserRole + 4
 #define FUSEPDF_CHECKSUM_ROLE Qt::UserRole + 5
+#define FUSEPDF_IMAGE_TYPE_ROLE Qt::UserRole + 6
+#define FUSEPDF_IMAGE_RES_ROLE Qt::UserRole + 7
 #define FUSEPDF_PAGE_ICON_SIZE 320
 #define FUSEPDF_CACHE_JPEG "%1/%2-%3.jpg"
 #define FUSEPDF_CACHE_PDF "%1/%2-%3.pdf"
@@ -71,8 +78,41 @@
 #define FUSEPDF_ICON_DOC ":/assets/document.png"
 #define FUSEPDF_ICON_LOGO ":/assets/fusepdf.png"
 #define FUSEPDF_GS_PREVIEW " -q -sDEVICE=jpeg -o \"%2\" -dFirstPage=%3 -dLastPage=%3 -dJPEGQ=%4 -r72x72 \"%1\""
+#define FUSEPDF_GS_EXPORT " -q -sDEVICE=%4 -o \"%2\" -dFirstPage=%3 -dLastPage=%3 -r%5x%5 \"%1\""
 #define FUSEPDF_GS_COUNT " -q -dNODISPLAY -dNOSAFER -c \"/pdffile (%1) (r) file runpdfbegin (PageCount: ) print pdfpagecount = quit\""
 #define FUSEPDF_GS_EXTRACT " -q -dNOPAUSE -dBATCH -sOutputFile=\"%2\" -dFirstPage=%3 -dLastPage=%3 -sDEVICE=pdfwrite \"%1\""
+
+enum exportImageType {
+    exportImageTypeUndefined,
+    exportTiffTypeGray,
+    exportTiffTypeRGB12,
+    exportTiffTypeRGB24,
+    exportTiffTypeRGB48,
+    exportTiffTypeCMYK32,
+    exportTiffTypeCMYK64,
+    exportPNGTypeGray,
+    exportPNGType16
+};
+
+class ExportImageDialog : public QDialog
+{
+    Q_OBJECT
+
+public:
+    ExportImageDialog(QWidget *parent = nullptr,
+                      Qt::WindowFlags f = Qt::WindowFlags(),
+                      QString suffix = QString());
+    int getImageType();
+    int getImageRes();
+
+private slots:
+    void handleButtonCancel();
+    void handleButtonOk();
+
+private:
+    QComboBox *_type;
+    QComboBox *_res;
+};
 
 class PagesListWidget : public QListWidget
 {
@@ -95,6 +135,9 @@ public:
     bool isModified();
     QVector<int> getPagesState(Qt::CheckState state);
 
+signals:
+    void requestExportPage(const QString &filename, int page);
+
 public slots:
     void setPageIcon(const QString &filename,
                      const QString &checksum,
@@ -107,6 +150,7 @@ private slots:
     void selectAllPages();
     void selectNoPages();
     void setCheckedState(Qt::CheckState state);
+    void exportSelectedPage();
 
 private:
     QString _filename;
@@ -189,6 +233,9 @@ private slots:
     int getPageCount(const QString &filename);
     static bool isPDF(const QString &filename);
     static bool isJPG(const QString &filename);
+    static bool isTIFF(const QString &filename);
+    static bool isPNG(const QString &filename);
+    static bool isImage(const QString &filename);
     static const QString getCachePath();
     PagesListWidget* getTab(const QString &filename);
     bool hasTab(const QString &filename);
@@ -210,6 +257,12 @@ private slots:
     void showTooltips(bool show);
     void on_actionCheck_for_updates_triggered();
     void on_actionReport_issue_triggered();
+    bool exportImage(const QString &filename,
+                    const QString &image,
+                    int page,
+                    int type,
+                    int res);
+    void handleExport(const QString &filename, int page);
 
 private:
     Ui::FusePDF *ui;

@@ -22,6 +22,107 @@
 #include "fusepdf.h"
 #include "ui_fusepdf.h"
 
+ExportImageDialog::ExportImageDialog(QWidget *parent,
+                                     Qt::WindowFlags f,
+                                     QString suffix):
+    QDialog(parent, f)
+  , _type(nullptr)
+  , _res(nullptr)
+{
+    setWindowTitle(tr("Export image"));
+
+    QVBoxLayout *layout = new QVBoxLayout(this);
+
+    QWidget *formatWidget = new QWidget(this);
+    QHBoxLayout *formatLayout = new QHBoxLayout(formatWidget);
+
+    QLabel *formatLabel = new QLabel(this);
+    formatLabel->setText(tr("Format"));
+    formatLayout->addWidget(formatLabel);
+
+    _type = new QComboBox(this);
+    _res = new QComboBox(this);
+
+    _res->addItem("72 dpi", 72);
+    _res->addItem("96 dpi", 96);
+    _res->addItem("120 dpi", 120);
+    _res->addItem("300 dpi", 300);
+    _res->addItem("600 dpi", 600);
+    _res->addItem("1200 dpi", 1200);
+    _res->setCurrentIndex(3);
+
+    if (suffix.isEmpty()) {
+        _type->addItem("PNG 16", exportPNGType16);
+        _type->addItem("PNG Gray", exportPNGTypeGray);
+        _type->addItem("TIFF RGB 24-bit", exportTiffTypeRGB24);
+        _type->addItem("TIFF RGB 12-bit", exportTiffTypeRGB12);
+        _type->addItem("TIFF RGB 48-bit", exportTiffTypeRGB48);
+        _type->addItem("TIFF CMYK 32-bit", exportTiffTypeCMYK32);
+        _type->addItem("TIFF CMYK 64-bit", exportTiffTypeCMYK64);
+        _type->addItem("TIFF Gray", exportTiffTypeGray);
+    } else if (suffix.toLower() == "png") {
+        _type->addItem("PNG 16", exportPNGType16);
+        _type->addItem("PNG Gray", exportPNGTypeGray);
+    } else if (suffix.toLower() == "tif" || suffix.toLower() == "tiff") {
+        _type->addItem("TIFF RGB 24-bit", exportTiffTypeRGB24);
+        _type->addItem("TIFF RGB 12-bit", exportTiffTypeRGB12);
+        _type->addItem("TIFF RGB 48-bit", exportTiffTypeRGB48);
+        _type->addItem("TIFF CMYK 32-bit", exportTiffTypeCMYK32);
+        _type->addItem("TIFF CMYK 64-bit", exportTiffTypeCMYK64);
+        _type->addItem("TIFF Gray", exportTiffTypeGray);
+    } else {
+        _type->addItem(tr("N/A"), exportImageTypeUndefined);
+    }
+
+    QLabel *resLabel = new QLabel(this);
+    resLabel->setText(tr("Resolution"));
+
+    formatLayout->addWidget(_type);
+    formatLayout->addWidget(resLabel);
+    formatLayout->addWidget(_res);
+
+    QWidget *buttonWidget = new QWidget(this);
+    QHBoxLayout *buttonLayout = new QHBoxLayout(buttonWidget);
+
+    QPushButton *buttonCancel = new QPushButton(this);
+    QPushButton *buttonOk = new QPushButton(this);
+
+    connect(buttonCancel, SIGNAL(clicked()),
+            this, SLOT(handleButtonCancel()));
+    connect(buttonOk, SIGNAL(clicked()),
+            this, SLOT(handleButtonOk()));
+
+    buttonCancel->setText(tr("Cancel"));
+    buttonOk->setText(tr("Export"));
+
+    buttonLayout->addStretch();
+    buttonLayout->addWidget(buttonCancel);
+    buttonLayout->addWidget(buttonOk);
+
+    layout->addWidget(formatWidget);
+    layout->addWidget(buttonWidget);
+}
+
+int ExportImageDialog::getImageType()
+{
+    return _type->currentData().toInt();
+}
+
+int ExportImageDialog::getImageRes()
+{
+    return _res->currentData().toInt();
+}
+
+void ExportImageDialog::handleButtonCancel()
+{
+    QDialog::reject();
+}
+
+void ExportImageDialog::handleButtonOk()
+{
+    QDialog::accept();
+}
+
 PagesListWidget::PagesListWidget(QWidget *parent,
                                  const QString &filename,
                                  const QString &checksum,
@@ -45,7 +146,7 @@ PagesListWidget::PagesListWidget(QWidget *parent,
                                                     this);
         item->setData(FUSEPDF_PAGE_ROLE, i);
         item->setCheckState(Qt::Checked);
-        item->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
+        item->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled | Qt::ItemIsSelectable);
     }
 
     connect(this, SIGNAL(itemClicked(QListWidgetItem*)),
@@ -125,8 +226,19 @@ void PagesListWidget::handleContextMenu(QPoint pos)
             this, SLOT(selectAllPages()));
     connect(&selectNoneAction, SIGNAL(triggered(bool)),
             this, SLOT(selectNoPages()));
+
     menu.addAction(&selectAllAction);
     menu.addAction(&selectNoneAction);
+
+    menu.addSeparator();
+    QAction exportAction;
+    exportAction.setText(tr("Export selected page"));
+
+    connect(&exportAction, SIGNAL(triggered(bool)),
+            this, SLOT(exportSelectedPage()));
+
+    menu.addAction(&exportAction);
+
     menu.exec(viewport()->mapToGlobal(pos));
 }
 
@@ -147,6 +259,15 @@ void PagesListWidget::setCheckedState(Qt::CheckState state)
         if (!item) { continue; }
         item->setCheckState(state);
     }
+}
+
+void PagesListWidget::exportSelectedPage()
+{
+    QListWidgetItem *item = currentItem();
+    if (!item) { return; }
+    QString filename = _filename;
+    int page = item->data(FUSEPDF_PAGE_ROLE).toInt();
+    emit requestExportPage(filename, page);
 }
 
 FilesTreeWidget::FilesTreeWidget(QWidget *parent):
@@ -580,6 +701,8 @@ void FusePDF::handleFoundPDF(const QList<QUrl> &urls)
                          info.fileName());
         connect(this, SIGNAL(foundPagePreview(QString,QString,QString,int)),
                 getTab(info.filePath()), SLOT(setPageIcon(QString,QString,QString,int)));
+        connect(getTab(info.filePath()), SIGNAL(requestExportPage(QString,int)),
+                this, SLOT(handleExport(QString,int)));
         QtConcurrent::run(this,
                           &FusePDF::getPagePreviews,
                           info.filePath(),
@@ -779,6 +902,27 @@ bool FusePDF::isJPG(const QString &filename)
     return (type.name() == "image/jpeg");
 }
 
+bool FusePDF::isTIFF(const QString &filename)
+{
+    QMimeDatabase db;
+    QMimeType type = db.mimeTypeForFile(filename);
+    return (type.name() == "image/tiff");
+}
+
+bool FusePDF::isPNG(const QString &filename)
+{
+    QMimeDatabase db;
+    QMimeType type = db.mimeTypeForFile(filename);
+    return (type.name() == "image/png");
+}
+
+bool FusePDF::isImage(const QString &filename)
+{
+    QMimeDatabase db;
+    QMimeType type = db.mimeTypeForFile(filename);
+    return (type.name().startsWith("image/"));
+}
+
 const QString FusePDF::getCachePath()
 {
     QString path = QDir::tempPath();
@@ -934,3 +1078,83 @@ void FusePDF::on_actionReport_issue_triggered()
 {
     QDesktopServices::openUrl(QUrl::fromUserInput(FUSEPDF_ISSUE_URL));
 }
+
+bool FusePDF::exportImage(const QString &filename,
+                          const QString &image,
+                          int page,
+                          int type,
+                          int res)
+{
+    qDebug() << "export image" << filename << image << page << type << res;
+    if (!isPDF(filename) || image.isEmpty() || page < 1 || res < 72) {
+        return false;
+    }
+    QString format;
+    switch (type) {
+    case exportTiffTypeGray:
+        format = "tiffgray";
+        break;
+    case exportTiffTypeRGB12:
+        format = "tiff12nc";
+        break;
+    case exportTiffTypeRGB24:
+        format = "tiff24nc";
+        break;
+    case exportTiffTypeRGB48:
+        format = "tiff48nc";
+        break;
+    case exportTiffTypeCMYK32:
+        format = "tiff32nc";
+        break;
+    case exportTiffTypeCMYK64:
+        format = "tiff64nc";
+        break;
+    case exportPNGTypeGray:
+        format = "pnggray";
+        break;
+    case exportPNGType16:
+        format = "png16m";
+        break;
+    default: break;
+    }
+    if (format.isEmpty()) { return false; }
+    QString command = findGhost();
+#ifdef Q_OS_WIN
+    command = QString("\"%1\"").arg(findGhost());
+#endif
+    command.append(QString(FUSEPDF_GS_EXPORT).arg(filename).arg(image).arg(page).arg(format).arg(res));
+    QProcess proc;
+    proc.start(command);
+    proc.waitForFinished();
+    proc.close();
+    if (isImage(image)) { return true; }
+    return false;
+}
+
+void FusePDF::handleExport(const QString &filename, int page)
+{
+    qDebug() << "handle export" << filename << page;
+    QString image = QFileDialog::getSaveFileName(this,
+                                                tr("Save Image"),
+                                                !_lastSaveDir.isEmpty()?_lastSaveDir:QDir::homePath(),
+                                                "*.tif *.tiff *.jpg *.jpeg *.png");
+
+    ExportImageDialog dialog(this, Qt::WindowFlags(), QFileInfo(image).suffix());
+    int d = dialog.exec();
+    if (d != QDialog::Accepted) { return; }
+    int type = dialog.getImageType();
+    int res = dialog.getImageRes();
+    if (exportImage(filename,
+                   image,
+                   page,
+                   type,
+                   res))
+    {
+        QDesktopServices::openUrl(QUrl::fromUserInput(image));
+    } else {
+        QMessageBox::warning(this,
+                             tr("Failed to export"),
+                             tr("Failed to export page to image."));
+    }
+}
+

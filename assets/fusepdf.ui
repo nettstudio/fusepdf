@@ -667,6 +667,9 @@
    <property name="text">
     <string>Report issue</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+E</string>
+   </property>
   </action>
  </widget>
  <customwidgets>
