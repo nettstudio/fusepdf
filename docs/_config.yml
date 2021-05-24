@@ -1,5 +1,6 @@
 theme: jekyll-theme-tactile
 show_downloads: true
+github.public: true
 title: FusePDF
 github:
   zip_url: https://github.com/nettstudio/fusepdf/releases/download/v1.2.0/FusePDF-1.2.0-release.zip
