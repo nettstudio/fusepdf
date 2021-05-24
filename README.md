@@ -1,10 +1,14 @@
 # FusePDF
 
-FusePDF is an simple application with one purpose, to merge PDF documents. Requires [Ghostscript](https://www.ghostscript.com/download/gsdnld.html) installed prior to usage.
+FusePDF is a simple application used for merging various PDF documents into one.
 
 Copyright (c) 2021 NettStudio AS. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 3 of the License, or (at your option) any later version.
+
+## Source
+
+FusePDF requires Qt5+ (Core/Gui/Widgets/Concurrent) to build, and Ghostscript (``gs``) available during runtime.
 
 ```
 git clone https://github.com/nettstudio/fusepdf
