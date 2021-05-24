@@ -57,6 +57,8 @@
 #include <QCryptographicHash>
 #include <QVector>
 
+#define FUSEPDF_RELEASES_URL "https://github.com/nettstudio/fusepdf/releases"
+#define FUSEPDF_ISSUE_URL "https://github.com/nettstudio/fusepdf/issues"
 #define FUSEPDF_PATH_ROLE Qt::UserRole + 1
 #define FUSEPDF_PAGES_ROLE Qt::UserRole + 2
 #define FUSEPDF_PAGE_ROLE Qt::UserRole + 3
@@ -203,11 +205,11 @@ private slots:
                              const QString &checksum,
                              int page);
     void showProgress(bool progress);
-
     void on_actionOpen_cache_folder_triggered();
-
     void on_actionShow_tooltips_triggered();
     void showTooltips(bool show);
+    void on_actionCheck_for_updates_triggered();
+    void on_actionReport_issue_triggered();
 
 private:
     Ui::FusePDF *ui;

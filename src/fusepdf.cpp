@@ -905,7 +905,6 @@ void FusePDF::on_actionShow_tooltips_triggered()
 
 void FusePDF::showTooltips(bool show)
 {
-    qDebug() << "show tooltips" << show;
     ui->metaTitleLabel->setToolTip(show?tr("Set document title"):QString());
     ui->metaTitle->setToolTip(show?ui->metaTitleLabel->toolTip():QString());
     ui->metaAuthorLabel->setToolTip(show?tr("Set document author"):QString());
@@ -924,4 +923,14 @@ void FusePDF::showTooltips(bool show)
     ui->inputs->setToolTip(show?tr("Drag and drop PDF documents you want to merge here. You can re-arrange after adding them (if sorting is disabled).\n\n"
                                    "Note that the first document will define the paper size on the final output.\n\n"
                                    "You can remove a document with the DEL key."):QString());
+}
+
+void FusePDF::on_actionCheck_for_updates_triggered()
+{
+    QDesktopServices::openUrl(QUrl::fromUserInput(FUSEPDF_RELEASES_URL));
+}
+
+void FusePDF::on_actionReport_issue_triggered()
+{
+    QDesktopServices::openUrl(QUrl::fromUserInput(FUSEPDF_ISSUE_URL));
 }

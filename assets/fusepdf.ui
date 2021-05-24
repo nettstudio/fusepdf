@@ -435,6 +435,9 @@
     <addaction name="actionRemember_meta_title"/>
     <addaction name="separator"/>
     <addaction name="actionOpen_cache_folder"/>
+    <addaction name="separator"/>
+    <addaction name="actionCheck_for_updates"/>
+    <addaction name="actionReport_issue"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuHelp"/>
@@ -650,6 +653,19 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+I</string>
+   </property>
+  </action>
+  <action name="actionCheck_for_updates">
+   <property name="text">
+    <string>Check for updates</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+U</string>
+   </property>
+  </action>
+  <action name="actionReport_issue">
+   <property name="text">
+    <string>Report issue</string>
    </property>
   </action>
  </widget>
