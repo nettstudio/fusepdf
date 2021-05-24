@@ -193,24 +193,7 @@ FusePDF::FusePDF(QWidget *parent)
     ui->inputs->header()->setSectionResizeMode(0, QHeaderView::Stretch);
     ui->inputs->header()->setSectionResizeMode(1, QHeaderView::Fixed);
 
-    ui->metaTitleLabel->setToolTip(tr("Set document title"));
-    ui->metaTitle->setToolTip(ui->metaTitleLabel->toolTip());
-    ui->metaAuthorLabel->setToolTip(tr("Set document author"));
-    ui->metaAuthor->setToolTip(ui->metaAuthorLabel->toolTip());
-    ui->metaSubjectLabel->setToolTip(tr("Set document subject"));
-    ui->metaSubject->setToolTip(ui->metaSubjectLabel->toolTip());
-    ui->presetLabel->setToolTip(tr("Distiller presets\n\n"
-                                   "- DEFAULT: selects output intended to be useful across a wide variety of uses, possibly at the expense of a larger output file.\n"
-                                   "- PREPRESS: selects output similar to Acrobat Distiller \"Prepress Optimized\" (up to version X) setting.\n"
-                                   "- EBOOK: selects medium-resolution output similar to the Acrobat Distiller (up to version X) \"eBook\" setting.\n"
-                                   "- SCREEN: selects low-resolution output similar to the Acrobat Distiller (up to version X) \"Screen Optimized\" setting.\n"
-                                   "- PRINTER: selects output similar to the Acrobat Distiller \"Print Optimized\" (up to version X) setting."));
-    ui->preset->setToolTip(ui->presetLabel->toolTip());
-    ui->compatLabel->setToolTip(tr("Select the PDF version this document should be compatible with."));
-    ui->compat->setToolTip(ui->compatLabel->toolTip());
-    ui->inputs->setToolTip(tr("Drag and drop PDF documents you want to merge here. You can re-arrange after adding them (if sorting is disabled).\n\n"
-                              "Note that the first document will define the paper size on the final output.\n\n"
-                              "You can remove a document with the DEL key."));
+
 
     QShortcut *deleteShortcut = new QShortcut(QKeySequence(Qt::Key_Delete), ui->inputs);
     connect(deleteShortcut, SIGNAL(activated()),
@@ -428,7 +411,7 @@ void FusePDF::commandFinished(int exitCode)
             _lastSaveDir = fileInfo.absoluteDir().absolutePath();
         }
         if (ui->actionOpen_saved_PDF->isChecked()) {
-            QDesktopServices::openUrl(_output);
+            QDesktopServices::openUrl(QUrl::fromUserInput(_output));
         }
         return;
     }
@@ -578,7 +561,7 @@ void FusePDF::handleFoundPDF(const QList<QUrl> &urls)
 {
     for (int i=0;i< urls.size();++i) {
         const QFileInfo info(urls.at(i).toLocalFile());
-        if (!isPDF(info.filePath())) { continue; }
+        if (!isPDF(info.filePath()) || hasFile(info.filePath())) { continue; }
         int pages = getPageCount(info.filePath());
         QString checksum = getChecksum(info.filePath());
         QTreeWidgetItem *item = new QTreeWidgetItem(ui->inputs);
@@ -609,11 +592,9 @@ void FusePDF::on_inputs_itemDoubleClicked(QTreeWidgetItem *item, int column)
     Q_UNUSED(column)
     if (!item) { return; }
     QString filename = item->data(0, FUSEPDF_PATH_ROLE).toString();
-    int pages = item->data(0, FUSEPDF_PAGES_ROLE).toInt();
-    qDebug() << filename << pages;
-    //QString file = item->text(1);
-    //if (!QFile::exists(file)) { return; }
-    //QDesktopServices::openUrl(QUrl::fromUserInput(file));
+    //int pages = item->data(0, FUSEPDF_PAGES_ROLE).toInt();
+    if (!QFile::exists(filename)) { return; }
+    QDesktopServices::openUrl(QUrl::fromUserInput(filename));
 }
 
 void FusePDF::on_actionAuto_Sort_triggered()
@@ -648,6 +629,8 @@ void FusePDF::loadOptions()
     _lastLoadDir = settings.value("lastLoadDir", "").toString();
     _lastSaveDir = settings.value("lastSaveDir", "").toString();
     ui->actionOpen_saved_PDF->setChecked(settings.value("openSavedPDF", true).toBool());
+    ui->actionShow_tooltips->setChecked(settings.value("showTooltips", true).toBool());
+    showTooltips(settings.value("showTooltips", true).toBool());
     ui->cmd->setVisible(ui->actionShow_log->isChecked());
     ui->inputs->setSortingEnabled(ui->actionAuto_Sort->isChecked());
     if (ui->actionRemember_meta_author->isChecked()) {
@@ -680,6 +663,7 @@ void FusePDF::saveOptions()
     settings.setValue("showLog", ui->actionShow_log->isChecked());
     settings.setValue("autoSort", ui->actionAuto_Sort->isChecked());
     settings.setValue("openSavedPDF", ui->actionOpen_saved_PDF->isChecked());
+    settings.setValue("showTooltips", ui->actionShow_tooltips->isChecked());
     settings.setValue("metaAuthor", ui->actionRemember_meta_author->isChecked());
     settings.setValue("metaSubject", ui->actionRemember_meta_subject->isChecked());
     settings.setValue("metaTitle", ui->actionRemember_meta_title->isChecked());
@@ -838,7 +822,7 @@ const QString FusePDF::getPagePreview(const QString &filename,
                                       int page,
                                       int quality)
 {
-    emit statusMessage(tr("Generating preview for page %1 ...").arg(page), 1000);
+    emit statusMessage(tr("Generating preview %1 for %2 ...").arg(page).arg(QFileInfo(filename).fileName()), 1000);
     QString cache = getCachePath();
     if (!isPDF(filename) || cache.isEmpty()) { return  QString(); }
     QString image = QString(FUSEPDF_CACHE_JPEG).arg(cache).arg(checksum).arg(page);
@@ -885,7 +869,7 @@ const QString FusePDF::extractPDF(const QString &filename,
                                   const QString &checksum,
                                   int page)
 {
-    emit statusMessage(tr("Extracting page %1 from document ...").arg(page), 1000);
+    emit statusMessage(tr("Extracting page %1 from %2 ...").arg(page).arg(QFileInfo(filename).fileName()), 1000);
     QString cache = getCachePath();
     QString command = findGhost();
 #ifdef Q_OS_WIN
@@ -911,4 +895,32 @@ void FusePDF::showProgress(bool progress)
 void FusePDF::on_actionOpen_cache_folder_triggered()
 {
     QDesktopServices::openUrl(QUrl::fromUserInput(getCachePath()));
+}
+
+void FusePDF::on_actionShow_tooltips_triggered()
+{
+    showTooltips(ui->actionShow_tooltips->isChecked());
+}
+
+void FusePDF::showTooltips(bool show)
+{
+    qDebug() << "show tooltips" << show;
+    ui->metaTitleLabel->setToolTip(show?tr("Set document title"):QString());
+    ui->metaTitle->setToolTip(show?ui->metaTitleLabel->toolTip():QString());
+    ui->metaAuthorLabel->setToolTip(show?tr("Set document author"):QString());
+    ui->metaAuthor->setToolTip(show?ui->metaAuthorLabel->toolTip():QString());
+    ui->metaSubjectLabel->setToolTip(show?tr("Set document subject"):QString());
+    ui->metaSubject->setToolTip(show?ui->metaSubjectLabel->toolTip():QString());
+    ui->presetLabel->setToolTip(show?tr("Distiller presets\n\n"
+                                        "- DEFAULT: selects output intended to be useful across a wide variety of uses, possibly at the expense of a larger output file.\n"
+                                        "- PREPRESS: selects output similar to Acrobat Distiller \"Prepress Optimized\" (up to version X) setting.\n"
+                                        "- EBOOK: selects medium-resolution output similar to the Acrobat Distiller (up to version X) \"eBook\" setting.\n"
+                                        "- SCREEN: selects low-resolution output similar to the Acrobat Distiller (up to version X) \"Screen Optimized\" setting.\n"
+                                        "- PRINTER: selects output similar to the Acrobat Distiller \"Print Optimized\" (up to version X) setting."):QString());
+    ui->preset->setToolTip(show?ui->presetLabel->toolTip():QString());
+    ui->compatLabel->setToolTip(show?tr("Select the PDF version this document should be compatible with."):QString());
+    ui->compat->setToolTip(show?ui->compatLabel->toolTip():QString());
+    ui->inputs->setToolTip(show?tr("Drag and drop PDF documents you want to merge here. You can re-arrange after adding them (if sorting is disabled).\n\n"
+                                   "Note that the first document will define the paper size on the final output.\n\n"
+                                   "You can remove a document with the DEL key."):QString());
 }

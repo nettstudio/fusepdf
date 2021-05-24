@@ -425,6 +425,7 @@
     <addaction name="actionAbout_Qt"/>
     <addaction name="separator"/>
     <addaction name="actionShow_log"/>
+    <addaction name="actionShow_tooltips"/>
     <addaction name="actionAuto_Sort"/>
     <addaction name="separator"/>
     <addaction name="actionOpen_saved_PDF"/>
@@ -635,6 +636,20 @@
   <action name="actionOpen_cache_folder">
    <property name="text">
     <string>Open cache folder</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+F</string>
+   </property>
+  </action>
+  <action name="actionShow_tooltips">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Show tooltips</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+I</string>
    </property>
   </action>
  </widget>

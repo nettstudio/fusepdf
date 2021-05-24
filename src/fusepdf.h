@@ -206,6 +206,9 @@ private slots:
 
     void on_actionOpen_cache_folder_triggered();
 
+    void on_actionShow_tooltips_triggered();
+    void showTooltips(bool show);
+
 private:
     Ui::FusePDF *ui;
     QString _output;
