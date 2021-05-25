@@ -1,6 +1,6 @@
 [Desktop Entry]
 Categories=Graphics;
-Comment=Merge multiple PDF documents
+Comment=Merge PDF documents
 Exec=FusePDF
 GenericName=FusePDF
 Icon=fusepdf
