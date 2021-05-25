@@ -14,6 +14,7 @@ FusePDF is a simple application used for merging/exporting PDF documents.
 
 ## News
 
+* [FusePDF 2.0 RC 1 released](https://github.com/nettstudio/fusepdf/releases/tag/v2.0.0-rc1)
 * [FusePDF 2.0 Beta 3 released](https://github.com/nettstudio/fusepdf/releases/tag/v2.0.0-beta3)
 * [FusePDF 2.0 Beta 2 released](https://github.com/nettstudio/fusepdf/releases/tag/v2.0.0-beta2)
 
