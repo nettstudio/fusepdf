@@ -25,7 +25,6 @@ Copyright (c) 2021 [NettStudio AS](https://nettstudio.no). All rights reserved.
 
 [![NettStudio](https://raw.githubusercontent.com/nettstudio/fusepdf/main/assets/nettstudio.png)](https://nettstudio.no)
 
-[![C/C++ CI](https://github.com/nettstudio/fusepdf/actions/workflows/c-cpp.yml/badge.svg)](https://github.com/nettstudio/fusepdf/actions/workflows/c-cpp.yml)
-[![GitHub](https://img.shields.io/github/license/nettstudio/fusepdf)](https://github.com/nettstudio/fusepdf/blob/main/COPYING) [![GitHub last commit](https://img.shields.io/github/last-commit/nettstudio/fusepdf)](https://github.com/nettstudio/fusepdf/commits/main) [![GitHub issues](https://img.shields.io/github/issues/nettstudio/fusepdf)](https://github.com/nettstudio/fusepdf/issues)
+[![GitHub](https://img.shields.io/github/license/nettstudio/fusepdf)](https://github.com/nettstudio/fusepdf/blob/main/COPYING) [![C/C++ CI](https://github.com/nettstudio/fusepdf/actions/workflows/c-cpp.yml/badge.svg)](https://github.com/nettstudio/fusepdf/actions/workflows/c-cpp.yml) [![GitHub issues](https://img.shields.io/github/issues/nettstudio/fusepdf)](https://github.com/nettstudio/fusepdf/issues)
 
 [![GitHub Repo stars](https://img.shields.io/github/stars/nettstudio/fusepdf?style=social)](https://github.com/nettstudio/fusepdf)
