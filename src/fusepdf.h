@@ -137,6 +137,7 @@ public:
 
 signals:
     void requestExportPage(const QString &filename, int page);
+    void requestExportPages(const QString &filename, QVector<int> pages);
 
 public slots:
     void setPageIcon(const QString &filename,
@@ -151,6 +152,7 @@ private slots:
     void selectNoPages();
     void setCheckedState(Qt::CheckState state);
     void exportSelectedPage();
+    void exportSelectedPages();
 
 private:
     QString _filename;
@@ -218,7 +220,6 @@ private slots:
     static const QString findGhost();
     void on_actionShow_log_triggered();
     void on_actionAbout_Qt_triggered();
-    bool hasWindowState();
     void handleFoundPDF(const QList<QUrl> &urls);
     void on_inputs_itemDoubleClicked(QTreeWidgetItem *item, int column);
     void on_actionAuto_Sort_triggered();
@@ -263,6 +264,7 @@ private slots:
                     int type,
                     int res);
     void handleExport(const QString &filename, int page);
+    void handleExports(const QString &filename, QVector<int> pages);
 
 private:
     Ui::FusePDF *ui;
