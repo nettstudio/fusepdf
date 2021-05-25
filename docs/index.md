@@ -1,14 +1,13 @@
-FusePDF is a simple application used for merging/exporting various PDF documents.
+FusePDF is a simple application used for merging/exporting PDF documents.
 
 ![screenshot1](https://github.com/nettstudio/fusepdf/raw/main/assets/fusepdf-screenshot.png "FusePDF screenshot")
 
 ## Features
 
 * Merge multiple PDF documents
-* Exclude PDF pages to merge
-* Preview PDF pages
+* Exclude and preview pages to merge
 * Add meta properties to final PDF
-* Export PDF page to image (PNG, TIFF RGB, TIFF CMYK)
+* Export page(s) to image(s) (PNG, TIFF RGB, TIFF CMYK)
 * Cross-platform (runs on Windows, macOS, Linux, BSD etc)
 
 ![screenshot2](https://github.com/nettstudio/fusepdf/raw/main/assets/fusepdf-screenshot-2.png "FusePDF screenshot 2")
