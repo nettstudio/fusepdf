@@ -101,6 +101,8 @@ ExportImageDialog::ExportImageDialog(QWidget *parent,
 
     layout->addWidget(formatWidget);
     layout->addWidget(buttonWidget);
+
+    QTimer::singleShot(100, buttonOk, SLOT(setFocus()));
 }
 
 int ExportImageDialog::getImageType()
@@ -349,6 +351,8 @@ FusePDF::FusePDF(QWidget *parent)
             this, SLOT(runCommand(QString,QString)));
     connect(this, SIGNAL(statusMessage(QString,int)),
             statusBar(), SLOT(showMessage(QString,int)));
+    connect(this, SIGNAL(exportDone(QString)),
+            this, SLOT(handleExportDone(QString)));
 
     loadSettings();
 }
@@ -755,6 +759,7 @@ void FusePDF::loadOptions()
     ui->actionRemember_meta_title->setChecked(settings.value("metaTitle", true).toBool());
     _lastLoadDir = settings.value("lastLoadDir", "").toString();
     _lastSaveDir = settings.value("lastSaveDir", "").toString();
+    _lastExportDir = settings.value("lastExportDir").toString();
     ui->actionOpen_saved_PDF->setChecked(settings.value("openSavedPDF", true).toBool());
     ui->actionShow_tooltips->setChecked(settings.value("showTooltips", true).toBool());
     showTooltips(settings.value("showTooltips", true).toBool());
@@ -808,6 +813,9 @@ void FusePDF::saveOptions()
     }
     if (!_lastSaveDir.isEmpty()) {
         settings.setValue("lastSaveDir", _lastSaveDir);
+    }
+    if (!_lastExportDir.isEmpty()) {
+        settings.setValue("lastExportDir", _lastExportDir);
     }
     settings.endGroup();
 }
@@ -1088,7 +1096,6 @@ bool FusePDF::exportImage(const QString &filename,
                           int type,
                           int res)
 {
-    qDebug() << "export image" << filename << image << page << type << res;
     if (!isPDF(filename) || image.isEmpty() || page < 1 || res < 72) {
         return false;
     }
@@ -1138,62 +1145,100 @@ void FusePDF::handleExport(const QString &filename, int page)
 {
     QString image = QFileDialog::getSaveFileName(this,
                                                 tr("Save Image"),
-                                                !_lastSaveDir.isEmpty()?_lastSaveDir:QDir::homePath(),
+                                                !_lastExportDir.isEmpty()?_lastExportDir:QDir::homePath(),
                                                 "*.tif *.tiff *.jpg *.jpeg *.png");
-
+    if (image.isEmpty()) { return; }
     ExportImageDialog dialog(this, Qt::WindowFlags(), QFileInfo(image).suffix());
     int d = dialog.exec();
     if (d != QDialog::Accepted) { return; }
     int type = dialog.getImageType();
     int res = dialog.getImageRes();
-    if (exportImage(filename,
-                   image,
-                   page,
-                   type,
-                   res))
-    {
-        QDesktopServices::openUrl(QUrl::fromUserInput(image));
-    } else {
-        QMessageBox::warning(this,
-                             tr("Failed to export"),
-                             tr("Failed to export page to image."));
-    }
+    QVector<int> pages;
+    pages << page;
+
+    showProgress(true);
+    QtConcurrent::run(this,
+                      &FusePDF::doExport,
+                      filename,
+                      image,
+                      pages,
+                      type,
+                      res);
 }
 
 void FusePDF::handleExports(const QString &filename,
                             QVector<int> pages)
 {
-    qDebug() << "handle exports" << filename << pages;
-    if (pages.size() < 2) {
-        handleExport(filename, pages.at(0));
-        return;
-    }
     QString image = QFileDialog::getSaveFileName(this,
                                                 tr("Save Image"),
-                                                !_lastSaveDir.isEmpty()?_lastSaveDir:QDir::homePath(),
+                                                !_lastExportDir.isEmpty()?_lastExportDir:QDir::homePath(),
                                                 "*.tif *.tiff *.jpg *.jpeg *.png");
-
+    if (image.isEmpty()) { return; }
     ExportImageDialog dialog(this, Qt::WindowFlags(), QFileInfo(image).suffix());
     int d = dialog.exec();
     if (d != QDialog::Accepted) { return; }
     int type = dialog.getImageType();
     int res = dialog.getImageRes();
 
+    showProgress(true);
+    QtConcurrent::run(this,
+                      &FusePDF::doExport,
+                      filename,
+                      image,
+                      pages,
+                      type,
+                      res);
+}
+
+void FusePDF::doExport(const QString &filename,
+                       const QString &image,
+                       QVector<int> pages,
+                       int type,
+                       int res)
+{
     QFileInfo info(image);
-    QString basePath = QString("%1/%2-%3.%4");
-    for (int i = 1; i <= pages.size(); ++i) {
+    for (int i = 0; i < pages.size(); ++i) {
+        emit statusMessage(tr("Exporting image %1 from %2 ...")
+                           .arg(pages.at(i))
+                           .arg(QFileInfo(filename).fileName()),
+                           1000);
         if (!exportImage(filename,
-                       basePath.arg(info.dir().absolutePath()).arg(info.baseName()).arg(i).arg(info.suffix()),
-                       i,
-                       type,
-                       res))
+                         QString("%1/%2-%3.%4")
+                         .arg(info.dir().absolutePath())
+                         .arg(info.baseName())
+                         .arg(pages.at(i))
+                         .arg(info.suffix()),
+                         pages.at(i),
+                         type,
+                         res))
         {
-            QMessageBox::warning(this,
-                                 tr("Failed to export"),
-                                 tr("Failed to export page %1 to image.").arg(i));
+            emit exportDone(QString());
             return;
         }
     }
-    QDesktopServices::openUrl(QUrl::fromUserInput(info.dir().absolutePath()));
+    if (pages.size() < 2) {
+        emit exportDone(QString("%1/%2-%3.%4")
+                        .arg(info.dir().absolutePath())
+                        .arg(info.baseName())
+                        .arg(1)
+                        .arg(info.suffix()));
+    } else {
+        emit exportDone(info.dir().absolutePath());
+    }
+}
+
+void FusePDF::handleExportDone(const QString &path)
+{
+    showProgress(false);
+    if (path.isEmpty()) {
+        QMessageBox::warning(this,
+                             tr("Failed to export"),
+                             tr("Failed to export image(s)."));
+        return;
+    }
+    if (_lastExportDir != QFileInfo(path).dir().absolutePath()) {
+        _lastExportDir = QFileInfo(path).dir().absolutePath();
+    }
+    QDesktopServices::openUrl(QUrl::fromUserInput(path));
 }
 

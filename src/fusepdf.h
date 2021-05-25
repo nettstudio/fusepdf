@@ -199,6 +199,7 @@ signals:
                       const QString &command);
     void statusMessage(const QString &message,
                        int timeout);
+    void exportDone(const QString &path);
 
 private slots:
     void on_actionOpen_triggered();
@@ -263,14 +264,23 @@ private slots:
                     int page,
                     int type,
                     int res);
-    void handleExport(const QString &filename, int page);
-    void handleExports(const QString &filename, QVector<int> pages);
+    void handleExport(const QString &filename,
+                      int page);
+    void handleExports(const QString &filename,
+                       QVector<int> pages);
+    void doExport(const QString &filename,
+                  const QString &image,
+                  QVector<int> pages,
+                  int type,
+                  int res);
+    void handleExportDone(const QString &path);
 
 private:
     Ui::FusePDF *ui;
     QString _output;
     QString _lastSaveDir;
     QString _lastLoadDir;
+    QString _lastExportDir;
     QProcess *_proc;
 };
 #endif // FUSEPDF_H
