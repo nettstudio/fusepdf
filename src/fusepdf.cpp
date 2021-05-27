@@ -1220,7 +1220,7 @@ void FusePDF::doExport(const QString &filename,
         emit exportDone(QString("%1/%2-%3.%4")
                         .arg(info.dir().absolutePath())
                         .arg(info.baseName())
-                        .arg(1)
+                        .arg(pages.at(0))
                         .arg(info.suffix()));
     } else {
         emit exportDone(info.dir().absolutePath());
@@ -1229,6 +1229,7 @@ void FusePDF::doExport(const QString &filename,
 
 void FusePDF::handleExportDone(const QString &path)
 {
+    qDebug() << "export done" << path;
     showProgress(false);
     if (path.isEmpty()) {
         QMessageBox::warning(this,
