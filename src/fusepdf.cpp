@@ -725,7 +725,8 @@ void FusePDF::handleFoundPDF(const QList<QUrl> &urls)
     }
 }
 
-void FusePDF::on_inputs_itemDoubleClicked(QTreeWidgetItem *item, int column)
+void FusePDF::on_inputs_itemDoubleClicked(QTreeWidgetItem *item,
+                                          int column)
 {
     Q_UNUSED(column)
     if (!item) { return; }
@@ -776,21 +777,33 @@ void FusePDF::loadOptions()
     showTooltips(settings.value("showTooltips", true).toBool());
     ui->cmd->setVisible(ui->actionShow_log->isChecked());
     ui->inputs->setSortingEnabled(ui->actionAuto_Sort->isChecked());
+
     if (ui->actionRemember_meta_author->isChecked()) {
         QString author = settings.value("metaAuthorText").toString();
-        if (!author.isEmpty()) { ui->metaAuthor->setText(author); }
+        if (!author.isEmpty()) {
+            ui->metaAuthor->blockSignals(true);
+            ui->metaAuthor->setText(author);
+            ui->metaAuthor->blockSignals(false);
+        }
     }
     if (ui->actionRemember_meta_subject->isChecked()) {
         QString subject = settings.value("metaSubjectText").toString();
-        if (!subject.isEmpty()) { ui->metaSubject->setText(subject); }
+        if (!subject.isEmpty()) {
+            ui->metaSubject->blockSignals(true);
+            ui->metaSubject->setText(subject);
+            ui->metaSubject->blockSignals(false);
+        }
     }
     if (ui->actionRemember_meta_title->isChecked()) {
         QString title = settings.value("metaTitleText").toString();
-        if (!title.isEmpty()) { ui->metaTitle->setText(title); }
+        if (!title.isEmpty()) {
+            ui->metaTitle->blockSignals(true);
+            ui->metaTitle->setText(title);
+            ui->metaTitle->blockSignals(false);
+        }
     }
-    settings.endGroup();
 
-    missingGhost();
+    settings.endGroup();
 }
 
 void FusePDF::saveOptions()
@@ -804,15 +817,7 @@ void FusePDF::saveOptions()
     settings.setValue("metaAuthor", ui->actionRemember_meta_author->isChecked());
     settings.setValue("metaSubject", ui->actionRemember_meta_subject->isChecked());
     settings.setValue("metaTitle", ui->actionRemember_meta_title->isChecked());
-    if (ui->actionRemember_meta_author->isChecked()) {
-        settings.setValue("metaAuthorText", ui->metaAuthor->text());
-    }
-    if (ui->actionRemember_meta_subject->isChecked()) {
-        settings.setValue("metaSubjectText", ui->metaSubject->text());
-    }
-    if (ui->actionRemember_meta_title->isChecked()) {
-        settings.setValue("metaTitleText", ui->metaTitle->text());
-    }
+
     if (!_lastLoadDir.isEmpty()) {
         settings.setValue("lastLoadDir", _lastLoadDir);
     }
@@ -1268,6 +1273,39 @@ void FusePDF::on_compat_currentTextChanged(const QString &arg1)
     QString savedCompat = settings.value("compat").toString();
     if (arg1 != savedCompat && !arg1.isEmpty()) {
         settings.setValue("compat", arg1);
+    }
+    settings.endGroup();
+}
+
+void FusePDF::on_metaTitle_textChanged(const QString &arg1)
+{
+    qDebug() << "meta title changed" << arg1;
+    QSettings settings;
+    settings.beginGroup("options");
+    if (ui->actionRemember_meta_title->isChecked()) {
+        settings.setValue("metaTitleText", arg1);
+    }
+    settings.endGroup();
+}
+
+void FusePDF::on_metaSubject_textChanged(const QString &arg1)
+{
+    qDebug() << "meta subject changed" << arg1;
+    QSettings settings;
+    settings.beginGroup("options");
+    if (ui->actionRemember_meta_subject->isChecked()) {
+        settings.setValue("metaSubjectText", arg1);
+    }
+    settings.endGroup();
+}
+
+void FusePDF::on_metaAuthor_textChanged(const QString &arg1)
+{
+    qDebug() << "meta author changed" << arg1;
+    QSettings settings;
+    settings.beginGroup("options");
+    if (ui->actionRemember_meta_author->isChecked()) {
+        settings.setValue("metaAuthorText", arg1);
     }
     settings.endGroup();
 }

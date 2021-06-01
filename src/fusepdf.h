@@ -222,7 +222,8 @@ private slots:
     void on_actionShow_log_triggered();
     void on_actionAbout_Qt_triggered();
     void handleFoundPDF(const QList<QUrl> &urls);
-    void on_inputs_itemDoubleClicked(QTreeWidgetItem *item, int column);
+    void on_inputs_itemDoubleClicked(QTreeWidgetItem *item,
+                                     int column);
     void on_actionAuto_Sort_triggered();
     bool hasFile(const QString &file);
     void loadOptions();
@@ -276,6 +277,9 @@ private slots:
     void handleExportDone(const QString &path);
     void on_preset_currentTextChanged(const QString &arg1);
     void on_compat_currentTextChanged(const QString &arg1);
+    void on_metaTitle_textChanged(const QString &arg1);
+    void on_metaSubject_textChanged(const QString &arg1);
+    void on_metaAuthor_textChanged(const QString &arg1);
 
 private:
     Ui::FusePDF *ui;
