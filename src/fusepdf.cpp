@@ -305,6 +305,7 @@ FusePDF::FusePDF(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::FusePDF)
     , _proc(nullptr)
+    , _tabButton(nullptr)
 {
     ui->setupUi(this);
     setWindowIcon(QIcon(FUSEPDF_ICON_LOGO));
@@ -336,6 +337,12 @@ FusePDF::FusePDF(QWidget *parent)
 
     _proc = new QProcess(this);
 
+    _tabButton = new QPushButton(this);
+    _tabButton->setFlat(true);
+    _tabButton->setIconSize(QSize(22, 22));
+    _tabButton->setIcon(QIcon(FUSEPDF_ICON_CLEAR));
+    _tabButton->setToolTip(tr("Clear"));
+    ui->tabs->setCornerWidget(_tabButton);
     populateUI();
 
     connect(_proc, SIGNAL(finished(int)),
@@ -354,6 +361,8 @@ FusePDF::FusePDF(QWidget *parent)
             statusBar(), SLOT(showMessage(QString,int)));
     connect(this, SIGNAL(exportDone(QString)),
             this, SLOT(handleExportDone(QString)));
+    connect(_tabButton, SIGNAL(clicked(bool)),
+            this, SLOT(handleTabButtonClicked(bool)));
 
     QTimer::singleShot(0, this, SLOT(loadSettings()));
 }
@@ -396,11 +405,6 @@ void FusePDF::on_actionSave_triggered()
 
     showProgress(true);
     QtConcurrent::run(this, &FusePDF::prepCommand, file);
-}
-
-void FusePDF::on_actionClear_triggered()
-{
-    clearInput();
 }
 
 void FusePDF::on_actionQuit_triggered()
@@ -637,8 +641,11 @@ void FusePDF::handleProcOutput()
     qDebug() << log;
 }
 
-void FusePDF::clearInput()
+void FusePDF::clearInput(bool askFirst)
 {
+    if (askFirst) {
+
+    }
     ui->inputs->clear();
     for (int i = 0; i < ui->tabs->count(); ++i) {
         PagesListWidget *tab = qobject_cast<PagesListWidget*>(ui->tabs->widget(i));
@@ -731,8 +738,9 @@ void FusePDF::on_inputs_itemDoubleClicked(QTreeWidgetItem *item,
     Q_UNUSED(column)
     if (!item) { return; }
     QString filename = item->data(0, FUSEPDF_PATH_ROLE).toString();
-    if (!QFile::exists(filename)) { return; }
-    QDesktopServices::openUrl(QUrl::fromUserInput(filename));
+    int index = getTabIndex(filename);
+    if (index < 1) { return; }
+    ui->tabs->setCurrentIndex(index);
 }
 
 void FusePDF::on_actionAuto_Sort_triggered()
@@ -1279,7 +1287,6 @@ void FusePDF::on_compat_currentTextChanged(const QString &arg1)
 
 void FusePDF::on_metaTitle_textChanged(const QString &arg1)
 {
-    qDebug() << "meta title changed" << arg1;
     QSettings settings;
     settings.beginGroup("options");
     if (ui->actionRemember_meta_title->isChecked()) {
@@ -1290,7 +1297,6 @@ void FusePDF::on_metaTitle_textChanged(const QString &arg1)
 
 void FusePDF::on_metaSubject_textChanged(const QString &arg1)
 {
-    qDebug() << "meta subject changed" << arg1;
     QSettings settings;
     settings.beginGroup("options");
     if (ui->actionRemember_meta_subject->isChecked()) {
@@ -1301,11 +1307,33 @@ void FusePDF::on_metaSubject_textChanged(const QString &arg1)
 
 void FusePDF::on_metaAuthor_textChanged(const QString &arg1)
 {
-    qDebug() << "meta author changed" << arg1;
     QSettings settings;
     settings.beginGroup("options");
     if (ui->actionRemember_meta_author->isChecked()) {
         settings.setValue("metaAuthorText", arg1);
     }
     settings.endGroup();
+}
+
+void FusePDF::on_tabs_currentChanged(int index)
+{
+    if (index == 0) {
+        _tabButton->setIcon(QIcon(FUSEPDF_ICON_CLEAR));
+        _tabButton->setToolTip(tr("Clear"));
+    } else {
+        _tabButton->setIcon(QIcon(FUSEPDF_ICON_MAIN));
+        _tabButton->setToolTip(tr("Show documents"));
+    }
+    qDebug() << "tab changed" << index;
+}
+
+void FusePDF::handleTabButtonClicked(bool checked)
+{
+    Q_UNUSED(checked)
+    int index = ui->tabs->currentIndex();
+    if (index == 0) {
+        clearInput(true);
+    } else if (index > 0) {
+        ui->tabs->setCurrentIndex(0);
+    }
 }

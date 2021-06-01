@@ -77,6 +77,7 @@
 #define FUSEPDF_ICON_MAIN ":/assets/fusepdf-document.png"
 #define FUSEPDF_ICON_DOC ":/assets/document.png"
 #define FUSEPDF_ICON_LOGO ":/assets/fusepdf.png"
+#define FUSEPDF_ICON_CLEAR ":/assets/fusepdf-clear.png"
 #define FUSEPDF_GS_PREVIEW " -q -sDEVICE=jpeg -o \"%2\" -dFirstPage=%3 -dLastPage=%3 -dJPEGQ=%4 -r72x72 \"%1\""
 #define FUSEPDF_GS_EXPORT " -q -sDEVICE=%4 -o \"%2\" -dFirstPage=%3 -dLastPage=%3 -dTextAlphaBits=4 -dGraphicsAlphaBits=4 -r%5x%5 \"%1\""
 #define FUSEPDF_GS_COUNT " -q -dNODISPLAY -dNOSAFER -c \"/pdffile (%1) (r) file runpdfbegin (PageCount: ) print pdfpagecount = quit\""
@@ -204,7 +205,6 @@ signals:
 private slots:
     void on_actionOpen_triggered();
     void on_actionSave_triggered();
-    void on_actionClear_triggered();
     void on_actionQuit_triggered();
     void on_actionAbout_triggered();
     void prepCommand(const QString &filename);
@@ -217,7 +217,7 @@ private slots:
     void loadSettings();
     void saveSettings();
     void handleProcOutput();
-    void clearInput();
+    void clearInput(bool askFirst = false);
     static const QString findGhost();
     void on_actionShow_log_triggered();
     void on_actionAbout_Qt_triggered();
@@ -280,6 +280,8 @@ private slots:
     void on_metaTitle_textChanged(const QString &arg1);
     void on_metaSubject_textChanged(const QString &arg1);
     void on_metaAuthor_textChanged(const QString &arg1);
+    void on_tabs_currentChanged(int index);
+    void handleTabButtonClicked(bool checked);
 
 private:
     Ui::FusePDF *ui;
@@ -288,5 +290,6 @@ private:
     QString _lastLoadDir;
     QString _lastExportDir;
     QProcess *_proc;
+    QPushButton *_tabButton;
 };
 #endif // FUSEPDF_H

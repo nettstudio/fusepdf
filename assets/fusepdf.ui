@@ -38,6 +38,12 @@
         <property name="currentIndex">
          <number>0</number>
         </property>
+        <property name="iconSize">
+         <size>
+          <width>22</width>
+          <height>22</height>
+         </size>
+        </property>
         <widget class="QWidget" name="tabInputs">
          <attribute name="icon">
           <iconset resource="../fusepdf.qrc">
@@ -413,7 +419,6 @@
     <addaction name="actionOpen"/>
     <addaction name="actionSave"/>
     <addaction name="separator"/>
-    <addaction name="actionClear"/>
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
    </widget>
@@ -478,7 +483,6 @@
    </attribute>
    <addaction name="actionOpen"/>
    <addaction name="actionSave"/>
-   <addaction name="actionClear"/>
   </widget>
   <widget class="QStatusBar" name="statusBar">
    <property name="sizeGripEnabled">
@@ -513,18 +517,6 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+S</string>
-   </property>
-  </action>
-  <action name="actionClear">
-   <property name="icon">
-    <iconset resource="../fusepdf.qrc">
-     <normaloff>:/assets/fusepdf-clear.png</normaloff>:/assets/fusepdf-clear.png</iconset>
-   </property>
-   <property name="text">
-    <string>Clear</string>
-   </property>
-   <property name="toolTip">
-    <string>Clear inputs</string>
    </property>
   </action>
   <action name="actionQuit">
