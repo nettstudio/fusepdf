@@ -334,6 +334,7 @@ FusePDF::FusePDF(QWidget *parent)
 
     ui->progressBar->setMaximumWidth(100);
     ui->statusBar->addPermanentWidget(ui->progressBar);
+    showProgress(false);
 
     _proc = new QProcess(this);
 
@@ -1046,6 +1047,7 @@ void FusePDF::showProgress(bool progress)
 {
     ui->progressBar->setMaximum(progress?0:100);
     ui->progressBar->setValue(progress?0:100);
+    ui->progressBar->setHidden(!progress);
 }
 
 void FusePDF::on_actionOpen_cache_folder_triggered()
