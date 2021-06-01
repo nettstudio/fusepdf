@@ -643,8 +643,14 @@ void FusePDF::handleProcOutput()
 
 void FusePDF::clearInput(bool askFirst)
 {
+    if (ui->inputs->topLevelItemCount() < 1) { return; }
     if (askFirst) {
-
+        int res = QMessageBox::question(this,
+                                        tr("Clear?"),
+                                        tr("Clear all documents?"),
+                                        QMessageBox::Yes | QMessageBox::No,
+                                        QMessageBox::Yes);
+        if (res != QMessageBox::Yes) { return; }
     }
     ui->inputs->clear();
     for (int i = 0; i < ui->tabs->count(); ++i) {
