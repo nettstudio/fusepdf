@@ -526,9 +526,6 @@
    <property name="toolTip">
     <string>Clear inputs</string>
    </property>
-   <property name="shortcut">
-    <string>Ctrl+C</string>
-   </property>
   </action>
   <action name="actionQuit">
    <property name="icon">
@@ -549,16 +546,10 @@
    <property name="text">
     <string>About</string>
    </property>
-   <property name="shortcut">
-    <string>Ctrl+A</string>
-   </property>
   </action>
   <action name="actionAbout_Qt">
    <property name="text">
     <string>About Qt</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+T</string>
    </property>
   </action>
   <action name="actionShow_log">
@@ -585,9 +576,6 @@
    <property name="toolTip">
     <string>Enable Sorting of items. Note that this will disable manual order.</string>
    </property>
-   <property name="shortcut">
-    <string>Ctrl+Z</string>
-   </property>
   </action>
   <action name="actionOpen_saved_PDF">
    <property name="checkable">
@@ -598,9 +586,6 @@
    </property>
    <property name="toolTip">
     <string>Open merged PDF</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+P</string>
    </property>
   </action>
   <action name="actionRemember_meta_author">
@@ -640,9 +625,6 @@
    <property name="text">
     <string>Open cache folder</string>
    </property>
-   <property name="shortcut">
-    <string>Ctrl+F</string>
-   </property>
   </action>
   <action name="actionShow_tooltips">
    <property name="checkable">
@@ -651,24 +633,15 @@
    <property name="text">
     <string>Show tooltips</string>
    </property>
-   <property name="shortcut">
-    <string>Ctrl+I</string>
-   </property>
   </action>
   <action name="actionCheck_for_updates">
    <property name="text">
     <string>Check for updates</string>
    </property>
-   <property name="shortcut">
-    <string>Ctrl+U</string>
-   </property>
   </action>
   <action name="actionReport_issue">
    <property name="text">
     <string>Report issue</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+E</string>
    </property>
   </action>
  </widget>
