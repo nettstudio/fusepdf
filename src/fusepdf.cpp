@@ -308,8 +308,6 @@ FusePDF::FusePDF(QWidget *parent)
 {
     ui->setupUi(this);
     setWindowIcon(QIcon(FUSEPDF_ICON_LOGO));
-
-
     qApp->setStyle(QStyleFactory::create("fusion"));
     // don't set palette on macos as it breaks dark mode
 #ifndef Q_OS_MAC
@@ -338,6 +336,8 @@ FusePDF::FusePDF(QWidget *parent)
 
     _proc = new QProcess(this);
 
+    populateUI();
+
     connect(_proc, SIGNAL(finished(int)),
             this, SLOT(commandFinished(int)));
     connect(_proc, SIGNAL(started()),
@@ -355,7 +355,7 @@ FusePDF::FusePDF(QWidget *parent)
     connect(this, SIGNAL(exportDone(QString)),
             this, SLOT(handleExportDone(QString)));
 
-    loadSettings();
+    QTimer::singleShot(0, this, SLOT(loadSettings()));
 }
 
 FusePDF::~FusePDF()
@@ -558,8 +558,10 @@ void FusePDF::commandFinished(int exitCode)
 
 void FusePDF::populateUI()
 {
-    ui->compat->clear();
     QIcon docIcon(FUSEPDF_ICON_DOC);
+
+    ui->compat->blockSignals(true);
+    ui->compat->clear();
     ui->compat->addItem(docIcon, "1.0");
     ui->compat->addItem(docIcon, "1.1");
     ui->compat->addItem(docIcon, "1.2");
@@ -568,7 +570,9 @@ void FusePDF::populateUI()
     ui->compat->addItem(docIcon, "1.5");
     ui->compat->addItem(docIcon, "1.6");
     ui->compat->addItem(docIcon, "1.7");
+    ui->compat->blockSignals(false);
 
+    ui->preset->blockSignals(true);
     ui->preset->clear();
     ui->preset->addItem(docIcon, "None");
     ui->preset->addItem(docIcon, "Default");
@@ -576,12 +580,11 @@ void FusePDF::populateUI()
     ui->preset->addItem(docIcon, "eBook");
     ui->preset->addItem(docIcon, "Screen");
     ui->preset->addItem(docIcon, "Printer");
+    ui->preset->blockSignals(false);
 }
 
 void FusePDF::loadSettings()
 {
-    if (isNewVersion()) { on_actionAbout_triggered(); }
-
     QSettings settings;
     settings.beginGroup("ui");
     QByteArray lastGeo = settings.value("geometry").toByteArray();
@@ -598,14 +601,16 @@ void FusePDF::loadSettings()
     if (wasMax) { showMaximized(); }
     settings.endGroup();
 
-    ui->progressBar->setMaximum(100);
-    ui->progressBar->setValue(100);
     loadOptions();
 
     if (getCachePath().isEmpty()) {
         QMessageBox::warning(this,
                              tr("Missing cache folder"),
                              tr("Unable to create the cache folder, please check your system permissions."));
+        QTimer::singleShot(100, qApp, SLOT(quit()));
+    }
+    if (missingGhost()) {
+        QTimer::singleShot(100, qApp, SLOT(quit()));
     }
 }
 
@@ -747,12 +752,17 @@ bool FusePDF::hasFile(const QString &file)
 
 void FusePDF::loadOptions()
 {
-    populateUI();
-
     QSettings settings;
     settings.beginGroup("options");
+
+    ui->compat->blockSignals(true);
     ui->compat->setCurrentText(settings.value("compat", "1.5").toString());
+    ui->compat->blockSignals(false);
+
+    ui->preset->blockSignals(true);
     ui->preset->setCurrentText(settings.value("preset", "Default").toString());
+    ui->preset->blockSignals(false);
+
     ui->actionShow_log->setChecked(settings.value("showLog", false).toBool());
     ui->actionAuto_Sort->setChecked(settings.value("autoSort", false).toBool());
     ui->actionRemember_meta_author->setChecked(settings.value("metaAuthor", true).toBool());
@@ -787,12 +797,6 @@ void FusePDF::saveOptions()
 {
     QSettings settings;
     settings.beginGroup("options");
-    if (!ui->compat->currentText().isEmpty()) {
-        settings.setValue("compat", ui->compat->currentText());
-    }
-    if (!ui->preset->currentText().isEmpty()) {
-        settings.setValue("preset", ui->preset->currentText());
-    }
     settings.setValue("showLog", ui->actionShow_log->isChecked());
     settings.setValue("autoSort", ui->actionAuto_Sort->isChecked());
     settings.setValue("openSavedPDF", ui->actionOpen_saved_PDF->isChecked());
@@ -1245,3 +1249,25 @@ void FusePDF::handleExportDone(const QString &path)
     QDesktopServices::openUrl(QUrl::fromUserInput(path));
 }
 
+
+void FusePDF::on_preset_currentTextChanged(const QString &arg1)
+{
+    QSettings settings;
+    settings.beginGroup("options");
+    QString savedPreset = settings.value("preset").toString();
+    if (arg1 != savedPreset && !arg1.isEmpty()) {
+        settings.setValue("preset", arg1);
+    }
+    settings.endGroup();
+}
+
+void FusePDF::on_compat_currentTextChanged(const QString &arg1)
+{
+    QSettings settings;
+    settings.beginGroup("options");
+    QString savedCompat = settings.value("compat").toString();
+    if (arg1 != savedCompat && !arg1.isEmpty()) {
+        settings.setValue("compat", arg1);
+    }
+    settings.endGroup();
+}

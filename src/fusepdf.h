@@ -274,6 +274,8 @@ private slots:
                   int type,
                   int res);
     void handleExportDone(const QString &path);
+    void on_preset_currentTextChanged(const QString &arg1);
+    void on_compat_currentTextChanged(const QString &arg1);
 
 private:
     Ui::FusePDF *ui;
