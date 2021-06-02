@@ -4,14 +4,6 @@ FusePDF is a simple cross-platform (Windows/macOS/Linux) application used for me
 
 ![screenshot2](https://github.com/nettstudio/fusepdf/raw/main/assets/fusepdf-screenshot-2.png "FusePDF screenshot 2")
 
-## News
-
-* [FusePDF 2.0 RC 3 released](https://github.com/nettstudio/fusepdf/releases/tag/v2.0.0-rc3)
-* [FusePDF 2.0 RC 2 released](https://github.com/nettstudio/fusepdf/releases/tag/v2.0.0-rc2)
-* [FusePDF 2.0 RC 1 released](https://github.com/nettstudio/fusepdf/releases/tag/v2.0.0-rc1)
-* [FusePDF 1.2.0 released](https://github.com/nettstudio/fusepdf/releases/tag/v1.2.0)
-
-## License
 
 This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 3 of the License, or (at your option) any later version.
 
