@@ -61,6 +61,8 @@
 #include <QVBoxLayout>
 #include <QComboBox>
 #include <QPushButton>
+#include <QStyledItemDelegate>
+#include <QPixmap>
 
 #define FUSEPDF_RELEASES_URL "https://github.com/nettstudio/fusepdf/releases"
 #define FUSEPDF_ISSUE_URL "https://github.com/nettstudio/fusepdf/issues"
@@ -71,13 +73,18 @@
 #define FUSEPDF_CHECKSUM_ROLE Qt::UserRole + 5
 #define FUSEPDF_IMAGE_TYPE_ROLE Qt::UserRole + 6
 #define FUSEPDF_IMAGE_RES_ROLE Qt::UserRole + 7
+#define FUSEPDF_CHECKED_ROLE Qt::UserRole + 8
 #define FUSEPDF_PAGE_ICON_SIZE 320
+#define FUSEPDF_ICON_DEFAULT_SIZE 22
 #define FUSEPDF_CACHE_JPEG "%1/%2-%3.jpg"
 #define FUSEPDF_CACHE_PDF "%1/%2-%3.pdf"
 #define FUSEPDF_ICON_MAIN ":/assets/fusepdf-document.png"
 #define FUSEPDF_ICON_DOC ":/assets/document.png"
 #define FUSEPDF_ICON_LOGO ":/assets/fusepdf.png"
 #define FUSEPDF_ICON_CLEAR ":/assets/fusepdf-clear.png"
+#define FUSEPDF_ICON_VALID ":/assets/fusepdf-valid.png"
+#define FUSEPDF_ICON_DENIED ":/assets/fusepdf-denied.png"
+#define FUSEPDF_ICON_GOFIRST ":/assets/fusepdf-gofirst.png"
 #define FUSEPDF_GS_PREVIEW " -q -sDEVICE=jpeg -o \"%2\" -dFirstPage=%3 -dLastPage=%3 -dJPEGQ=%4 -r72x72 \"%1\""
 #define FUSEPDF_GS_EXPORT " -q -sDEVICE=%4 -o \"%2\" -dFirstPage=%3 -dLastPage=%3 -dTextAlphaBits=4 -dGraphicsAlphaBits=4 -r%5x%5 \"%1\""
 #define FUSEPDF_GS_COUNT " -q -dNODISPLAY -dNOSAFER -c \"/pdffile (%1) (r) file runpdfbegin (PageCount: ) print pdfpagecount = quit\""
@@ -115,6 +122,31 @@ private:
     QComboBox *_res;
 };
 
+class PageDelegate : public QStyledItemDelegate
+{
+    Q_OBJECT
+
+public:
+    using QStyledItemDelegate::QStyledItemDelegate;
+
+    void paint(QPainter *painter, const QStyleOptionViewItem &option,
+               const QModelIndex &index) const override
+    {
+        QStyledItemDelegate::paint(painter, option, index);
+        painter->save();
+
+        int dim = FUSEPDF_ICON_DEFAULT_SIZE;
+        int x = option.rect.x() + ((option.rect.width()/2) - (dim/2));
+        int y = option.rect.y() + (option.rect.height() - dim) - (dim/2);
+
+        QPixmap pix;
+        pix.load(index.data(FUSEPDF_CHECKED_ROLE).toBool()? FUSEPDF_ICON_VALID : FUSEPDF_ICON_DENIED);
+        painter->drawPixmap(QRect(x, y, dim, dim), pix);
+
+        painter->restore();
+    }
+};
+
 class PagesListWidget : public QListWidget
 {
     Q_OBJECT
@@ -134,7 +166,7 @@ public:
         return _pages;
     }
     bool isModified();
-    QVector<int> getPagesState(Qt::CheckState state);
+    QVector<int> getPagesState(bool state);
 
 signals:
     void requestExportPage(const QString &filename, int page);
@@ -151,7 +183,7 @@ private slots:
     void handleContextMenu(QPoint pos);
     void selectAllPages();
     void selectNoPages();
-    void setCheckedState(Qt::CheckState state);
+    void setCheckedState(bool state);
     void exportSelectedPage();
     void exportSelectedPages();
 

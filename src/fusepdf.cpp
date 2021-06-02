@@ -141,17 +141,18 @@ PagesListWidget::PagesListWidget(QWidget *parent,
     setResizeMode(QListView::Adjust);
     setFrameShape(QFrame::NoFrame);
     setContextMenuPolicy(Qt::CustomContextMenu);
+    setItemDelegate(new PageDelegate(this));
 
     for (int i = 1; i <= _pages; ++i) {
         QListWidgetItem *item = new QListWidgetItem(QIcon(FUSEPDF_ICON_LOGO),
-                                                    QString::number(i),
+                                                    QString(),
                                                     this);
         item->setData(FUSEPDF_PAGE_ROLE, i);
-        item->setCheckState(Qt::Checked);
-        item->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled | Qt::ItemIsSelectable);
+        item->setData(FUSEPDF_CHECKED_ROLE, true);
+        item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
     }
 
-    connect(this, SIGNAL(itemClicked(QListWidgetItem*)),
+    connect(this, SIGNAL(itemDoubleClicked(QListWidgetItem*)),
             this, SLOT(handleItemClicked(QListWidgetItem*)));
     connect(this, SIGNAL(customContextMenuRequested(QPoint)),
             this, SLOT(handleContextMenu(QPoint)));
@@ -161,19 +162,18 @@ bool PagesListWidget::isModified() {
     for (int i = 0; i < count(); ++i) {
         QListWidgetItem *item = this->item(i);
         if (!item) { continue; }
-        if (item->checkState() == Qt::Unchecked) { return true; }
+        if (!item->data(FUSEPDF_CHECKED_ROLE).toBool()) { return true; }
     }
     return false;
 }
 
-QVector<int> PagesListWidget::getPagesState(Qt::CheckState state)
+QVector<int> PagesListWidget::getPagesState(bool state)
 {
     QVector<int> result;
-    if (state == Qt::PartiallyChecked) { return result; }
     for (int i = 0; i < count(); ++i) {
         QListWidgetItem *item = this->item(i);
         if (!item) { continue; }
-        if (item->checkState() == state) {
+        if (item->data(FUSEPDF_CHECKED_ROLE).toBool() == state) {
             result.append(item->data(FUSEPDF_PAGE_ROLE).toInt());
         }
     }
@@ -212,9 +212,11 @@ void PagesListWidget::setPageIcon(const QString &filename,
 void PagesListWidget::handleItemClicked(QListWidgetItem *item)
 {
     if (!item) { return; }
-    if (item->checkState() == Qt::Checked) {
-        item->setCheckState(Qt::Unchecked);
-    } else { item->setCheckState(Qt::Checked); }
+    if (item->data(FUSEPDF_CHECKED_ROLE).toBool()) {
+        item->setData(FUSEPDF_CHECKED_ROLE, false);
+    } else {
+        item->setData(FUSEPDF_CHECKED_ROLE, true);
+    }
 }
 
 void PagesListWidget::handleContextMenu(QPoint pos)
@@ -251,20 +253,20 @@ void PagesListWidget::handleContextMenu(QPoint pos)
 
 void PagesListWidget::selectAllPages()
 {
-    setCheckedState(Qt::Checked);
+    setCheckedState(true);
 }
 
 void PagesListWidget::selectNoPages()
 {
-    setCheckedState(Qt::Unchecked);
+    setCheckedState(false);
 }
 
-void PagesListWidget::setCheckedState(Qt::CheckState state)
+void PagesListWidget::setCheckedState(bool state)
 {
     for (int i = 0; i < count(); ++i) {
         QListWidgetItem *item = this->item(i);
         if (!item) { continue; }
-        item->setCheckState(state);
+        item->setData(FUSEPDF_CHECKED_ROLE, state);
     }
 }
 
@@ -280,7 +282,7 @@ void PagesListWidget::exportSelectedPage()
 void PagesListWidget::exportSelectedPages()
 {
     emit requestExportPages(_filename,
-                            getPagesState(Qt::Checked));
+                            getPagesState(true));
 }
 
 FilesTreeWidget::FilesTreeWidget(QWidget *parent):
@@ -458,9 +460,9 @@ const QString FusePDF::makeCommand(const QString &filename)
         QString filename = ui->inputs->topLevelItem(i)->data(0, FUSEPDF_PATH_ROLE).toString();
         PagesListWidget *tab = getTab(filename);
         bool modified = false;
-        if (tab && tab->isModified() && tab->getPagesState(Qt::Checked).size() > 0) {
+        if (tab && tab->isModified() && tab->getPagesState(true).size() > 0) {
             modified = true;
-            QVector<int> pages = tab->getPagesState(Qt::Checked);
+            QVector<int> pages = tab->getPagesState(true);
             for (int i = 0; i < pages.count(); ++i) {
                 QString extracted = extractPDF(filename, getChecksum(filename), pages.at(i));
                 if (!extracted.isEmpty()) {
@@ -1327,10 +1329,9 @@ void FusePDF::on_tabs_currentChanged(int index)
         _tabButton->setIcon(QIcon(FUSEPDF_ICON_CLEAR));
         _tabButton->setToolTip(tr("Clear"));
     } else {
-        _tabButton->setIcon(QIcon(FUSEPDF_ICON_MAIN));
+        _tabButton->setIcon(QIcon(FUSEPDF_ICON_GOFIRST));
         _tabButton->setToolTip(tr("Show documents"));
     }
-    qDebug() << "tab changed" << index;
 }
 
 void FusePDF::handleTabButtonClicked(bool checked)

@@ -8,5 +8,8 @@
         <file>assets/fusepdf-document.png</file>
         <file>assets/document.png</file>
         <file>assets/nettstudio.png</file>
+        <file>assets/fusepdf-denied.png</file>
+        <file>assets/fusepdf-valid.png</file>
+        <file>assets/fusepdf-gofirst.png</file>
     </qresource>
 </RCC>
