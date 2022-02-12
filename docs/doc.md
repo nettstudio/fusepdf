@@ -6,17 +6,64 @@ author: NettStudio AS
 date: 'February 12, 2022'
 mainfont: DejaVuSans.ttf
 fontsize: 12pt
-...
+---
 
 # Introduction
 
-FusePDF is a simple cross-platform (Windows/macOS/Linux) application used for merging, splitting and exporting (PNG/TIFF RGB/CMYK) PDF pages and documents.
+FusePDF is an simple cross-platform and open source application used for merging, splitting and extracting PDF pages and documents.
 
 ![Screenshot of main interface](https://github.com/nettstudio/fusepdf/raw/main/assets/fusepdf-screenshot.png "Screenshot of main interface")
 
-![Screenshot of pages in a document](https://github.com/nettstudio/fusepdf/raw/main/assets/fusepdf-screenshot-2.png "Screenshot of pages in a document")
+## Features
+
+* Drag-and-drop any PDF document
+* Sort documents
+* Preview document pages
+* Exclude/Include document pages
+* Export pages as images or PDF
+* PDF presets for most outputs
+* PDF compatibility up to 1.7
+* PDF meta data (properties)
+
+# ChangeLog
+
+## 2.0.0
+
+Released : Jun 2, 2021.
+
+  * Improved UI/UX
+  * Preview pages
+  * Include/Exclude pages
+  * Bug fixes
+  * More options
+  * Improved macOS support
+  * Export page(s) to image(s)
+
+## 1.2.0
+
+Released : Apr 13, 2021.
+
+  * Improved Linux support
+  * Change license to GPLv3
+  * Improved UI
+
+## 1.1.0
+
+Released : Jan 26, 2021.
+
+  * Support for meta/properties data
+  * More options
+  * Improved UX
+
+## 1.0.0
+
+Released : Jan 24, 2021.
+
+  * Initial release
 
 # License
+
+## FusePDF
 
 Copyright &copy; 2021, 2022 [NettStudio AS](https://nettstudio.no). All rights reserved.
 
@@ -26,11 +73,7 @@ This program is distributed in the hope that it will be useful, but WITHOUT ANY 
 
 You should have received a copy of the GNU General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-## Third-party
-
-Windows releases of FusePDF includes various other open-source components.
-
-### Qt
+## Qt
 
 Copyright &copy; 2020 The Qt Company Ltd and other contributors.
 
@@ -42,7 +85,7 @@ This program is distributed in the hope that it will be useful, but WITHOUT ANY 
 
 You should have received a copy of the GNU General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-### GPL Ghostscript
+## GPL Ghostscript
 
 Copyright &copy; 2000-2021 Artifex Software, Inc.  All rights reserved.
 
