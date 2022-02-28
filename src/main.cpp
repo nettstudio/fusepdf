@@ -1,8 +1,9 @@
 /*
 #
-# FusePDF - https://nettstudio.no
+# FusePDF - https://fusepdf.no
 #
-# Copyright (c) 2021 NettStudio AS. All rights reserved.
+# Copyright (c) 2021 NettStudio AS <https://nettstudio.no>.
+# All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
