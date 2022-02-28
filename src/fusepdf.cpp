@@ -44,33 +44,33 @@ ExportImageDialog::ExportImageDialog(QWidget *parent,
     _type = new QComboBox(this);
     _res = new QComboBox(this);
 
-    _res->addItem("72 dpi", 72);
-    _res->addItem("96 dpi", 96);
-    _res->addItem("120 dpi", 120);
-    _res->addItem("300 dpi", 300);
-    _res->addItem("600 dpi", 600);
-    _res->addItem("1200 dpi", 1200);
+    _res->addItem(tr("72 dpi"), 72);
+    _res->addItem(tr("96 dpi"), 96);
+    _res->addItem(tr("120 dpi"), 120);
+    _res->addItem(tr("300 dpi"), 300);
+    _res->addItem(tr("600 dpi"), 600);
+    _res->addItem(tr("1200 dpi"), 1200);
     _res->setCurrentIndex(3);
 
     if (suffix.isEmpty()) {
-        _type->addItem("PNG 16", exportPNGType16);
-        _type->addItem("PNG Gray", exportPNGTypeGray);
-        _type->addItem("TIFF RGB 24-bit", exportTiffTypeRGB24);
-        _type->addItem("TIFF RGB 12-bit", exportTiffTypeRGB12);
-        _type->addItem("TIFF RGB 48-bit", exportTiffTypeRGB48);
-        _type->addItem("TIFF CMYK 32-bit", exportTiffTypeCMYK32);
-        _type->addItem("TIFF CMYK 64-bit", exportTiffTypeCMYK64);
-        _type->addItem("TIFF Gray", exportTiffTypeGray);
+        _type->addItem(tr("PNG 16"), exportPNGType16);
+        _type->addItem(tr("PNG Gray"), exportPNGTypeGray);
+        _type->addItem(tr("TIFF RGB 24-bit"), exportTiffTypeRGB24);
+        _type->addItem(tr("TIFF RGB 12-bit"), exportTiffTypeRGB12);
+        _type->addItem(tr("TIFF RGB 48-bit"), exportTiffTypeRGB48);
+        _type->addItem(tr("TIFF CMYK 32-bit"), exportTiffTypeCMYK32);
+        _type->addItem(tr("TIFF CMYK 64-bit"), exportTiffTypeCMYK64);
+        _type->addItem(tr("TIFF Gray"), exportTiffTypeGray);
     } else if (suffix.toLower() == "png") {
-        _type->addItem("PNG 16", exportPNGType16);
-        _type->addItem("PNG Gray", exportPNGTypeGray);
+        _type->addItem(tr("PNG 16"), exportPNGType16);
+        _type->addItem(tr("PNG Gray"), exportPNGTypeGray);
     } else if (suffix.toLower() == "tif" || suffix.toLower() == "tiff") {
-        _type->addItem("TIFF RGB 24-bit", exportTiffTypeRGB24);
-        _type->addItem("TIFF RGB 12-bit", exportTiffTypeRGB12);
-        _type->addItem("TIFF RGB 48-bit", exportTiffTypeRGB48);
-        _type->addItem("TIFF CMYK 32-bit", exportTiffTypeCMYK32);
-        _type->addItem("TIFF CMYK 64-bit", exportTiffTypeCMYK64);
-        _type->addItem("TIFF Gray", exportTiffTypeGray);
+        _type->addItem(tr("TIFF RGB 24-bit"), exportTiffTypeRGB24);
+        _type->addItem(tr("TIFF RGB 12-bit"), exportTiffTypeRGB12);
+        _type->addItem(tr("TIFF RGB 48-bit"), exportTiffTypeRGB48);
+        _type->addItem(tr("TIFF CMYK 32-bit"), exportTiffTypeCMYK32);
+        _type->addItem(tr("TIFF CMYK 64-bit"), exportTiffTypeCMYK64);
+        _type->addItem(tr("TIFF Gray"), exportTiffTypeGray);
     } else {
         _type->addItem(tr("N/A"), exportImageTypeUndefined);
     }
@@ -418,14 +418,14 @@ void FusePDF::on_actionQuit_triggered()
 void FusePDF::on_actionAbout_triggered()
 {
     QMessageBox::about(this,
-                       tr("FusePDF"),
-                       tr("<h2>FusePDF %1</h2>"
-                          "<p>Copyright &copy;2021 <a href='https://nettstudio.no'>NettStudio AS</a>. All rights reserved.</p>"
-                          "<p style=\"font-size:small;\">This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 3 of the License, or (at your option) any later version.</p>"
-                          "<p style=\"font-size:small;\">This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.</p>"
-                          "<p style=\"font-size:small;\">You should have received a copy of the GNU General Public License along with this program.  If not, see <a href=\"https://www.gnu.org/licenses\">www.gnu.org/licenses</a>.</p>"
-                          "<p style=\"text-align:left;\"><a href=\"https://nettstudio.no\"><img src=\":/assets/nettstudio.png\"></a></p>"
-                          ).arg(VERSION_APP));
+                       QString("FusePDF"),
+                       QString("<h2>FusePDF %1</h2>"
+                               "<p>Copyright &copy;2021 <a href='https://nettstudio.no'>NettStudio AS</a>. All rights reserved.</p>"
+                               "<p style=\"font-size:small;\">This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 3 of the License, or (at your option) any later version.</p>"
+                               "<p style=\"font-size:small;\">This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.</p>"
+                               "<p style=\"font-size:small;\">You should have received a copy of the GNU General Public License along with this program.  If not, see <a href=\"https://www.gnu.org/licenses\">www.gnu.org/licenses</a>.</p>"
+                               "<p style=\"text-align:left;\"><a href=\"https://nettstudio.no\"><img src=\":/assets/nettstudio.png\"></a></p>"
+                              ).arg(VERSION_APP));
 }
 
 void FusePDF::prepCommand(const QString &filename)
@@ -481,7 +481,7 @@ const QString FusePDF::makeCommand(const QString &filename)
     QString author = ui->metaAuthor->text();
 
     QString marks;
-    marks.append("/Creator(FusePDF - nettstudio.no)");
+    marks.append("/Creator(FusePDF - https://fusepdf.no)");
 
     if (!title.isEmpty()) { marks.append(QString("/Title<%1>").arg(QString(toUtf16Hex(title)).toUpper())); }
     if (!subject.isEmpty()) { marks.append(QString("/Subject<%1>").arg(QString(toUtf16Hex(subject)).toUpper())); }
@@ -883,7 +883,7 @@ void FusePDF::handleProcessError(QProcess::ProcessError error)
         errorMsg = tr("An unknown error occured. For example, the process may not be running, or it may have closed its input channel.");
         break;
     }
-    errorMsg.append(" See log (CTRL+L) for more information");
+    errorMsg.append(QString(" %1").arg(tr("See log (CTRL+L) for more information")));
     QMessageBox::warning(this, tr("Process failed"), errorMsg);
 }
 
