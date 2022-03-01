@@ -1,8 +1,8 @@
 [Desktop Entry]
-Categories=Graphics;
-Comment=Merge PDF documents
-Exec=FusePDF
-GenericName=FusePDF
-Icon=fusepdf
-Name=FusePDF
 Type=Application
+Categories=Graphics;Office
+GenericName=FusePDF
+Name=FusePDF
+Icon=fusepdf
+Exec=fusepdf
+Comment=Merge PDF documents
