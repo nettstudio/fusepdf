@@ -21,7 +21,11 @@
 */
 
 #include "fusepdf.h"
+
+#include <QDebug>
 #include <QApplication>
+#include <QTranslator>
+#include <QLocale>
 
 int main(int argc, char *argv[])
 {
@@ -31,6 +35,19 @@ int main(int argc, char *argv[])
     QApplication::setApplicationVersion(VERSION_APP);
     QApplication::setOrganizationName("NettStudio AS");
     QApplication::setOrganizationDomain("nettstudio.no");
+
+    // test i18n
+    //QLocale curLocale(QLocale("no"));
+    //QLocale::setDefault(curLocale);
+
+    QTranslator i18n;
+    i18n.load(QLocale(),
+              QLatin1String("fusepdf"),
+              QLatin1String("_"),
+              QLatin1String(":/i18n"));
+    qDebug() << "Locale" << QLocale().name() << i18n.filePath();
+    a.installTranslator(&i18n);
+
     FusePDF w;
     w.show();
     return a.exec();

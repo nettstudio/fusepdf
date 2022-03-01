@@ -2,7 +2,7 @@
 
 [![GitHub](https://img.shields.io/github/license/nettstudio/fusepdf)](https://github.com/nettstudio/fusepdf/blob/main/COPYING) [![C/C++ CI](https://github.com/nettstudio/fusepdf/actions/workflows/c-cpp.yml/badge.svg)](https://github.com/nettstudio/fusepdf/actions/workflows/c-cpp.yml) [![GitHub issues](https://img.shields.io/github/issues/nettstudio/fusepdf)](https://github.com/nettstudio/fusepdf/issues)
 
-FusePDF is a simple cross-platform *(Windows/macOS/Linux)* application used for merging, splitting and exporting PDF pages and documents.
+FusePDF is a simple cross-platform application used for merging, splitting and exporting PDF pages and documents.
 
 ## License
 
@@ -19,6 +19,7 @@ FusePDF requires Qt5+ (Core/Gui/Widgets/Concurrent) to build, and Ghostscript (`
 ```
 git clone https://github.com/nettstudio/fusepdf
 cd fusepdf
+git submodule update -i
 mkdir build && cd build
 qmake CONFIG+=release PREFIX=/usr .. && make
 ```
