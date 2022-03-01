@@ -32,6 +32,8 @@ CONFIG += c++11
 CONFIG(release, debug|release): DEFINES += QT_NO_DEBUG_OUTPUT QT_NO_WARNING_OUTPUT
 isEmpty(PREFIX): PREFIX = /usr/local
 
+CONFIG(FORCE_NORWEGIAN): DEFINES += FORCE_NORWEGIAN
+
 DEFINES += QT_DEPRECATED_WARNINGS
 DEFINES += VERSION_APP=\\\"$${VERSION}\\\"
 
@@ -48,7 +50,6 @@ SOURCES += src/main.cpp src/fusepdf.cpp
 HEADERS += src/fusepdf.h
 FORMS += assets/fusepdf.ui
 RESOURCES += fusepdf.qrc
-OTHER_FILES += README.md
 INSTALLS += target docs desktop hicolor
 
 desktop.path = $${PREFIX}/share/applications
@@ -56,7 +57,7 @@ desktop.files = assets/fusepdf.desktop
 hicolor.path = $${PREFIX}/share/icons
 hicolor.files = assets/hicolor
 docs.path = $${PREFIX}/share/doc/$${TARGET}-$${VERSION}
-docs.files = COPYING README.md
+docs.files = COPYING
 target.path = $${PREFIX}/bin
 
 exists(i18n/fusepdf.pri): include(i18n/fusepdf.pri)
