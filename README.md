@@ -4,22 +4,64 @@
 
 FusePDF is a simple cross-platform application used for merging, splitting and exporting PDF pages and documents.
 
-## License
-
-This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 3 of the License, or (at your option) any later version.
+See [website](http://fusepdf.no) for more information regarding usage.
 
 Copyright (c) 2021, 2022 [NettStudio AS](https://nettstudio.no). All rights reserved.
 
 [![NettStudio](https://raw.githubusercontent.com/nettstudio/fusepdf/main/assets/nettstudio.png)](https://nettstudio.no)
 
-## Build (on macOS/Linux/BSD)
+## Build (on Linux/macOS/FreeBSD)
 
 FusePDF requires Qt5+ (Core/Gui/Widgets/Concurrent) to build, and Ghostscript (``gs``) available during runtime.
+
+## Installing dependencies
+
+Instructions for installing the needed dependencies.
+
+### Debian/Ubuntu (and compatible)
+
+``sudo apt install ghostscript qt5-default qtbase5-dev qttools5-dev-tools``
+
+### Fedora/CentOS/RHEL (and compatible)
+
+``sudo yum install ghostscript qt5-qtbase-devel qt5-qttools``
+
+### macports
+
+``sudo port install ghostscript qt5-qtbase qt5-qttools``
+
+### FreeBSD
+
+``sudo pkg install ghostscript9-agpl-base qt5``
+
+## Get source code
+
+Getting the latest source code from GitHub:
 
 ```
 git clone https://github.com/nettstudio/fusepdf
 cd fusepdf
 git submodule update -i
+```
+
+or download the latest stable tarball [release](https://github.com/nettstudio/fusepdf/releases/latest).
+
+
+## Build source code
+
+```
 mkdir build && cd build
 qmake CONFIG+=release PREFIX=/usr .. && make
+```
+
+## Run executable
+
+```
+./fusepdf
+```
+
+## Package
+
+```
+make INSTALL_ROOT=<path_to_package_folder> install
 ```

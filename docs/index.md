@@ -8,14 +8,22 @@ FusePDF is an simple cross-platform and open source application used for merging
 
 * Drag-and-drop any PDF document
 * Sort documents
-* Preview document pages
-* Exclude/Include document pages
-* Export pages as images or PDF
-* PDF presets for most outputs
+* Preview pages
+* Exclude/Include pages
+* Export to images or PDF
+* PDF presets
 * PDF compatibility up to 1.7
-* PDF meta data (properties)
+* Change or add PDF meta data (properties)
 
 # ChangeLog
+
+## 2.1.0
+
+Released : TBA
+
+  * Added support for i18n
+  * Added norwegian translation
+  * Added documentation
 
 ## 2.0.0
 
@@ -62,6 +70,10 @@ This program is free software; you can redistribute it and/or modify it under th
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+Translations (i18n) are Creative Commons Zero v1.0 Universal.
+
+The Creative Commons CC0 Public Domain Dedication waives copyright interest in a work you've created and dedicates it to the world-wide public domain. Use CC0 to opt out of copyright entirely and ensure your work has the widest reach. As with the Unlicense and typical software licenses, CC0 disclaims warranties. CC0 is very similar to the Unlicense.
 
 ## Qt
 
