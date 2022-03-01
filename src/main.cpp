@@ -36,16 +36,17 @@ int main(int argc, char *argv[])
     QApplication::setOrganizationName("NettStudio AS");
     QApplication::setOrganizationDomain("nettstudio.no");
 
-    // test i18n
-    //QLocale curLocale(QLocale("no"));
-    //QLocale::setDefault(curLocale);
+#ifdef FORCE_NORWEGIAN
+    QLocale curLocale(QLocale("no"));
+    QLocale::setDefault(curLocale);
+#endif
 
     QTranslator i18n;
     i18n.load(QLocale(),
               QLatin1String("fusepdf"),
               QLatin1String("_"),
               QLatin1String(":/i18n"));
-#if QT_VERSION > QT_VERSION_CHECK(5, 14, 2)
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
     qDebug() << "Locale" << QLocale().name() << i18n.filePath();
 #endif
     a.installTranslator(&i18n);
