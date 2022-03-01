@@ -45,7 +45,9 @@ int main(int argc, char *argv[])
               QLatin1String("fusepdf"),
               QLatin1String("_"),
               QLatin1String(":/i18n"));
+#if QT_VERSION > QT_VERSION_CHECK(5, 14, 2)
     qDebug() << "Locale" << QLocale().name() << i18n.filePath();
+#endif
     a.installTranslator(&i18n);
 
     FusePDF w;
