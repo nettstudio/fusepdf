@@ -520,7 +520,7 @@ void FusePDF::runCommand(const QString &filename,
     if (_proc->isOpen()) {
         QMessageBox::warning(this,
                              tr("Still active"),
-                             tr("FusePDF process is still active, please wait until done."));
+                             QString("FusePDF %1").arg(tr("process is still active, please wait until done.")));
         return;
     }
 
@@ -704,7 +704,7 @@ void FusePDF::on_actionShow_log_triggered()
 
 void FusePDF::on_actionAbout_Qt_triggered()
 {
-    QMessageBox::aboutQt(this, tr("About Qt"));
+    QMessageBox::aboutQt(this, QString("%1 Qt").arg(tr("About")));
 }
 
 void FusePDF::handleFoundPDF(const QList<QUrl> &urls)
@@ -861,8 +861,12 @@ bool FusePDF::missingGhost()
 {
     if (findGhost().isEmpty()) {
         QMessageBox::warning(this,
-                             tr("Missing Ghostscript"),
-                             tr("Unable to find Ghostscript, please download the latest installer from <a href='https://www.ghostscript.com/download/gsdnld.html'>www.ghostscript.com</a> and install it before running FusePDF again."));
+                             QString("%1 Ghostscript").arg(tr("Missing")),
+                             QString("%1 Ghostscript, %2 <a href=\"%4\">ghostscript.com</a> %3.")
+                             .arg(tr("Unable to find"))
+                             .arg(tr("please download the latest installer from"))
+                             .arg(tr("and install it before running this application again"))
+                             .arg(FUSEPDF_GS_URL));
         return true;
     }
     return false;
@@ -874,13 +878,13 @@ void FusePDF::handleProcessError(QProcess::ProcessError error)
     QString errorMsg;
     switch (error) {
     case QProcess::FailedToStart:
-        errorMsg = tr("The process failed to start. Either the invoked program is missing, or you may have insufficient permissions to invoke the program (Ghostscript).");
+        errorMsg = tr("The process failed to start.");
         break;
     case QProcess::Crashed:
-        errorMsg = tr("The process crashed some time after starting successfully.");
+        errorMsg = tr("The process crashed.");
         break;
     default:
-        errorMsg = tr("An unknown error occured. For example, the process may not be running, or it may have closed its input channel.");
+        errorMsg = tr("An unknown error occured.");
         break;
     }
     errorMsg.append(QString(" %1").arg(tr("See log (CTRL+L) for more information")));
