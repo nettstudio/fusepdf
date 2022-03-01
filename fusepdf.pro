@@ -18,7 +18,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 #
 
-TARGET = FusePDF
+unix:!mac {
+    TARGET = fusepdf
+} else {
+    TARGET = FusePDF
+}
 VERSION = 2.1.0
 TEMPLATE = app
 
@@ -29,7 +33,6 @@ CONFIG(release, debug|release): DEFINES += QT_NO_DEBUG_OUTPUT QT_NO_WARNING_OUTP
 isEmpty(PREFIX): PREFIX = /usr/local
 
 DEFINES += QT_DEPRECATED_WARNINGS
-#DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000
 DEFINES += VERSION_APP=\\\"$${VERSION}\\\"
 
 QMAKE_TARGET_COMPANY = "NettStudio AS"
