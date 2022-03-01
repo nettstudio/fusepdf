@@ -52,16 +52,7 @@ ExportImageDialog::ExportImageDialog(QWidget *parent,
     _res->addItem(tr("1200 dpi"), 1200);
     _res->setCurrentIndex(3);
 
-    if (suffix.isEmpty()) {
-        _type->addItem(tr("PNG 16"), exportPNGType16);
-        _type->addItem(tr("PNG Gray"), exportPNGTypeGray);
-        _type->addItem(tr("TIFF RGB 24-bit"), exportTiffTypeRGB24);
-        _type->addItem(tr("TIFF RGB 12-bit"), exportTiffTypeRGB12);
-        _type->addItem(tr("TIFF RGB 48-bit"), exportTiffTypeRGB48);
-        _type->addItem(tr("TIFF CMYK 32-bit"), exportTiffTypeCMYK32);
-        _type->addItem(tr("TIFF CMYK 64-bit"), exportTiffTypeCMYK64);
-        _type->addItem(tr("TIFF Gray"), exportTiffTypeGray);
-    } else if (suffix.toLower() == "png") {
+    if (suffix.toLower() == "png") {
         _type->addItem(tr("PNG 16"), exportPNGType16);
         _type->addItem(tr("PNG Gray"), exportPNGTypeGray);
     } else if (suffix.toLower() == "tif" || suffix.toLower() == "tiff") {
@@ -72,7 +63,14 @@ ExportImageDialog::ExportImageDialog(QWidget *parent,
         _type->addItem(tr("TIFF CMYK 64-bit"), exportTiffTypeCMYK64);
         _type->addItem(tr("TIFF Gray"), exportTiffTypeGray);
     } else {
-        _type->addItem(tr("N/A"), exportImageTypeUndefined);
+        _type->addItem(tr("PNG 16"), exportPNGType16);
+        _type->addItem(tr("PNG Gray"), exportPNGTypeGray);
+        _type->addItem(tr("TIFF RGB 24-bit"), exportTiffTypeRGB24);
+        _type->addItem(tr("TIFF RGB 12-bit"), exportTiffTypeRGB12);
+        _type->addItem(tr("TIFF RGB 48-bit"), exportTiffTypeRGB48);
+        _type->addItem(tr("TIFF CMYK 32-bit"), exportTiffTypeCMYK32);
+        _type->addItem(tr("TIFF CMYK 64-bit"), exportTiffTypeCMYK64);
+        _type->addItem(tr("TIFF Gray"), exportTiffTypeGray);
     }
 
     QLabel *resLabel = new QLabel(this);
@@ -312,16 +310,22 @@ FusePDF::FusePDF(QWidget *parent)
 {
     ui->setupUi(this);
     setWindowIcon(QIcon(FUSEPDF_ICON_LOGO));
+
+#if defined(Q_OS_WIN) || defined(Q_OS_MAC)
+    // force fusion style on Windows/macOS,
+    // on Linux/BSD we don't care, use whatever the system has defined.
     qApp->setStyle(QStyleFactory::create("fusion"));
+#endif
+
     // don't set palette on macos as it breaks dark mode
 #ifndef Q_OS_MAC
     QPalette mainPalette = qApp->palette();
-    mainPalette.setColor(QPalette::Highlight, QColor(203,9,0)); // #cb0900
-    mainPalette.setColor(QPalette::Link, QColor(203,9,0));
+    mainPalette.setColor(QPalette::Highlight, QColor(203, 9, 0)); // #cb0900
+    mainPalette.setColor(QPalette::Link, QColor(203, 9, 0));
     qApp->setPalette(mainPalette);
 
     QPalette treePalette = ui->inputs->palette();
-    treePalette.setColor(QPalette::Highlight, QColor(124,124,124)); // #7c7c7c
+    treePalette.setColor(QPalette::Highlight, QColor(124, 124, 124)); // #7c7c7c
     ui->inputs->setPalette(treePalette);
 #endif
     ui->inputs->header()->setVisible(true); // bypass designer bug
@@ -531,6 +535,7 @@ void FusePDF::runCommand(const QString &filename,
         return;
     }
     _output = filename;
+    qDebug() << "runCommand" << command;
     _proc->start(command);
 }
 
@@ -677,7 +682,7 @@ const QString FusePDF::findGhost()
         QString bin32 = appDir + "/bin/gswin32c.exe";
         if (QFile::exists(bin32)) { return bin32; }
     }
-    QString programFilesPath(getenv("PROGRAMFILES"));
+    QString programFilesPath(qgetenv("PROGRAMFILES"));
     QDirIterator it(programFilesPath + "/gs", QStringList() << "*.*", QDir::Dirs/*, QDirIterator::Subdirectories*/);
     while (it.hasNext()) {
         QString folder = it.next();
@@ -965,6 +970,39 @@ bool FusePDF::isImage(const QString &filename)
     return (type.name().startsWith("image/"));
 }
 
+QString FusePDF::ghostImageFormat(int type)
+{
+    QString format;
+    switch (type) {
+    case exportTiffTypeGray:
+        format = "tiffgray";
+        break;
+    case exportTiffTypeRGB12:
+        format = "tiff12nc";
+        break;
+    case exportTiffTypeRGB24:
+        format = "tiff24nc";
+        break;
+    case exportTiffTypeRGB48:
+        format = "tiff48nc";
+        break;
+    case exportTiffTypeCMYK32:
+        format = "tiff32nc";
+        break;
+    case exportTiffTypeCMYK64:
+        format = "tiff64nc";
+        break;
+    case exportPNGTypeGray:
+        format = "pnggray";
+        break;
+    case exportPNGType16:
+        format = "png16m";
+        break;
+    default: break;
+    }
+    return format;
+}
+
 const QString FusePDF::getCachePath()
 {
     QString path = QDir::tempPath();
@@ -1126,47 +1164,36 @@ bool FusePDF::exportImage(const QString &filename,
                           const QString &image,
                           int page,
                           int type,
-                          int res)
+                          int res,
+                          int alpha)
 {
-    if (!isPDF(filename) || image.isEmpty() || page < 1 || res < 72) {
+    if (!isPDF(filename) || image.isEmpty() || page < 1 || res < 72 || alpha < 1) {
         return false;
     }
-    QString format;
-    switch (type) {
-    case exportTiffTypeGray:
-        format = "tiffgray";
-        break;
-    case exportTiffTypeRGB12:
-        format = "tiff12nc";
-        break;
-    case exportTiffTypeRGB24:
-        format = "tiff24nc";
-        break;
-    case exportTiffTypeRGB48:
-        format = "tiff48nc";
-        break;
-    case exportTiffTypeCMYK32:
-        format = "tiff32nc";
-        break;
-    case exportTiffTypeCMYK64:
-        format = "tiff64nc";
-        break;
-    case exportPNGTypeGray:
-        format = "pnggray";
-        break;
-    case exportPNGType16:
-        format = "png16m";
-        break;
-    default: break;
-    }
+    QString format = ghostImageFormat(type);
     if (format.isEmpty()) { return false; }
+
     QString command = findGhost();
 #ifdef Q_OS_WIN
     command = QString("\"%1\"").arg(findGhost());
 #endif
-    command.append(QString(FUSEPDF_GS_EXPORT).arg(filename).arg(image).arg(page).arg(format).arg(res));
+
+    QStringList options;
+    options << "-q";
+    options << QString("-sDEVICE=%1").arg(format);
+    options << "-o";
+    options << image;
+    options << QString("-dFirstPage=%1").arg(page);
+    options << QString("-dLastPage=%1").arg(page);
+    options << QString("-dTextAlphaBits=%1").arg(alpha);
+    options << QString("-dGraphicsAlphaBits=%1").arg(alpha);
+    options << QString("-r%1x%1").arg(res);
+    options << filename;
+
+    qDebug() << "exportImage" << command << options;
+
     QProcess proc;
-    proc.start(command);
+    proc.start(command, options);
     proc.waitForFinished();
     proc.close();
     if (isImage(image)) { return true; }
@@ -1178,7 +1205,7 @@ void FusePDF::handleExport(const QString &filename, int page)
     QString image = QFileDialog::getSaveFileName(this,
                                                 tr("Save Image"),
                                                 !_lastExportDir.isEmpty()?_lastExportDir:QDir::homePath(),
-                                                "*.tif *.tiff *.jpg *.jpeg *.png");
+                                                "*.tif *.tiff *.png");
     if (image.isEmpty()) { return; }
     ExportImageDialog dialog(this, Qt::WindowFlags(), QFileInfo(image).suffix());
     int d = dialog.exec();

@@ -88,7 +88,6 @@
 #define FUSEPDF_ICON_GOFIRST ":/assets/fusepdf-gofirst.png"
 #define FUSEPDF_GS_URL "https://www.ghostscript.com/download/gsdnld.html"
 #define FUSEPDF_GS_PREVIEW " -q -sDEVICE=jpeg -o \"%2\" -dFirstPage=%3 -dLastPage=%3 -dJPEGQ=%4 -r72x72 \"%1\""
-#define FUSEPDF_GS_EXPORT " -q -sDEVICE=%4 -o \"%2\" -dFirstPage=%3 -dLastPage=%3 -dTextAlphaBits=4 -dGraphicsAlphaBits=4 -r%5x%5 \"%1\""
 #define FUSEPDF_GS_COUNT " -q -dNODISPLAY -dNOSAFER -c \"/pdffile (%1) (r) file runpdfbegin (PageCount: ) print pdfpagecount = quit\""
 #define FUSEPDF_GS_EXTRACT " -q -dNOPAUSE -dBATCH -sOutputFile=\"%2\" -dFirstPage=%3 -dLastPage=%3 -sDEVICE=pdfwrite \"%1\""
 
@@ -273,6 +272,7 @@ private slots:
     static bool isTIFF(const QString &filename);
     static bool isPNG(const QString &filename);
     static bool isImage(const QString &filename);
+    static QString ghostImageFormat(int type);
     static const QString getCachePath();
     PagesListWidget* getTab(const QString &filename);
     bool hasTab(const QString &filename);
@@ -298,7 +298,8 @@ private slots:
                     const QString &image,
                     int page,
                     int type,
-                    int res);
+                    int res,
+                    int alpha = 4);
     void handleExport(const QString &filename,
                       int page);
     void handleExports(const QString &filename,

@@ -36,7 +36,7 @@ Instructions for installing the needed dependencies.
 
 ## Get source code
 
-Getting the latest source code from GitHub:
+Getting the latest (unstable) source code from GitHub:
 
 ```
 git clone https://github.com/nettstudio/fusepdf
