@@ -57,7 +57,7 @@ desktop.files = assets/fusepdf.desktop
 hicolor.path = $${PREFIX}/share/icons
 hicolor.files = assets/hicolor
 docs.path = $${PREFIX}/share/doc/$${TARGET}-$${VERSION}
-docs.files = COPYING
+docs.files = COPYING docs/fuse.pdf
 target.path = $${PREFIX}/bin
 
 exists(i18n/fusepdf.pri): include(i18n/fusepdf.pri)

@@ -62,6 +62,70 @@ Released : Jan 24, 2021.
 
   * Initial release
 
+# Open Source
+
+## Introduction
+
+FusePDF requires Qt5 (Core/Gui/Widgets/Concurrent) to build, and Ghostscript (``gs``) available during runtime.
+
+## Dependencies
+
+Instructions for installing the needed dependencies on various platforms.
+
+### Debian/Ubuntu (and compatible)
+
+``sudo apt install ghostscript qt5-default qtbase5-dev qttools5-dev-tools``
+
+### Fedora/CentOS/RHEL (and compatible)
+
+``sudo yum install ghostscript qt5-qtbase-devel qt5-qttools``
+
+### macports
+
+``sudo port install ghostscript qt5-qtbase qt5-qttools``
+
+### FreeBSD
+
+``sudo pkg install ghostscript9-agpl-base qt5``
+
+## Download
+
+Download the latest (``main``) source code from GitHub:
+
+```
+git clone https://github.com/nettstudio/fusepdf
+cd fusepdf
+git submodule update -i
+```
+
+We also have stable branches (may contain fixes not available in releases):
+
+ * ``v1.0``
+ * ``v2.0``
+
+```
+git checkout vX.Y
+```
+
+Or download the latest stable tarball [release](https://github.com/nettstudio/fusepdf/releases/latest).
+
+## Building
+
+In the FusePDF source folder run the following commands:
+
+```
+mkdir build && cd build
+qmake CONFIG+=release PREFIX=/usr .. && make
+```
+
+## Package
+
+If you want to package the build (highly recommended) run the following command (remember to replace the output folder):
+
+```
+make INSTALL_ROOT=<path_to_package_folder> install
+```
+
 # License
 
 ## FusePDF
