@@ -1,7 +1,7 @@
 #!/bin/bash
 
 PLANG=${3:-en}
-pandoc "$1" \
+./tools/pandoc "$1" \
     --include-in-header tools/header.tex \
     -V linkcolor:blue \
     -V geometry:a4paper \
