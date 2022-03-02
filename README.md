@@ -4,8 +4,6 @@
 
 FusePDF is a simple cross-platform application used for merging, splitting and exporting PDF pages and documents.
 
-See [website](http://fusepdf.no) for more information regarding usage.
-
 Copyright (c) 2021, 2022 [NettStudio AS](https://nettstudio.no). All rights reserved.
 
 [![NettStudio](https://raw.githubusercontent.com/nettstudio/fusepdf/main/assets/nettstudio.png)](https://nettstudio.no)
@@ -36,7 +34,7 @@ Instructions for installing the needed dependencies.
 
 ## Get source code
 
-Getting the latest (unstable) source code from GitHub:
+Getting the latest (``main``) source code from GitHub:
 
 ```
 git clone https://github.com/nettstudio/fusepdf
@@ -44,7 +42,16 @@ cd fusepdf
 git submodule update -i
 ```
 
-or download the latest stable tarball [release](https://github.com/nettstudio/fusepdf/releases/latest).
+We also have stable branches (may contain fixes not available in releases):
+
+ * ``v1.0`` *(unmaintained, kept as archive)*
+ * ``v2.0`` *(maintained until ``v2.1`` is branched)*
+
+```
+git checkout vX.Y
+```
+
+Or download the latest stable tarball [release](https://github.com/nettstudio/fusepdf/releases/latest).
 
 
 ## Build source code

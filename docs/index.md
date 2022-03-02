@@ -22,8 +22,11 @@ FusePDF is an simple cross-platform and open source application used for merging
 Released : TBA
 
   * Added support for i18n
-  * Added norwegian translation
+  * Added Norwegian translation
   * Added documentation
+  * Updated code base for Qt 5.15 (fix warnings/deprecated)
+  * Export image bug fix (check format compatibility before export)
+  * Updated Ghostscript bundle to 9.55 (Windows release)
 
 ## 2.0.0
 
