@@ -26,7 +26,9 @@ Released : TBA
   * Added documentation
   * Updated code base for Qt 5.15 (fix warnings/deprecated)
   * Export image bug fix (check format compatibility before export)
-  * Updated Ghostscript bundle to 9.55 (Windows release)
+  * Windows release updated to Ghostscript 9.55
+  * Windows release updated to Qt 5.12.12
+  * Windows release now uses MSVC 2019
 
 ## 2.0.0
 
