@@ -456,8 +456,10 @@ const QString FusePDF::makeCommand(const QString &filename)
     if (!ui->compat->currentText().isEmpty() && ui->compat->currentText().toLower() != "default") {
         command.append(QString(" -dCompatibilityLevel=%1").arg(ui->compat->currentText()));
     }
-    if (!ui->preset->currentText().isEmpty() && ui->preset->currentText().toLower() != "none") {
-        command.append(QString(" -dPDFSETTINGS=/%1").arg(ui->preset->currentText().toLower()));
+    if (!ui->preset->currentData().toString().isEmpty() &&
+        ui->preset->currentData().toString().toLower() != "none")
+    {
+        command.append(QString(" -dPDFSETTINGS=/%1").arg(ui->preset->currentData().toString().toLower()));
     }
     command.append(" -dNOPAUSE -dBATCH -dDetectDuplicateImages -dCompressFonts=true");
     command.append(QString(" -sOutputFile=\"%1\"").arg(filename));
@@ -586,12 +588,12 @@ void FusePDF::populateUI()
 
     ui->preset->blockSignals(true);
     ui->preset->clear();
-    ui->preset->addItem(docIcon, "None");
-    ui->preset->addItem(docIcon, "Default");
-    ui->preset->addItem(docIcon, "Prepress");
-    ui->preset->addItem(docIcon, "eBook");
-    ui->preset->addItem(docIcon, "Screen");
-    ui->preset->addItem(docIcon, "Printer");
+    ui->preset->addItem(docIcon, tr("None"), "None");
+    ui->preset->addItem(docIcon, tr("Default"), "Default");
+    ui->preset->addItem(docIcon, tr("Prepress"), "Prepress");
+    ui->preset->addItem(docIcon, tr("eBook"), "eBook");
+    ui->preset->addItem(docIcon, tr("Screen"), "Screen");
+    ui->preset->addItem(docIcon, tr("Printer"), "Printer");
     ui->preset->blockSignals(false);
 }
 
@@ -782,8 +784,16 @@ void FusePDF::loadOptions()
     ui->compat->setCurrentText(settings.value("compat", "1.5").toString());
     ui->compat->blockSignals(false);
 
+    QString savedPreset = settings.value("preset", "Default").toString();
     ui->preset->blockSignals(true);
-    ui->preset->setCurrentText(settings.value("preset", "Default").toString());
+    for (int i = 0; i < ui->preset->count(); i++) {
+        QString value = ui->preset->itemData(i).toString();
+        if (value == savedPreset) {
+            ui->preset->setCurrentIndex(i);
+            qDebug() << "set preset index" << i << savedPreset;
+            break;
+        }
+    }
     ui->preset->blockSignals(false);
 
     ui->actionShow_log->setChecked(settings.value("showLog", false).toBool());
@@ -1302,14 +1312,17 @@ void FusePDF::handleExportDone(const QString &path)
     QDesktopServices::openUrl(QUrl::fromUserInput(path));
 }
 
-
-void FusePDF::on_preset_currentTextChanged(const QString &arg1)
+void FusePDF::on_preset_currentIndexChanged(int index)
 {
+    if (index >= ui->preset->count()) { return; }
+    QString newPreset = ui->preset->itemData(index).toString();
+
     QSettings settings;
     settings.beginGroup("options");
     QString savedPreset = settings.value("preset").toString();
-    if (arg1 != savedPreset && !arg1.isEmpty()) {
-        settings.setValue("preset", arg1);
+    if (newPreset != savedPreset && !newPreset.isEmpty()) {
+        settings.setValue("preset", newPreset);
+        qDebug() << "updated preset settings" << newPreset << "vs." << savedPreset;
     }
     settings.endGroup();
 }
@@ -1376,3 +1389,4 @@ void FusePDF::handleTabButtonClicked(bool checked)
         ui->tabs->setCurrentIndex(0);
     }
 }
+

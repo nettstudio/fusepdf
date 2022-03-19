@@ -310,13 +310,15 @@ private slots:
                   int type,
                   int res);
     void handleExportDone(const QString &path);
-    void on_preset_currentTextChanged(const QString &arg1);
+    void on_preset_currentIndexChanged(int index);
     void on_compat_currentTextChanged(const QString &arg1);
     void on_metaTitle_textChanged(const QString &arg1);
     void on_metaSubject_textChanged(const QString &arg1);
     void on_metaAuthor_textChanged(const QString &arg1);
     void on_tabs_currentChanged(int index);
     void handleTabButtonClicked(bool checked);
+
+
 
 private:
     Ui::FusePDF *ui;
