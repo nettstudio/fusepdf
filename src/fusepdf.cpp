@@ -312,11 +312,29 @@ FusePDF::FusePDF(QWidget *parent)
     ui->setupUi(this);
     setWindowIcon(QIcon(FUSEPDF_ICON_LOGO));
 
+    QFont font = this->font();
+    if (font.pointSize() < 9) {
+        font.setPointSize(9);
+        setFont(font);
+    }
+
 #if defined(Q_OS_WIN) || defined(Q_OS_MAC)
     // force fusion style on Windows/macOS,
     // on Linux/BSD we don't care, use whatever the system has defined.
     qApp->setStyle(QStyleFactory::create("fusion"));
 #endif
+
+    ui->presetLabel->setContentsMargins(6, 0, 6, 0);
+    ui->compatLabel->setContentsMargins(6, 0, 6, 0);
+
+    QWidget *spacer = new QWidget(this);
+    spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    ui->toolBar->addWidget(spacer);
+
+    ui->toolBar->addWidget(ui->presetLabel);
+    ui->toolBar->addWidget(ui->preset);
+    ui->toolBar->addWidget(ui->compatLabel);
+    ui->toolBar->addWidget(ui->compat);
 
     if (hasDarkMode()) {
         QPalette palette;
@@ -366,7 +384,7 @@ FusePDF::FusePDF(QWidget *parent)
 
     _tabButton = new QPushButton(this);
     _tabButton->setFlat(true);
-    _tabButton->setIconSize(QSize(22, 22));
+    _tabButton->setIconSize(QSize(24, 24));
     _tabButton->setIcon(QIcon(FUSEPDF_ICON_CLEAR));
     _tabButton->setToolTip(tr("Clear"));
     ui->tabs->setCornerWidget(_tabButton);
@@ -473,8 +491,9 @@ const QString FusePDF::makeCommand(const QString &filename)
     command = QString("\"%1\"").arg(findGhost());
 #endif
     command.append(" -sDEVICE=pdfwrite");
-    if (!ui->compat->currentText().isEmpty() && ui->compat->currentText().toLower() != "default") {
-        command.append(QString(" -dCompatibilityLevel=%1").arg(ui->compat->currentText()));
+    if (!ui->compat->currentData().toString().isEmpty() &&
+        ui->compat->currentData().toString().toLower() != "default") {
+        command.append(QString(" -dCompatibilityLevel=%1").arg(ui->compat->currentData().toString()));
     }
     if (!ui->preset->currentData().toString().isEmpty() &&
         ui->preset->currentData().toString().toLower() != "none")
@@ -596,14 +615,14 @@ void FusePDF::populateUI()
 
     ui->compat->blockSignals(true);
     ui->compat->clear();
-    ui->compat->addItem(docIcon, "1.0");
-    ui->compat->addItem(docIcon, "1.1");
-    ui->compat->addItem(docIcon, "1.2");
-    ui->compat->addItem(docIcon, "1.3");
-    ui->compat->addItem(docIcon, "1.4");
-    ui->compat->addItem(docIcon, "1.5");
-    ui->compat->addItem(docIcon, "1.6");
-    ui->compat->addItem(docIcon, "1.7");
+    ui->compat->addItem(docIcon, tr("Version 1.0"), "1.0");
+    ui->compat->addItem(docIcon, tr("Version 1.1"), "1.1");
+    ui->compat->addItem(docIcon, tr("Version 1.2"), "1.2");
+    ui->compat->addItem(docIcon, tr("Version 1.3"), "1.3");
+    ui->compat->addItem(docIcon, tr("Version 1.4"), "1.4");
+    ui->compat->addItem(docIcon, tr("Version 1.5"), "1.5");
+    ui->compat->addItem(docIcon, tr("Version 1.6"), "1.6");
+    ui->compat->addItem(docIcon, tr("Version 1.6"), "1.7");
     ui->compat->blockSignals(false);
 
     ui->preset->blockSignals(true);
@@ -800,8 +819,17 @@ void FusePDF::loadOptions()
     QSettings settings;
     settings.beginGroup("options");
 
+    QString savedCompat = settings.value("compat", "1.5").toString();
     ui->compat->blockSignals(true);
-    ui->compat->setCurrentText(settings.value("compat", "1.5").toString());
+    //ui->compat->setCurrentText(settings.value("compat", "1.5").toString());
+    for (int i = 0; i < ui->compat->count(); i++) {
+        QString value = ui->compat->itemData(i).toString();
+        if (value == savedCompat) {
+            ui->compat->setCurrentIndex(i);
+            qDebug() << "set compat index" << i << savedCompat;
+            break;
+        }
+    }
     ui->compat->blockSignals(false);
 
     QString savedPreset = settings.value("preset", "Default").toString();
@@ -1347,13 +1375,17 @@ void FusePDF::on_preset_currentIndexChanged(int index)
     settings.endGroup();
 }
 
-void FusePDF::on_compat_currentTextChanged(const QString &arg1)
+void FusePDF::on_compat_currentIndexChanged(int index)
 {
+    if (index >= ui->compat->count()) { return; }
+    QString newCompat = ui->compat->itemData(index).toString();
+
     QSettings settings;
     settings.beginGroup("options");
     QString savedCompat = settings.value("compat").toString();
-    if (arg1 != savedCompat && !arg1.isEmpty()) {
-        settings.setValue("compat", arg1);
+    if (newCompat != savedCompat && !newCompat.isEmpty()) {
+        settings.setValue("compat", newCompat);
+        qDebug() << "updated compat settings" << newCompat << "vs." << savedCompat;
     }
     settings.endGroup();
 }
