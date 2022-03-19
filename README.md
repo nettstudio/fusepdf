@@ -9,3 +9,5 @@ Copyright (c) 2021, 2022 [NettStudio AS](https://nettstudio.no). All rights rese
 [![NettStudio](https://raw.githubusercontent.com/nettstudio/fusepdf/main/assets/nettstudio.png)](https://nettstudio.no)
 
 **See [fusepdf.no](https://www.fusepdf.no/#open-source) for additional information.**
+
+[![Download FusePDF](https://a.fsdn.com/con/app/sf-download-button)](https://sourceforge.net/projects/fusepdf/files/latest/download)
