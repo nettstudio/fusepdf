@@ -42,14 +42,13 @@ int main(int argc, char *argv[])
 #endif
 
     QTranslator i18n;
-    i18n.load(QLocale(),
-              QLatin1String("fusepdf"),
-              QLatin1String("_"),
-              QLatin1String(":/i18n"));
+    if (i18n.load(QLocale(),
+                  QLatin1String("fusepdf"),
+                  QLatin1String("_"),
+                  QLatin1String(":/i18n"))) { a.installTranslator(&i18n); }
 #if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
-    qDebug() << "Locale" << QLocale().name() << i18n.filePath();
+    qDebug() << "Locale?" << QLocale().name() << i18n.filePath();
 #endif
-    a.installTranslator(&i18n);
 
     FusePDF w;
     w.show();
