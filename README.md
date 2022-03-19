@@ -7,3 +7,5 @@ FusePDF is a simple cross-platform application used for merging, splitting and e
 Copyright (c) 2021, 2022 [NettStudio AS](https://nettstudio.no). All rights reserved.
 
 [![NettStudio](https://raw.githubusercontent.com/nettstudio/fusepdf/main/assets/nettstudio.png)](https://nettstudio.no)
+
+**See [fusepdf.no](https://www.fusepdf.no/#open-source) for additional information.**
