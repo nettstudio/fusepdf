@@ -330,20 +330,18 @@ FusePDF::FusePDF(QWidget *parent)
         palette.setColor(QPalette::Text, Qt::white);
         palette.setColor(QPalette::Button, QColor(53,53,53));
         palette.setColor(QPalette::ButtonText, Qt::white);
-        palette.setColor(QPalette::BrightText, Qt::red);
         palette.setColor(QPalette::Highlight, QColor(0,124,151));
         palette.setColor(QPalette::HighlightedText, Qt::white);
         palette.setColor(QPalette::Disabled, QPalette::Text, Qt::darkGray);
         palette.setColor(QPalette::Disabled, QPalette::ButtonText, Qt::darkGray);
         qApp->setPalette(palette);
-        qApp->setStyleSheet("QToolBar { border: 0; }");
     }
 
     // don't set palette on macos as it breaks dark mode
 #ifndef Q_OS_MAC
     QPalette mainPalette = qApp->palette();
     mainPalette.setColor(QPalette::Highlight, QColor(203, 9, 0)); // #cb0900
-    mainPalette.setColor(QPalette::Link, QColor(203, 9, 0));
+    mainPalette.setColor(QPalette::Link, hasDarkMode() ? Qt::white : QColor(203, 9, 0));
     qApp->setPalette(mainPalette);
 
     QPalette treePalette = ui->inputs->palette();
@@ -1416,7 +1414,7 @@ bool FusePDF::hasDarkMode()
 {
 #ifdef Q_OS_WIN
     QSettings settings("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize", QSettings::NativeFormat);
-    if (settings.value("AppsUseLightTheme") == 0){ return true; }
+    if (settings.value("AppsUseLightTheme") == 0) { return true; }
 #endif
     return false;
 }

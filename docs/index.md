@@ -7,12 +7,11 @@ FusePDF is an simple cross-platform and open source application used for merging
 ## Features
 
 * Drag-and-drop any PDF document
-* Sort documents
 * Preview pages
 * Exclude/Include pages
-* Export to images or PDF
-* PDF presets
-* PDF compatibility up to 1.7
+* Export to images and/or PDF
+* Support PDF presets
+* PDF compatibility up to version 1.7
 * Change or add PDF meta data (properties)
 
 # ChangeLog
@@ -23,7 +22,7 @@ Released : TBA
 
   * Support dark mode on Windows
   * Added support for i18n
-  * Added documentation
+  * Added documentation (not complete)
   * Export image bug fix (check format compatibility before export)
   * Windows release updated to Ghostscript 9.55
   * Windows release updated to Qt 5.12.12
@@ -97,15 +96,6 @@ Download the latest (``main``) source code from GitHub:
 git clone https://github.com/nettstudio/fusepdf
 cd fusepdf
 git submodule update -i
-```
-
-We also have stable branches (may contain fixes not available in releases):
-
- * ``v1.0``
- * ``v2.0``
-
-```
-git checkout vX.Y
 ```
 
 Or download the latest stable tarball [release](https://github.com/nettstudio/fusepdf/releases/latest).
