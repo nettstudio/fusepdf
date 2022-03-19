@@ -615,14 +615,14 @@ void FusePDF::populateUI()
 
     ui->compat->blockSignals(true);
     ui->compat->clear();
-    ui->compat->addItem(docIcon, tr("Version 1.0"), "1.0");
-    ui->compat->addItem(docIcon, tr("Version 1.1"), "1.1");
-    ui->compat->addItem(docIcon, tr("Version 1.2"), "1.2");
-    ui->compat->addItem(docIcon, tr("Version 1.3"), "1.3");
-    ui->compat->addItem(docIcon, tr("Version 1.4"), "1.4");
-    ui->compat->addItem(docIcon, tr("Version 1.5"), "1.5");
-    ui->compat->addItem(docIcon, tr("Version 1.6"), "1.6");
-    ui->compat->addItem(docIcon, tr("Version 1.6"), "1.7");
+    ui->compat->addItem(docIcon, tr("PDF 1.0"), "1.0");
+    ui->compat->addItem(docIcon, tr("PDF 1.1"), "1.1");
+    ui->compat->addItem(docIcon, tr("PDF 1.2"), "1.2");
+    ui->compat->addItem(docIcon, tr("PDF 1.3"), "1.3");
+    ui->compat->addItem(docIcon, tr("PDF 1.4"), "1.4");
+    ui->compat->addItem(docIcon, tr("PDF 1.5"), "1.5");
+    ui->compat->addItem(docIcon, tr("PDF 1.6"), "1.6");
+    ui->compat->addItem(docIcon, tr("PDF 1.6"), "1.7");
     ui->compat->blockSignals(false);
 
     ui->preset->blockSignals(true);
