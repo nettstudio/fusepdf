@@ -75,7 +75,7 @@
 #define FUSEPDF_IMAGE_TYPE_ROLE Qt::UserRole + 6
 #define FUSEPDF_IMAGE_RES_ROLE Qt::UserRole + 7
 #define FUSEPDF_CHECKED_ROLE Qt::UserRole + 8
-#define FUSEPDF_PAGE_ICON_SIZE 320
+#define FUSEPDF_PAGE_ICON_SIZE 480
 #define FUSEPDF_ICON_DEFAULT_SIZE 22
 #define FUSEPDF_CACHE_JPEG "%1/%2-%3.jpg"
 #define FUSEPDF_CACHE_PDF "%1/%2-%3.pdf"
@@ -280,7 +280,7 @@ private slots:
     const QString getPagePreview(const QString &filename,
                                  const QString &checksum,
                                  int page,
-                                 int quality = 50);
+                                 int quality = 75);
     void getPagePreviews(const QString &filename,
                          const QString &checksum,
                          int pages);
@@ -318,7 +318,7 @@ private slots:
     void on_tabs_currentChanged(int index);
     void handleTabButtonClicked(bool checked);
 
-
+    bool hasDarkMode();
 
 private:
     Ui::FusePDF *ui;

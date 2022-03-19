@@ -21,6 +21,7 @@ FusePDF is an simple cross-platform and open source application used for merging
 
 Released : TBA
 
+  * Support dark mode on Windows
   * Added support for i18n
   * Added documentation
   * Export image bug fix (check format compatibility before export)

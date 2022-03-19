@@ -141,6 +141,7 @@ PagesListWidget::PagesListWidget(QWidget *parent,
     setFrameShape(QFrame::NoFrame);
     setContextMenuPolicy(Qt::CustomContextMenu);
     setItemDelegate(new PageDelegate(this));
+    setSpacing(10);
 
     for (int i = 1; i <= _pages; ++i) {
         QListWidgetItem *item = new QListWidgetItem(QIcon(FUSEPDF_ICON_LOGO),
@@ -316,6 +317,27 @@ FusePDF::FusePDF(QWidget *parent)
     // on Linux/BSD we don't care, use whatever the system has defined.
     qApp->setStyle(QStyleFactory::create("fusion"));
 #endif
+
+    if (hasDarkMode()) {
+        QPalette palette;
+        palette.setColor(QPalette::Window, QColor(53,53,53));
+        palette.setColor(QPalette::WindowText, Qt::white);
+        palette.setColor(QPalette::Base, QColor(15,15,15));
+        palette.setColor(QPalette::AlternateBase, QColor(53,53,53));
+        palette.setColor(QPalette::Link, Qt::white);
+        palette.setColor(QPalette::LinkVisited, Qt::white);
+        palette.setColor(QPalette::ToolTipText, Qt::black);
+        palette.setColor(QPalette::Text, Qt::white);
+        palette.setColor(QPalette::Button, QColor(53,53,53));
+        palette.setColor(QPalette::ButtonText, Qt::white);
+        palette.setColor(QPalette::BrightText, Qt::red);
+        palette.setColor(QPalette::Highlight, QColor(0,124,151));
+        palette.setColor(QPalette::HighlightedText, Qt::white);
+        palette.setColor(QPalette::Disabled, QPalette::Text, Qt::darkGray);
+        palette.setColor(QPalette::Disabled, QPalette::ButtonText, Qt::darkGray);
+        qApp->setPalette(palette);
+        qApp->setStyleSheet("QToolBar { border: 0; }");
+    }
 
     // don't set palette on macos as it breaks dark mode
 #ifndef Q_OS_MAC
@@ -1388,5 +1410,14 @@ void FusePDF::handleTabButtonClicked(bool checked)
     } else if (index > 0) {
         ui->tabs->setCurrentIndex(0);
     }
+}
+
+bool FusePDF::hasDarkMode()
+{
+#ifdef Q_OS_WIN
+    QSettings settings("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize", QSettings::NativeFormat);
+    if (settings.value("AppsUseLightTheme") == 0){ return true; }
+#endif
+    return false;
 }
 
