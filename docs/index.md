@@ -2,7 +2,7 @@
 
 FusePDF is an simple cross-platform and open source application used for merging, splitting and extracting PDF pages and documents.
 
-![Screenshot of main interface](https://github.com/nettstudio/fusepdf/raw/main/assets/fusepdf-screenshot.png "Screenshot of main interface")
+![Screenshot of main interface](fusepdf-screenshot-01.png "Screenshot of main interface")
 
 ## Features
 
@@ -13,6 +13,28 @@ FusePDF is an simple cross-platform and open source application used for merging
 * Support PDF presets
 * PDF compatibility up to version 1.7
 * Change or add PDF meta data (properties)
+
+# Usage
+
+## Basic usage
+
+For the most basic usage we assume you have a couple of PDF documents you want to merge into one.
+
+You can add PDF documents in various ways, either by drag-and-drop or with the ``Open`` action in the toolbar or in the ``File`` menu (``Ctrl+O``). You can select multiple documents with the open dialog, and of course drag-and-drop multiple documents.
+
+![Screenshot of main interface with document added](fusepdf-screenshot-02.png "Screenshot of main interface with document added")
+
+That's it, now click ``Save`` (or ``Ctrl+S``) and you are done.
+
+## Issues
+
+Some common issues user may experience.
+
+### Missing Ghostscript
+
+![Screenshot of missing Ghostscript](fusepdf-screenshot-08.png "Screenshot of missing Ghostscript")
+
+If you see this dialog your installation is broken, or you are using a version of FusePDF shipped without Ghostscript. On Windows follow the instructions or download a FusePDF version with Ghostscript included. On macOS/Linux/BSD make sure Ghostscript (``gs``) is installed, check your package manager for more information.
 
 # ChangeLog
 
