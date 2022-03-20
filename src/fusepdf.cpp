@@ -623,7 +623,7 @@ void FusePDF::populateUI()
     ui->compat->addItem(docIcon, QString("PDF %1 1.4").arg(versionString), "1.4");
     ui->compat->addItem(docIcon, QString("PDF %1 1.5").arg(versionString), "1.5");
     ui->compat->addItem(docIcon, QString("PDF %1 1.6").arg(versionString), "1.6");
-    ui->compat->addItem(docIcon, QString("PDF %1 1.6").arg(versionString), "1.7");
+    ui->compat->addItem(docIcon, QString("PDF %1 1.7").arg(versionString), "1.7");
     ui->compat->blockSignals(false);
 
     ui->preset->blockSignals(true);
