@@ -1072,7 +1072,7 @@ const QString FusePDF::getCachePath()
     path.append("/fusepdf");
     if (!QFile::exists(path)) {
         QDir dir(path);
-        if (!dir.mkpath(path)) { return "";}
+        if (!dir.mkpath(path)) { return QString(); }
     }
     return path;
 }
@@ -1268,9 +1268,9 @@ bool FusePDF::exportImage(const QString &filename,
         return false;
     }
     QString format = ghostImageFormat(type);
-    if (format.isEmpty()) { return false; }
-
     QString command = findGhost();
+
+    if (command.isEmpty() || format.isEmpty()) { return false; }
 #ifdef Q_OS_WIN
     command = QString("\"%1\"").arg(findGhost());
 #endif
@@ -1287,12 +1287,13 @@ bool FusePDF::exportImage(const QString &filename,
     options << QString("-r%1x%1").arg(res);
     options << filename;
 
-    qDebug() << "exportImage" << command << options;
-
     QProcess proc;
     proc.start(command, options);
     proc.waitForFinished();
     proc.close();
+
+    qDebug() << command << options << image;
+
     if (isImage(image)) { return true; }
     return false;
 }
@@ -1328,7 +1329,7 @@ void FusePDF::handleExports(const QString &filename,
     QString image = QFileDialog::getSaveFileName(this,
                                                 tr("Save Image"),
                                                 !_lastExportDir.isEmpty()?_lastExportDir:QDir::homePath(),
-                                                "*.tif *.tiff *.jpg *.jpeg *.png");
+                                                "*.tif *.tiff *.png");
     if (image.isEmpty()) { return; }
     ExportImageDialog dialog(this, Qt::WindowFlags(), QFileInfo(image).suffix());
     int d = dialog.exec();
