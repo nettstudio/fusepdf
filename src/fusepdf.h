@@ -312,7 +312,6 @@ private slots:
     void on_metaAuthor_textChanged(const QString &arg1);
     void on_tabs_currentChanged(int index);
     void handleTabButtonClicked(bool checked);
-
     bool hasDarkMode();
 
 private:

@@ -1361,10 +1361,10 @@ void FusePDF::doExport(const QString &filename,
                            1000);
         if (!exportImage(filename,
                          QString("%1/%2-%3.%4")
-                         .arg(info.dir().absolutePath())
-                         .arg(info.baseName())
-                         .arg(pages.at(i))
-                         .arg(info.suffix()),
+                         .arg(info.dir().absolutePath(),
+                              info.baseName(),
+                              QString::number(pages.at(i)),
+                              info.suffix()),
                          pages.at(i),
                          type,
                          res))
@@ -1375,10 +1375,10 @@ void FusePDF::doExport(const QString &filename,
     }
     if (pages.size() < 2) {
         emit exportDone(QString("%1/%2-%3.%4")
-                        .arg(info.dir().absolutePath())
-                        .arg(info.baseName())
-                        .arg(pages.at(0))
-                        .arg(info.suffix()));
+                        .arg(info.dir().absolutePath(),
+                             info.baseName(),
+                             QString::number(pages.at(0)),
+                             info.suffix()));
     } else {
         emit exportDone(info.dir().absolutePath());
     }
