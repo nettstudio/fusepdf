@@ -88,9 +88,6 @@
 #define FUSEPDF_ICON_DENIED ":/assets/fusepdf-denied.png"
 #define FUSEPDF_ICON_GOFIRST ":/assets/fusepdf-gofirst.png"
 #define FUSEPDF_GS_URL "https://www.ghostscript.com/download/gsdnld.html"
-//#define FUSEPDF_GS_PREVIEW " -q -sDEVICE=jpeg -o \"%2\" -dFirstPage=%3 -dLastPage=%3 -dJPEGQ=%4 -r72x72 \"%1\""
-//#define FUSEPDF_GS_COUNT " -q -dNODISPLAY -dNOSAFER -c \"/pdffile (%1) (r) file runpdfbegin (PageCount: ) print pdfpagecount = quit\""
-//#define FUSEPDF_GS_EXTRACT " -q -dNOPAUSE -dBATCH -sOutputFile=\"%2\" -dFirstPage=%3 -dLastPage=%3 -sDEVICE=pdfwrite \"%1\""
 
 enum exportImageType {
     exportImageTypeUndefined,
@@ -131,7 +128,8 @@ class PageDelegate : public QStyledItemDelegate
 public:
     using QStyledItemDelegate::QStyledItemDelegate;
 
-    void paint(QPainter *painter, const QStyleOptionViewItem &option,
+    void paint(QPainter *painter,
+               const QStyleOptionViewItem &option,
                const QModelIndex &index) const override
     {
         QStyledItemDelegate::paint(painter, option, index);
@@ -158,21 +156,17 @@ public:
                     const QString &filename = QString(),
                     const QString &checksum = QString(),
                     int pages = 0);
-    const QString getFilename() {
-        return _filename;
-    }
-    const QString getChecksum() {
-        return _checksum;
-    }
-    int getPageCount() {
-        return _pages;
-    }
+    const QString getFilename() { return _filename; }
+    const QString getChecksum() { return _checksum; }
+    int getPageCount() { return _pages; }
     bool isModified();
     QVector<int> getPagesState(bool state);
 
 signals:
-    void requestExportPage(const QString &filename, int page);
-    void requestExportPages(const QString &filename, QVector<int> pages);
+    void requestExportPage(const QString &filename,
+                           int page);
+    void requestExportPages(const QString &filename,
+                            QVector<int> pages);
 
 public slots:
     void setPageIcon(const QString &filename,
@@ -206,10 +200,7 @@ signals:
     void foundPDF(const QList<QUrl> &urls);
 
 protected:
-    void dragEnterEvent(QDragEnterEvent *e)
-    {
-        e->acceptProposedAction();
-    }
+    void dragEnterEvent(QDragEnterEvent *e) { e->acceptProposedAction(); }
     void dropEvent(QDropEvent *e);
 };
 
@@ -268,6 +259,9 @@ private slots:
     void deleteDocumentItem();
     QByteArray toUtf16Hex(QString str);
     int getPageCount(const QString &filename);
+    static bool isFileType(const QString &filename,
+                           const QString &mime,
+                           bool startsWith = false);
     static bool isPDF(const QString &filename);
     static bool isJPG(const QString &filename);
     static bool isTIFF(const QString &filename);

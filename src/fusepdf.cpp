@@ -336,6 +336,8 @@ FusePDF::FusePDF(QWidget *parent)
     ui->toolBar->addWidget(ui->compatLabel);
     ui->toolBar->addWidget(ui->compat);
 
+    // don't set palette on macos as it breaks dark mode
+#ifndef Q_OS_MAC
     if (hasDarkMode()) {
         QPalette palette;
         palette.setColor(QPalette::Window, QColor(53,53,53));
@@ -354,9 +356,6 @@ FusePDF::FusePDF(QWidget *parent)
         palette.setColor(QPalette::Disabled, QPalette::ButtonText, Qt::darkGray);
         qApp->setPalette(palette);
     }
-
-    // don't set palette on macos as it breaks dark mode
-#ifndef Q_OS_MAC
     QPalette mainPalette = qApp->palette();
     mainPalette.setColor(QPalette::Highlight, QColor(203, 9, 0)); // #cb0900
     mainPalette.setColor(QPalette::Link, hasDarkMode() ? Qt::white : QColor(203, 9, 0));
@@ -1000,39 +999,38 @@ int FusePDF::getPageCount(const QString &filename)
     return result;
 }
 
-bool FusePDF::isPDF(const QString &filename)
+bool FusePDF::isFileType(const QString &filename,
+                         const QString &mime,
+                         bool startsWith)
 {
     QMimeDatabase db;
     QMimeType type = db.mimeTypeForFile(filename);
-    return (type.name() == "application/pdf");
+    return (startsWith? type.name().startsWith(mime) : type.name() == mime);
+}
+
+bool FusePDF::isPDF(const QString &filename)
+{
+    return isFileType(filename, "application/pdf");
 }
 
 bool FusePDF::isJPG(const QString &filename)
 {
-    QMimeDatabase db;
-    QMimeType type = db.mimeTypeForFile(filename);
-    return (type.name() == "image/jpeg");
+    return isFileType(filename, "image/jpeg");
 }
 
 bool FusePDF::isTIFF(const QString &filename)
 {
-    QMimeDatabase db;
-    QMimeType type = db.mimeTypeForFile(filename);
-    return (type.name() == "image/tiff");
+    return isFileType(filename, "image/tiff");
 }
 
 bool FusePDF::isPNG(const QString &filename)
 {
-    QMimeDatabase db;
-    QMimeType type = db.mimeTypeForFile(filename);
-    return (type.name() == "image/png");
+    return isFileType(filename, "image/png");
 }
 
 bool FusePDF::isImage(const QString &filename)
 {
-    QMimeDatabase db;
-    QMimeType type = db.mimeTypeForFile(filename);
-    return (type.name().startsWith("image/"));
+    return isFileType(filename, "image/", true);
 }
 
 QString FusePDF::ghostImageFormat(int type)
