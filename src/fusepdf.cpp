@@ -2,7 +2,7 @@
 #
 # FusePDF - https://fusepdf.no
 #
-# Copyright (c) 2021 NettStudio AS <https://nettstudio.no>.
+# Copyright (c) 2021, 2022 NettStudio AS <https://nettstudio.no>.
 # All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
@@ -613,16 +613,18 @@ void FusePDF::populateUI()
 {
     QIcon docIcon(FUSEPDF_ICON_DOC);
 
+    QString versionString = tr("version");
+
     ui->compat->blockSignals(true);
     ui->compat->clear();
-    ui->compat->addItem(docIcon, tr("PDF 1.0"), "1.0");
-    ui->compat->addItem(docIcon, tr("PDF 1.1"), "1.1");
-    ui->compat->addItem(docIcon, tr("PDF 1.2"), "1.2");
-    ui->compat->addItem(docIcon, tr("PDF 1.3"), "1.3");
-    ui->compat->addItem(docIcon, tr("PDF 1.4"), "1.4");
-    ui->compat->addItem(docIcon, tr("PDF 1.5"), "1.5");
-    ui->compat->addItem(docIcon, tr("PDF 1.6"), "1.6");
-    ui->compat->addItem(docIcon, tr("PDF 1.6"), "1.7");
+    ui->compat->addItem(docIcon, QString("PDF %1 1.0").arg(versionString), "1.0");
+    ui->compat->addItem(docIcon, QString("PDF %1 1.1").arg(versionString), "1.1");
+    ui->compat->addItem(docIcon, QString("PDF %1 1.2").arg(versionString), "1.2");
+    ui->compat->addItem(docIcon, QString("PDF %1 1.3").arg(versionString), "1.3");
+    ui->compat->addItem(docIcon, QString("PDF %1 1.4").arg(versionString), "1.4");
+    ui->compat->addItem(docIcon, QString("PDF %1 1.5").arg(versionString), "1.5");
+    ui->compat->addItem(docIcon, QString("PDF %1 1.6").arg(versionString), "1.6");
+    ui->compat->addItem(docIcon, QString("PDF %1 1.6").arg(versionString), "1.7");
     ui->compat->blockSignals(false);
 
     ui->preset->blockSignals(true);
@@ -821,7 +823,6 @@ void FusePDF::loadOptions()
 
     QString savedCompat = settings.value("compat", "1.5").toString();
     ui->compat->blockSignals(true);
-    //ui->compat->setCurrentText(settings.value("compat", "1.5").toString());
     for (int i = 0; i < ui->compat->count(); i++) {
         QString value = ui->compat->itemData(i).toString();
         if (value == savedCompat) {
@@ -898,15 +899,9 @@ void FusePDF::saveOptions()
     settings.setValue("metaSubject", ui->actionRemember_meta_subject->isChecked());
     settings.setValue("metaTitle", ui->actionRemember_meta_title->isChecked());
 
-    if (!_lastLoadDir.isEmpty()) {
-        settings.setValue("lastLoadDir", _lastLoadDir);
-    }
-    if (!_lastSaveDir.isEmpty()) {
-        settings.setValue("lastSaveDir", _lastSaveDir);
-    }
-    if (!_lastExportDir.isEmpty()) {
-        settings.setValue("lastExportDir", _lastExportDir);
-    }
+    if (!_lastLoadDir.isEmpty()) { settings.setValue("lastLoadDir", _lastLoadDir); }
+    if (!_lastSaveDir.isEmpty()) { settings.setValue("lastSaveDir", _lastSaveDir); }
+    if (!_lastExportDir.isEmpty()) { settings.setValue("lastExportDir", _lastExportDir); }
     settings.endGroup();
 }
 
@@ -926,10 +921,10 @@ bool FusePDF::missingGhost()
         QMessageBox::warning(this,
                              QString("%1 Ghostscript").arg(tr("Missing")),
                              QString("%1 Ghostscript, %2 <a href=\"%4\">ghostscript.com</a> %3.")
-                             .arg(tr("Unable to find"))
-                             .arg(tr("please download the latest installer from"))
-                             .arg(tr("and install it before running this application again"))
-                             .arg(FUSEPDF_GS_URL));
+                             .arg(tr("Unable to find"),
+                                  tr("please download the latest installer from"),
+                                  tr("and install it before running this application again"),
+                                  FUSEPDF_GS_URL));
         return true;
     }
     return false;
@@ -980,16 +975,28 @@ int FusePDF::getPageCount(const QString &filename)
 {
     int result = 0;
     if (!isPDF(filename)) { return result; }
+
     QString command = findGhost();
+    if (command.isEmpty()) { return result; }
 #ifdef Q_OS_WIN
     command = QString("\"%1\"").arg(findGhost());
 #endif
-    command.append(QString(FUSEPDF_GS_COUNT).arg(filename));
+
+    QStringList options;
+    options << "-q";
+    options << "-dNODISPLAY";
+    options << "-dNOSAFER";
+    options << "-c";
+    options << QString("\"/pdffile (%1) (r) file runpdfbegin (PageCount: ) print pdfpagecount = quit\"").arg(filename);
+
     QProcess proc;
-    proc.start(command);
+    proc.start(command, options);
     proc.waitForFinished();
     result = proc.readAll().replace("PageCount:", "").simplified().toInt();
     proc.close();
+
+    qDebug() << command << options << result;
+
     return result;
 }
 
@@ -1108,16 +1115,33 @@ const QString FusePDF::getPagePreview(const QString &filename,
     emit statusMessage(tr("Generating preview %1 for %2 ...").arg(page).arg(QFileInfo(filename).fileName()), 1000);
     QString cache = getCachePath();
     if (!isPDF(filename) || cache.isEmpty()) { return  QString(); }
-    QString image = QString(FUSEPDF_CACHE_JPEG).arg(cache).arg(checksum).arg(page);
+
+    QString image = QString(FUSEPDF_CACHE_JPEG).arg(cache, checksum, QString::number(page));
+
     QString command = findGhost();
+    if (command.isEmpty()) { return QString(); }
 #ifdef Q_OS_WIN
     command = QString("\"%1\"").arg(findGhost());
 #endif
-    command.append(QString(FUSEPDF_GS_PREVIEW).arg(filename).arg(image).arg(page).arg(quality));
+
+    QStringList options;
+    options << "-q";
+    options << "-sDEVICE=jpeg";
+    options << "-o";
+    options << image;
+    options << QString("-dFirstPage=%1").arg(page);
+    options << QString("-dLastPage=%1").arg(page);
+    options << QString("-dJPEGQ=%1").arg(quality);
+    options << "-r72x72";
+    options << filename;
+
     QProcess proc;
-    proc.start(command);
+    proc.start(command, options);
     proc.waitForFinished();
     proc.close();
+
+    qDebug() << command << options << image;
+
     if (isJPG(image)) { return image; }
     return QString();
 }
