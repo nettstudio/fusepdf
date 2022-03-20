@@ -384,7 +384,8 @@ FusePDF::FusePDF(QWidget *parent)
     _tabButton = new QPushButton(this);
     _tabButton->setFlat(true);
     _tabButton->setIconSize(QSize(24, 24));
-    _tabButton->setIcon(QIcon(FUSEPDF_ICON_CLEAR));
+    _tabButton->setIcon(QIcon::fromTheme(HICOLOR_ICON_CLEAR,
+                                         QIcon(FUSEPDF_ICON_CLEAR)));
     _tabButton->setToolTip(tr("Clear"));
     ui->tabs->setCornerWidget(_tabButton);
     populateUI();
@@ -610,7 +611,16 @@ void FusePDF::commandFinished(int exitCode)
 
 void FusePDF::populateUI()
 {
-    QIcon docIcon(FUSEPDF_ICON_DOC);
+    QIcon docIcon(QIcon::fromTheme(HICOLOR_ICON_DOC,
+                                   QIcon(FUSEPDF_ICON_DOC)));
+
+    ui->actionOpen->setIcon(QIcon::fromTheme(HICOLOR_ICON_OPEN,
+                                             QIcon(FUSEPDF_ICON_OPEN)));
+    ui->actionQuit->setIcon(QIcon::fromTheme(HICOLOR_ICON_QUIT,
+                                             QIcon(FUSEPDF_ICON_QUIT)));
+    ui->actionSave->setIcon(QIcon::fromTheme(HICOLOR_ICON_SAVE,
+                                             QIcon(FUSEPDF_ICON_SAVE)));
+
 
     QString versionString = tr("version");
 
@@ -709,7 +719,9 @@ void FusePDF::clearInput(bool askFirst)
         tab->deleteLater();
     }
     ui->tabs->clear();
-    ui->tabs->addTab(ui->tabInputs, QIcon(FUSEPDF_ICON_MAIN), tr("Documents"));
+    ui->tabs->addTab(ui->tabInputs,
+                     QIcon(FUSEPDF_ICON_MAIN),
+                     tr("Documents"));
     ui->cmd->clear();
     _output.clear();
 }
@@ -772,7 +784,7 @@ void FusePDF::handleFoundPDF(const QList<QUrl> &urls)
         if (!info.absolutePath().isEmpty()) { _lastLoadDir = info.absolutePath(); }
         if (hasTab(info.filePath())) { continue; }
         ui->tabs->addTab(new PagesListWidget(this, info.filePath(), checksum, pages),
-                         QIcon(FUSEPDF_ICON_DOC),
+                         QIcon(QIcon::fromTheme(HICOLOR_ICON_DOC, QIcon(FUSEPDF_ICON_DOC))),
                          info.fileName());
         connect(this, SIGNAL(foundPagePreview(QString,QString,QString,int)),
                 getTab(info.filePath()), SLOT(setPageIcon(QString,QString,QString,int)));
@@ -1463,10 +1475,12 @@ void FusePDF::on_metaAuthor_textChanged(const QString &arg1)
 void FusePDF::on_tabs_currentChanged(int index)
 {
     if (index == 0) {
-        _tabButton->setIcon(QIcon(FUSEPDF_ICON_CLEAR));
+        _tabButton->setIcon(QIcon(QIcon::fromTheme(HICOLOR_ICON_CLEAR,
+                                                   QIcon(FUSEPDF_ICON_CLEAR))));
         _tabButton->setToolTip(tr("Clear"));
     } else {
-        _tabButton->setIcon(QIcon(FUSEPDF_ICON_GOFIRST));
+        _tabButton->setIcon(QIcon(QIcon::fromTheme(HICOLOR_ICON_GOFIRST,
+                                                   QIcon(FUSEPDF_ICON_GOFIRST))));
         _tabButton->setToolTip(tr("Show documents"));
     }
 }

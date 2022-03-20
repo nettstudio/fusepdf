@@ -68,6 +68,8 @@
 #define FUSEPDF_SITE_URL "https://fusepdf.no"
 #define FUSEPDF_RELEASES_URL "https://github.com/nettstudio/fusepdf/releases"
 #define FUSEPDF_ISSUE_URL "https://github.com/nettstudio/fusepdf/issues"
+#define FUSEPDF_GS_URL "https://www.ghostscript.com/download/gsdnld.html"
+
 #define FUSEPDF_PATH_ROLE Qt::UserRole + 1
 #define FUSEPDF_PAGES_ROLE Qt::UserRole + 2
 #define FUSEPDF_PAGE_ROLE Qt::UserRole + 3
@@ -76,10 +78,13 @@
 #define FUSEPDF_IMAGE_TYPE_ROLE Qt::UserRole + 6
 #define FUSEPDF_IMAGE_RES_ROLE Qt::UserRole + 7
 #define FUSEPDF_CHECKED_ROLE Qt::UserRole + 8
+
 #define FUSEPDF_PAGE_ICON_SIZE 480
 #define FUSEPDF_ICON_DEFAULT_SIZE 22
+
 #define FUSEPDF_CACHE_JPEG "%1/%2-%3.jpg"
 #define FUSEPDF_CACHE_PDF "%1/%2-%3.pdf"
+
 #define FUSEPDF_ICON_MAIN ":/assets/fusepdf-document.png"
 #define FUSEPDF_ICON_DOC ":/assets/document.png"
 #define FUSEPDF_ICON_LOGO ":/assets/fusepdf.png"
@@ -87,7 +92,18 @@
 #define FUSEPDF_ICON_VALID ":/assets/fusepdf-valid.png"
 #define FUSEPDF_ICON_DENIED ":/assets/fusepdf-denied.png"
 #define FUSEPDF_ICON_GOFIRST ":/assets/fusepdf-gofirst.png"
-#define FUSEPDF_GS_URL "https://www.ghostscript.com/download/gsdnld.html"
+#define FUSEPDF_ICON_OPEN ":/assets/fusepdf-open.png"
+#define FUSEPDF_ICON_SAVE ":/assets/fusepdf-save.png"
+#define FUSEPDF_ICON_QUIT ":/assets/fusepdf-quit.png"
+
+#define HICOLOR_ICON_DOC "document"
+#define HICOLOR_ICON_CLEAR "edit-clear"
+#define HICOLOR_ICON_VALID "dialog-apply"
+#define HICOLOR_ICON_DENIED "dialog-cancel"
+#define HICOLOR_ICON_GOFIRST "go-first"
+#define HICOLOR_ICON_OPEN "document-open"
+#define HICOLOR_ICON_SAVE "document-save"
+#define HICOLOR_ICON_QUIT "appliction-exit"
 
 enum exportImageType {
     exportImageTypeUndefined,
