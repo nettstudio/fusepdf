@@ -65,6 +65,7 @@
 #include <QStyledItemDelegate>
 #include <QPixmap>
 
+#define FUSEPDF_SITE_URL "https://fusepdf.no"
 #define FUSEPDF_RELEASES_URL "https://github.com/nettstudio/fusepdf/releases"
 #define FUSEPDF_ISSUE_URL "https://github.com/nettstudio/fusepdf/issues"
 #define FUSEPDF_PATH_ROLE Qt::UserRole + 1
@@ -89,7 +90,7 @@
 #define FUSEPDF_GS_URL "https://www.ghostscript.com/download/gsdnld.html"
 //#define FUSEPDF_GS_PREVIEW " -q -sDEVICE=jpeg -o \"%2\" -dFirstPage=%3 -dLastPage=%3 -dJPEGQ=%4 -r72x72 \"%1\""
 //#define FUSEPDF_GS_COUNT " -q -dNODISPLAY -dNOSAFER -c \"/pdffile (%1) (r) file runpdfbegin (PageCount: ) print pdfpagecount = quit\""
-#define FUSEPDF_GS_EXTRACT " -q -dNOPAUSE -dBATCH -sOutputFile=\"%2\" -dFirstPage=%3 -dLastPage=%3 -sDEVICE=pdfwrite \"%1\""
+//#define FUSEPDF_GS_EXTRACT " -q -dNOPAUSE -dBATCH -sOutputFile=\"%2\" -dFirstPage=%3 -dLastPage=%3 -sDEVICE=pdfwrite \"%1\""
 
 enum exportImageType {
     exportImageTypeUndefined,

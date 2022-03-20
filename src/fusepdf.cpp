@@ -1146,12 +1146,14 @@ const QString FusePDF::getPagePreview(const QString &filename,
     return QString();
 }
 
-void FusePDF::getPagePreviews(const QString &filename, const QString &checksum, int pages)
+void FusePDF::getPagePreviews(const QString &filename,
+                              const QString &checksum,
+                              int pages)
 {
     QString cache = getCachePath();
     if (!isPDF(filename) || pages < 1 || cache.isEmpty()) { return; }
     for (int i = 1; i <= pages; ++i) {
-        QString image = QString(FUSEPDF_CACHE_JPEG).arg(cache).arg(checksum).arg(i);
+        QString image = QString(FUSEPDF_CACHE_JPEG).arg(cache, checksum, QString::number(i));
         if (!QFile::exists(image)) {
             image = getPagePreview(filename, checksum, i);
         }
@@ -1179,16 +1181,31 @@ const QString FusePDF::extractPDF(const QString &filename,
     emit statusMessage(tr("Extracting page %1 from %2 ...").arg(page).arg(QFileInfo(filename).fileName()), 1000);
     QString cache = getCachePath();
     QString command = findGhost();
+
+    if (command.isEmpty() || cache.isEmpty()) { return QString(); }
 #ifdef Q_OS_WIN
     command = QString("\"%1\"").arg(findGhost());
 #endif
-    if (cache.isEmpty()) { return QString(); }
-    cache = QString(FUSEPDF_CACHE_PDF).arg(cache).arg(checksum).arg(page);
-    command.append(QString(FUSEPDF_GS_EXTRACT).arg(filename).arg(cache).arg(page));
+
+    cache = QString(FUSEPDF_CACHE_PDF).arg(cache, checksum, QString::number(page));
+
+    QStringList options;
+    options << "-q";
+    options << "-dNOPAUSE";
+    options << "-dBATCH";
+    options << QString("-sOutputFile=\"%1\"").arg(cache);
+    options << QString("-dFirstPage=%1").arg(page);
+    options << QString("-dLastPage=%1").arg(page);
+    options << "-sDEVICE=pdfwrite";
+    options << filename;
+
     QProcess proc;
-    proc.start(command);
+    proc.start(command, options);
     proc.waitForFinished();
     proc.close();
+
+    qDebug() << command << options << cache;
+
     if (isPDF(cache)) { return cache; }
     return QString();
 }
