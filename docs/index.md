@@ -1,4 +1,4 @@
-# Introduction
+# Merge PDF documents
 
 FusePDF is an simple cross-platform and open source application used for merging, splitting and extracting PDF pages and documents.
 
