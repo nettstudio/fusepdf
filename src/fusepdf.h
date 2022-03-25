@@ -105,6 +105,10 @@
 #define HICOLOR_ICON_SAVE "document-save"
 #define HICOLOR_ICON_QUIT "appliction-exit"
 
+#define FUSEPDF_GS_PREVIEW " -q -sDEVICE=jpeg -o \"%2\" -dFirstPage=%3 -dLastPage=%3 -dJPEGQ=%4 -r72x72 \"%1\""
+#define FUSEPDF_GS_COUNT " -q -dNODISPLAY -dNOSAFER -c \"/pdffile (%1) (r) file runpdfbegin (PageCount: ) print pdfpagecount = quit\""
+#define FUSEPDF_GS_EXTRACT " -q -dNOPAUSE -dBATCH -sOutputFile=\"%2\" -dFirstPage=%3 -dLastPage=%3 -sDEVICE=pdfwrite \"%1\""
+
 enum exportImageType {
     exportImageTypeUndefined,
     exportTiffTypeGray,

@@ -993,20 +993,21 @@ int FusePDF::getPageCount(const QString &filename)
     command = QString("\"%1\"").arg(findGhost());
 #endif
 
-    QStringList options;
+    command.append(QString(FUSEPDF_GS_COUNT).arg(filename));
+    /*QStringList options;
     options << "-q";
     options << "-dNODISPLAY";
     options << "-dNOSAFER";
     options << "-c";
-    options << QString("\"/pdffile (%1) (r) file runpdfbegin (PageCount: ) print pdfpagecount = quit\"").arg(filename);
+    options << QString("\"/pdffile (%1) (r) file runpdfbegin (PageCount: ) print pdfpagecount = quit\"").arg(filename);*/
 
     QProcess proc;
-    proc.start(command, options);
+    proc.start(command/*, options*/);
     proc.waitForFinished();
     result = proc.readAll().replace("PageCount:", "").simplified().toInt();
     proc.close();
 
-    qDebug() << command << options << result;
+    qDebug() << command << /*options <<*/ result;
 
     return result;
 }
@@ -1134,7 +1135,8 @@ const QString FusePDF::getPagePreview(const QString &filename,
     command = QString("\"%1\"").arg(findGhost());
 #endif
 
-    QStringList options;
+    command.append(QString(FUSEPDF_GS_PREVIEW).arg(filename).arg(image).arg(page).arg(quality));
+    /*QStringList options;
     options << "-q";
     options << "-sDEVICE=jpeg";
     options << "-o";
@@ -1143,14 +1145,14 @@ const QString FusePDF::getPagePreview(const QString &filename,
     options << QString("-dLastPage=%1").arg(page);
     options << QString("-dJPEGQ=%1").arg(quality);
     options << "-r72x72";
-    options << filename;
+    options << filename;*/
 
     QProcess proc;
-    proc.start(command, options);
+    proc.start(command/*, options*/);
     proc.waitForFinished();
     proc.close();
 
-    qDebug() << command << options << image;
+    qDebug() << command << /*options <<*/ image;
 
     if (isJPG(image)) { return image; }
     return QString();
@@ -1199,7 +1201,8 @@ const QString FusePDF::extractPDF(const QString &filename,
 
     cache = QString(FUSEPDF_CACHE_PDF).arg(cache, checksum, QString::number(page));
 
-    QStringList options;
+    command.append(QString(FUSEPDF_GS_EXTRACT).arg(filename).arg(cache).arg(page));
+    /*QStringList options;
     options << "-q";
     options << "-dNOPAUSE";
     options << "-dBATCH";
@@ -1207,14 +1210,14 @@ const QString FusePDF::extractPDF(const QString &filename,
     options << QString("-dFirstPage=%1").arg(page);
     options << QString("-dLastPage=%1").arg(page);
     options << "-sDEVICE=pdfwrite";
-    options << filename;
+    options << filename;*/
 
     QProcess proc;
-    proc.start(command, options);
+    proc.start(command/*, options*/);
     proc.waitForFinished();
     proc.close();
 
-    qDebug() << command << options << cache;
+    qDebug() << command << /*options <<*/ cache;
 
     if (isPDF(cache)) { return cache; }
     return QString();

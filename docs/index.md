@@ -28,7 +28,7 @@ That's it, now click ``Save`` (or ``Ctrl+S``) and you are done.
 
 ## Issues
 
-Some common issues user may experience.
+Some common issues users may experience.
 
 ### Missing Ghostscript
 
