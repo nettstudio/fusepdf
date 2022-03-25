@@ -570,10 +570,10 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Remember author properties</string>
+    <string>Remember author</string>
    </property>
    <property name="toolTip">
-    <string>Remember author properties</string>
+    <string>Remember author</string>
    </property>
   </action>
   <action name="actionRemember_meta_subject">
@@ -581,10 +581,10 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Remember subject properties</string>
+    <string>Remember subject</string>
    </property>
    <property name="toolTip">
-    <string>Remember subject peroperties</string>
+    <string>Remember subject</string>
    </property>
   </action>
   <action name="actionRemember_meta_title">
@@ -592,10 +592,10 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Remember title properties</string>
+    <string>Remember title</string>
    </property>
    <property name="toolTip">
-    <string>Remember title properties</string>
+    <string>Remember title</string>
    </property>
   </action>
   <action name="actionOpen_cache_folder">
