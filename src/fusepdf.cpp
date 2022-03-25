@@ -1290,7 +1290,8 @@ bool FusePDF::exportImage(const QString &filename,
     command = QString("\"%1\"").arg(findGhost());
 #endif
 
-    QStringList options;
+    command.append(QString(FUSEPDF_GS_EXPORT).arg(filename).arg(image).arg(page).arg(format).arg(res));
+    /*QStringList options;
     options << "-q";
     options << QString("-sDEVICE=%1").arg(format);
     options << "-o";
@@ -1300,14 +1301,14 @@ bool FusePDF::exportImage(const QString &filename,
     options << QString("-dTextAlphaBits=%1").arg(alpha);
     options << QString("-dGraphicsAlphaBits=%1").arg(alpha);
     options << QString("-r%1x%1").arg(res);
-    options << filename;
+    options << filename;*/
 
     QProcess proc;
-    proc.start(command, options);
+    proc.start(command/*, options*/);
     proc.waitForFinished();
     proc.close();
 
-    qDebug() << command << options << image;
+    qDebug() << command << /*options <<*/ image;
 
     if (isImage(image)) { return true; }
     return false;
