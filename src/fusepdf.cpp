@@ -721,7 +721,7 @@ void FusePDF::clearInput(bool askFirst)
     ui->tabs->clear();
     ui->tabs->addTab(ui->tabInputs,
                      QIcon(FUSEPDF_ICON_MAIN),
-                     tr("Documents"));
+                     tr("Output"));
     ui->cmd->clear();
     _output.clear();
 }

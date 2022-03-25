@@ -50,7 +50,7 @@
            <normaloff>:/assets/fusepdf-document.png</normaloff>:/assets/fusepdf-document.png</iconset>
          </attribute>
          <attribute name="title">
-          <string>Documents</string>
+          <string>Output</string>
          </attribute>
          <layout class="QHBoxLayout" name="horizontalLayout_2">
           <property name="spacing">
