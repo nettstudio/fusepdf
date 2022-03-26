@@ -355,6 +355,8 @@ private slots:
     void handleOutputRemoveSelected();
     void handleOutputClearAll();
     void handleOutputAdd();
+    void on_actionDocumentation_triggered();
+    void on_actionOutput_preview_triggered();
 
 private:
     Ui::FusePDF *ui;

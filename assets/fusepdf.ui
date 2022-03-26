@@ -436,12 +436,14 @@
     <addaction name="separator"/>
     <addaction name="actionOpen_saved_PDF"/>
     <addaction name="separator"/>
+    <addaction name="actionOutput_preview"/>
     <addaction name="actionRemember_meta_author"/>
     <addaction name="actionRemember_meta_subject"/>
     <addaction name="actionRemember_meta_title"/>
     <addaction name="separator"/>
     <addaction name="actionOpen_cache_folder"/>
     <addaction name="separator"/>
+    <addaction name="actionDocumentation"/>
     <addaction name="actionCheck_for_updates"/>
     <addaction name="actionReport_issue"/>
    </widget>
@@ -638,6 +640,19 @@
    </property>
    <property name="toolTip">
     <string>Support</string>
+   </property>
+  </action>
+  <action name="actionDocumentation">
+   <property name="text">
+    <string>Documentation</string>
+   </property>
+  </action>
+  <action name="actionOutput_preview">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Output preview</string>
    </property>
   </action>
  </widget>

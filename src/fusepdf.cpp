@@ -883,7 +883,9 @@ void FusePDF::handleFoundPDF(const QList<QUrl> &urls)
                           info.filePath(),
                           checksum,
                           pages);
-        QtConcurrent::run(this, &FusePDF::generateOutputPreview);
+        if (ui->actionOutput_preview->isChecked()) {
+            QtConcurrent::run(this, &FusePDF::generateOutputPreview);
+        }
     }
 }
 
@@ -943,6 +945,7 @@ void FusePDF::loadOptions()
     }
     ui->preset->blockSignals(false);
 
+    ui->actionOutput_preview->setChecked(settings.value("outputPreview", true).toBool());
     ui->actionShow_log->setChecked(settings.value("showLog", false).toBool());
     ui->actionAuto_Sort->setChecked(settings.value("autoSort", false).toBool());
     ui->actionRemember_meta_author->setChecked(settings.value("metaAuthor", true).toBool());
@@ -989,6 +992,7 @@ void FusePDF::saveOptions()
 {
     QSettings settings;
     settings.beginGroup("options");
+    settings.setValue("outputPreview", ui->actionOutput_preview->isChecked());
     settings.setValue("showLog", ui->actionShow_log->isChecked());
     settings.setValue("autoSort", ui->actionAuto_Sort->isChecked());
     settings.setValue("openSavedPDF", ui->actionOpen_saved_PDF->isChecked());
@@ -1598,12 +1602,14 @@ void FusePDF::generateOutputPreview()
 
 void FusePDF::handleOutputPagesChanged()
 {
+    if (!ui->actionOutput_preview->isChecked()) { return; }
     QtConcurrent::run(this, &FusePDF::generateOutputPreview);
 }
 
 void FusePDF::showOutputPreview(const QStringList &images)
 {
     qDebug() << "ShowOutputPreview" << images;
+    if (!ui->actionOutput_preview->isChecked()) { return; }
     if (images.size() < 1) { return; }
     ui->preview->clear();
     ui->preview->show();
@@ -1644,3 +1650,23 @@ void FusePDF::handleOutputAdd()
     on_actionOpen_triggered();
 }
 
+
+void FusePDF::on_actionDocumentation_triggered()
+{
+    QString url = "https://fusepdf.no";
+    QString readme = QString("%1/README.pdf").arg(qApp->applicationDirPath());
+    if (QFile::exists(readme)) { url = readme; }
+    QDesktopServices::openUrl(QUrl::fromUserInput(url));
+}
+
+
+void FusePDF::on_actionOutput_preview_triggered()
+{
+    if (ui->actionOutput_preview->isChecked()) {
+        ui->preview->clear();
+        handleOutputPagesChanged();
+    } else {
+        ui->preview->clear();
+        ui->preview->hide();
+    }
+}
