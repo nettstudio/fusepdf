@@ -42,6 +42,9 @@ If you see this dialog your installation is broken, or you are using a version o
 
 Released : TBA
 
+  * Real time output preview
+  * UI changes
+  * Code changes
   * Support dark mode on Windows
   * Added support for i18n
   * Added documentation (not complete)
