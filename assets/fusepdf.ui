@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>565</width>
+    <width>909</width>
     <height>555</height>
    </rect>
   </property>
@@ -311,7 +311,7 @@
           </sizepolicy>
          </property>
          <property name="text">
-          <string>Preset</string>
+          <string>Distiller Preset</string>
          </property>
         </widget>
        </item>
@@ -409,7 +409,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>565</width>
+     <width>909</width>
      <height>25</height>
     </rect>
    </property>

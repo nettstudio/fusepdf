@@ -1304,18 +1304,18 @@ void FusePDF::on_actionShow_tooltips_triggered()
 
 void FusePDF::showTooltips(bool show)
 {
-    ui->metaTitleLabel->setToolTip(show?tr("Set document title"):QString());
+    ui->metaTitleLabel->setToolTip(show?tr("Set custom document title"):QString());
     ui->metaTitle->setToolTip(show?ui->metaTitleLabel->toolTip():QString());
-    ui->metaAuthorLabel->setToolTip(show?tr("Set document author"):QString());
+    ui->metaAuthorLabel->setToolTip(show?tr("Set custom document author"):QString());
     ui->metaAuthor->setToolTip(show?ui->metaAuthorLabel->toolTip():QString());
-    ui->metaSubjectLabel->setToolTip(show?tr("Set document subject"):QString());
+    ui->metaSubjectLabel->setToolTip(show?tr("Set custom document subject"):QString());
     ui->metaSubject->setToolTip(show?ui->metaSubjectLabel->toolTip():QString());
     ui->presetLabel->setToolTip(show?tr("Distiller presets\n\n"
                                         "- DEFAULT: selects output intended to be useful across a wide variety of uses, possibly at the expense of a larger output file.\n"
-                                        "- PREPRESS: selects output similar to Acrobat Distiller \"Prepress Optimized\" (up to version X) setting.\n"
-                                        "- EBOOK: selects medium-resolution output similar to the Acrobat Distiller (up to version X) \"eBook\" setting.\n"
-                                        "- SCREEN: selects low-resolution output similar to the Acrobat Distiller (up to version X) \"Screen Optimized\" setting.\n"
-                                        "- PRINTER: selects output similar to the Acrobat Distiller \"Print Optimized\" (up to version X) setting."):QString());
+                                        "- PREPRESS: selects output similar to Acrobat Distiller \"Prepress Optimized\" setting.\n"
+                                        "- EBOOK: selects medium-resolution output similar to the Acrobat Distiller \"eBook\" setting.\n"
+                                        "- SCREEN: selects low-resolution output similar to the Acrobat Distiller \"Screen Optimized\" setting.\n"
+                                        "- PRINTER: selects output similar to the Acrobat Distiller \"Print Optimized\" setting."):QString());
     ui->preset->setToolTip(show?ui->presetLabel->toolTip():QString());
     ui->compatLabel->setToolTip(show?tr("Select the PDF version this document should be compatible with."):QString());
     ui->compat->setToolTip(show?ui->compatLabel->toolTip():QString());
