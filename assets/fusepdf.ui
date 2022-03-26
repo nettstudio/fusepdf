@@ -54,7 +54,7 @@
          </attribute>
          <layout class="QHBoxLayout" name="horizontalLayout_2">
           <property name="spacing">
-           <number>0</number>
+           <number>6</number>
           </property>
           <property name="leftMargin">
            <number>0</number>
@@ -126,6 +126,9 @@
              </property>
             </column>
            </widget>
+          </item>
+          <item>
+           <widget class="QListWidget" name="preview"/>
           </item>
          </layout>
         </widget>

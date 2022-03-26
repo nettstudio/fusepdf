@@ -217,6 +217,7 @@ void PagesListWidget::handleItemClicked(QListWidgetItem *item)
     } else {
         item->setData(FUSEPDF_CHECKED_ROLE, true);
     }
+    emit changed();
 }
 
 void PagesListWidget::handleContextMenu(QPoint pos)
@@ -268,6 +269,7 @@ void PagesListWidget::setCheckedState(bool state)
         if (!item) { continue; }
         item->setData(FUSEPDF_CHECKED_ROLE, state);
     }
+    emit changed();
 }
 
 void PagesListWidget::exportSelectedPage()
@@ -299,6 +301,7 @@ FilesTreeWidget::FilesTreeWidget(QWidget *parent):
 
 void FilesTreeWidget::dropEvent(QDropEvent *e)
 {
+    emit changed();
     if (e->mimeData()->hasUrls()) { emit foundPDF(e->mimeData()->urls()); }
     else { QTreeWidget::dropEvent(e); }
 }
@@ -400,6 +403,8 @@ FusePDF::FusePDF(QWidget *parent)
             this, SLOT(handleProcessError(QProcess::ProcessError)));
     connect(ui->inputs, SIGNAL(foundPDF(QList<QUrl>)),
             this, SLOT(handleFoundPDF(QList<QUrl>)));
+    connect(ui->inputs, SIGNAL(changed()),
+            this, SLOT(handleOutputPagesChanged()));
     connect(this, SIGNAL(commandReady(QString,QString)),
             this, SLOT(runCommand(QString,QString)));
     connect(this, SIGNAL(statusMessage(QString,int)),
@@ -645,6 +650,20 @@ void FusePDF::populateUI()
     ui->preset->addItem(docIcon, tr("Screen"), "Screen");
     ui->preset->addItem(docIcon, tr("Printer"), "Printer");
     ui->preset->blockSignals(false);
+
+    ui->preview->hide();
+    ui->preview->setViewMode(QListView::IconMode);
+    ui->preview->setIconSize(QSize(FUSEPDF_PAGE_ICON_SIZE, FUSEPDF_PAGE_ICON_SIZE));
+    ui->preview->setUniformItemSizes(true);
+    ui->preview->setWrapping(true);
+    ui->preview->setResizeMode(QListView::Adjust);
+    ui->preview->setFrameShape(QFrame::NoFrame);
+    ui->preview->setContextMenuPolicy(Qt::CustomContextMenu);
+    ui->preview->setItemDelegate(new PageDelegate(this));
+    ui->preview->setSpacing(10);
+
+    connect(this, SIGNAL(generatedOutputPreview(QStringList)),
+            this, SLOT(showOutputPreview(QStringList)));
 }
 
 void FusePDF::loadSettings()
@@ -724,6 +743,8 @@ void FusePDF::clearInput(bool askFirst)
                      tr("Output"));
     ui->cmd->clear();
     _output.clear();
+    ui->preview->clear();
+    ui->preview->hide();
 }
 
 const QString FusePDF::findGhost()
@@ -792,11 +813,14 @@ void FusePDF::handleFoundPDF(const QList<QUrl> &urls)
                 this, SLOT(handleExport(QString,int)));
         connect(getTab(info.filePath()), SIGNAL(requestExportPages(QString,QVector<int>)),
                 this, SLOT(handleExports(QString,QVector<int>)));
+        connect(getTab(info.filePath()), SIGNAL(changed()),
+                this, SLOT(handleOutputPagesChanged()));
         QtConcurrent::run(this,
                           &FusePDF::getPagePreviews,
                           info.filePath(),
                           checksum,
                           pages);
+        QtConcurrent::run(this, &FusePDF::generateOutputPreview);
     }
 }
 
@@ -1170,14 +1194,16 @@ const QString FusePDF::getChecksum(const QString &filename)
 
 const QString FusePDF::extractPDF(const QString &filename,
                                   const QString &checksum,
-                                  int page)
+                                  int page,
+                                  bool force)
 {
-    emit statusMessage(tr("Extracting page %1 from %2 ...").arg(page).arg(QFileInfo(filename).fileName()), 1000);
+    emit statusMessage(tr("Extracting pages ..."), 1000);
     QString cache = getCachePath();
     QString command = findGhost();
 
     if (command.isEmpty() || cache.isEmpty()) { return QString(); }
     cache = QString(FUSEPDF_CACHE_PDF).arg(cache, checksum, QString::number(page));
+    if (!force && QFile::exists(cache) && isPDF(cache)) { return cache; }
 #ifdef Q_OS_WIN
     command = QString("\"%1\"").arg(findGhost());
 #endif
@@ -1466,5 +1492,75 @@ bool FusePDF::hasDarkMode()
     if (settings.value("AppsUseLightTheme") == 0) { return true; }
 #endif
     return false;
+}
+
+void FusePDF::generateOutputPreview()
+{
+    QString cache = getCachePath();
+    if (cache.isEmpty()) { return; }
+    QStringList docs, images;
+    for (int i = 0; i < ui->inputs->topLevelItemCount(); ++i) {
+        QString filename = ui->inputs->topLevelItem(i)->data(0, FUSEPDF_PATH_ROLE).toString();
+        PagesListWidget *tab = getTab(filename);
+        bool modified = false;
+        if (tab && tab->isModified() && tab->getPagesState(true).size() > 0) {
+            modified = true;
+            QVector<int> pages = tab->getPagesState(true);
+            for (int i = 0; i < pages.count(); ++i) {
+                QString extracted = extractPDF(filename, getChecksum(filename), pages.at(i), false);
+                if (!extracted.isEmpty()) {
+                    docs << extracted;
+                    QString checksum = getChecksum(filename);
+                    QString image = QString(FUSEPDF_CACHE_JPEG).arg(cache, checksum, QString::number(pages.at(i)));
+                    if (!QFile::exists(image)) { image = getPagePreview(filename, checksum, i); }
+                    if (!image.isEmpty()) { images << image; }
+                }
+            }
+        }
+        if (!modified) {
+            docs << filename;
+            int pages = getPageCount(filename);
+            QString checksum = getChecksum(filename);
+            for (int i = 1; i <= pages; ++i) {
+                QString image = QString(FUSEPDF_CACHE_JPEG).arg(cache, checksum, QString::number(i));
+                if (!QFile::exists(image)) { image = getPagePreview(filename, checksum, i); }
+                if (!image.isEmpty() && !images.contains(image)) { images << image; }
+            }
+        }
+    }
+    if (images.size() > 0) { emit generatedOutputPreview(images); }
+}
+
+void FusePDF::handleOutputPagesChanged()
+{
+    QtConcurrent::run(this, &FusePDF::generateOutputPreview);
+}
+
+void FusePDF::showOutputPreview(const QStringList &images)
+{
+    qDebug() << "ShowOutputPreview" << images;
+    if (images.size() < 1) { return; }
+    ui->preview->clear();
+    ui->preview->show();
+    for (int i = 0; i < images.size(); ++i) {
+        QListWidgetItem *item = new QListWidgetItem(QIcon(FUSEPDF_ICON_LOGO),
+                                                    QString(),
+                                                    ui->preview);
+        item->setFlags(Qt::ItemIsEnabled);
+        QPixmap pix(FUSEPDF_PAGE_ICON_SIZE, FUSEPDF_PAGE_ICON_SIZE);
+        pix.fill(QColor(Qt::transparent));
+        QPainter p(&pix);
+        QPixmap ppix = QPixmap::fromImage(QImage(images.at(i))).scaledToHeight(FUSEPDF_PAGE_ICON_SIZE,
+                                                                               Qt::SmoothTransformation);
+        ppix = ppix.copy(0, 0, FUSEPDF_PAGE_ICON_SIZE, FUSEPDF_PAGE_ICON_SIZE);
+        QPainter pp(&ppix);
+        QPainterPath ppath;
+        ppath.addRect(0, 0, ppix.width(), ppix.height());
+        QPen ppen(Qt::black, 2);
+        pp.setPen(ppen);
+        pp.drawPath(ppath);
+        p.drawPixmap((pix.width()/2)-(ppix.width()/2), 0, ppix);
+        item->setIcon(pix);
+    }
 }
 
