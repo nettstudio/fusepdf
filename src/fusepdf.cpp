@@ -358,6 +358,14 @@ FusePDF::FusePDF(QWidget *parent)
         palette.setColor(QPalette::Disabled, QPalette::Text, Qt::darkGray);
         palette.setColor(QPalette::Disabled, QPalette::ButtonText, Qt::darkGray);
         qApp->setPalette(palette);
+
+        QPalette previewPalette  = ui->preview->palette();
+        previewPalette.setColor(QPalette::Base, QColor(30, 30, 30));
+        ui->preview->setPalette(previewPalette);
+    } else {
+        QPalette previewPalette  = ui->preview->palette();
+        previewPalette.setColor(QPalette::Base, Qt::lightGray);
+        ui->preview->setPalette(previewPalette);
     }
     QPalette mainPalette = qApp->palette();
     mainPalette.setColor(QPalette::Highlight, QColor(203, 9, 0)); // #cb0900
@@ -807,6 +815,10 @@ void FusePDF::handleFoundPDF(const QList<QUrl> &urls)
         ui->tabs->addTab(new PagesListWidget(this, info.filePath(), checksum, pages),
                          QIcon(QIcon::fromTheme(HICOLOR_ICON_DOC, QIcon(FUSEPDF_ICON_DOC))),
                          info.fileName());
+        QPalette pal = getTab(info.filePath())->palette();
+        if (hasDarkMode()) { pal.setColor(QPalette::Base, QColor(30, 30, 30)); }
+        else { pal.setColor(QPalette::Base, Qt::lightGray); }
+        getTab(info.filePath())->setPalette(pal);
         connect(this, SIGNAL(foundPagePreview(QString,QString,QString,int)),
                 getTab(info.filePath()), SLOT(setPageIcon(QString,QString,QString,int)));
         connect(getTab(info.filePath()), SIGNAL(requestExportPage(QString,int)),
