@@ -564,10 +564,10 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Enable sorting</string>
+    <string>Automatic sorting</string>
    </property>
    <property name="toolTip">
-    <string>Enable Sorting of items. Note that this will disable manual order.</string>
+    <string>Automatic sorting of items</string>
    </property>
   </action>
   <action name="actionOpen_saved_PDF">
@@ -634,7 +634,10 @@
   </action>
   <action name="actionReport_issue">
    <property name="text">
-    <string>Report issue</string>
+    <string>Support</string>
+   </property>
+   <property name="toolTip">
+    <string>Support</string>
    </property>
   </action>
  </widget>
