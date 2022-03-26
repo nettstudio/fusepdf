@@ -7,7 +7,7 @@ FusePDF is an simple cross-platform and open source application used for merging
 ## Features
 
 * Drag-and-drop any PDF document
-* Preview pages
+* Preview input and output pages
 * Exclude/Include pages
 * Export to images and/or PDF
 * Support PDF presets
@@ -40,8 +40,9 @@ If you see this dialog your installation is broken, or you are using a version o
 
 ## 2.1.0
 
-Released : TBA
+Released : ETA Apr 1, 2022.
 
+  * Context menu in output tree
   * Real time output preview
   * UI changes
   * Code changes
