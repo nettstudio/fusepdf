@@ -223,6 +223,15 @@ public:
 signals:
     void foundPDF(const QList<QUrl> &urls);
     void changed();
+    void removeSelected();
+    void clearAll();
+    void add();
+
+private slots:
+    void handleContextMenu(QPoint pos);
+    void handleRemoveSelectedAction();
+    void handleClearAllAction();
+    void handleAddAction();
 
 protected:
     void dragEnterEvent(QDragEnterEvent *e) { e->acceptProposedAction(); }
@@ -343,6 +352,9 @@ private slots:
     void generateOutputPreview();
     void handleOutputPagesChanged();
     void showOutputPreview(const QStringList &images);
+    void handleOutputRemoveSelected();
+    void handleOutputClearAll();
+    void handleOutputAdd();
 
 private:
     Ui::FusePDF *ui;

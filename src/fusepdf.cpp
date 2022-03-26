@@ -297,6 +297,51 @@ FilesTreeWidget::FilesTreeWidget(QWidget *parent):
     setDragDropMode(QAbstractItemView::InternalMove);
     setDropIndicatorShown(false);
     setIconSize(QSize(32, 32));
+
+    setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(this, SIGNAL(customContextMenuRequested(QPoint)),
+            this, SLOT(handleContextMenu(QPoint)));
+}
+
+void FilesTreeWidget::handleContextMenu(QPoint pos)
+{
+    QMenu menu;
+
+    QAction removeSelectedAction;
+    QAction clearAllAction;
+    QAction addAction;
+
+    removeSelectedAction.setText(tr("Remove"));
+    clearAllAction.setText(tr("Clear"));
+    addAction.setText(tr("Add"));
+
+    connect(&removeSelectedAction, SIGNAL(triggered(bool)),
+            this, SLOT(handleRemoveSelectedAction()));
+    connect(&clearAllAction, SIGNAL(triggered(bool)),
+            this, SLOT(handleClearAllAction()));
+    connect(&addAction, SIGNAL(triggered(bool)),
+            this, SLOT(handleAddAction()));
+
+    menu.addAction(&addAction);
+    if (selectedItems().size() > 0) { menu.addAction(&removeSelectedAction); }
+    if (topLevelItemCount() > 0) { menu.addAction(&clearAllAction); }
+
+    menu.exec(viewport()->mapToGlobal(pos));
+}
+
+void FilesTreeWidget::handleRemoveSelectedAction()
+{
+    emit removeSelected();
+}
+
+void FilesTreeWidget::handleClearAllAction()
+{
+    emit clearAll();
+}
+
+void FilesTreeWidget::handleAddAction()
+{
+    emit add();
 }
 
 void FilesTreeWidget::dropEvent(QDropEvent *e)
@@ -413,6 +458,12 @@ FusePDF::FusePDF(QWidget *parent)
             this, SLOT(handleFoundPDF(QList<QUrl>)));
     connect(ui->inputs, SIGNAL(changed()),
             this, SLOT(handleOutputPagesChanged()));
+    connect(ui->inputs, SIGNAL(removeSelected()),
+            this, SLOT(handleOutputRemoveSelected()));
+    connect(ui->inputs, SIGNAL(clearAll()),
+            this, SLOT(handleOutputClearAll()));
+    connect(ui->inputs, SIGNAL(add()),
+            this, SLOT(handleOutputAdd()));
     connect(this, SIGNAL(commandReady(QString,QString)),
             this, SLOT(runCommand(QString,QString)));
     connect(this, SIGNAL(statusMessage(QString,int)),
@@ -1008,6 +1059,8 @@ void FusePDF::deleteDocumentItem()
     if (!tab) { return; }
     ui->tabs->removeTab(index);
     tab->deleteLater();
+
+    handleOutputPagesChanged();
 }
 
 QByteArray FusePDF::toUtf16Hex(QString str)
@@ -1266,9 +1319,9 @@ void FusePDF::showTooltips(bool show)
     ui->preset->setToolTip(show?ui->presetLabel->toolTip():QString());
     ui->compatLabel->setToolTip(show?tr("Select the PDF version this document should be compatible with."):QString());
     ui->compat->setToolTip(show?ui->compatLabel->toolTip():QString());
-    ui->inputs->setToolTip(show?tr("Drag and drop PDF documents you want to merge here. You can re-arrange after adding them (if sorting is disabled).\n\n"
+    /*ui->inputs->setToolTip(show?tr("Drag and drop PDF documents you want to merge here. You can re-arrange after adding them (if sorting is disabled).\n\n"
                                    "Note that the first document will define the paper size on the final output.\n\n"
-                                   "You can remove a document with the DEL key."):QString());
+                                   "You can remove a document with the DEL key."):QString());*/
 }
 
 void FusePDF::on_actionCheck_for_updates_triggered()
@@ -1574,5 +1627,20 @@ void FusePDF::showOutputPreview(const QStringList &images)
         p.drawPixmap((pix.width()/2)-(ppix.width()/2), 0, ppix);
         item->setIcon(pix);
     }
+}
+
+void FusePDF::handleOutputRemoveSelected()
+{
+    deleteDocumentItem();
+}
+
+void FusePDF::handleOutputClearAll()
+{
+    clearInput(true);
+}
+
+void FusePDF::handleOutputAdd()
+{
+    on_actionOpen_triggered();
 }
 
