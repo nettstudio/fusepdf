@@ -301,7 +301,7 @@ private slots:
     const QString getPagePreview(const QString &filename,
                                  const QString &checksum,
                                  int page,
-                                 int quality = 75);
+                                 int quality = 90);
     void getPagePreviews(const QString &filename,
                          const QString &checksum,
                          int pages);

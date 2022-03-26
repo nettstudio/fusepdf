@@ -128,7 +128,20 @@
            </widget>
           </item>
           <item>
-           <widget class="QListWidget" name="preview"/>
+           <widget class="QListWidget" name="preview">
+            <property name="minimumSize">
+             <size>
+              <width>520</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>520</width>
+              <height>16777215</height>
+             </size>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>
