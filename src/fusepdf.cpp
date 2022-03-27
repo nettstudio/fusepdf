@@ -384,12 +384,11 @@ FusePDF::FusePDF(QWidget *parent)
     ui->toolBar->addWidget(ui->compatLabel);
     ui->toolBar->addWidget(ui->compat);
 
+    // don't set palette on macos as it breaks dark mode
+#ifndef Q_OS_MAC
     QPalette previewPalette  = ui->preview->palette();
     previewPalette.setColor(QPalette::Base, hasDarkMode() ? QColor(30, 30, 30) : Qt::lightGray);
     ui->preview->setPalette(previewPalette);
-
-    // don't set palette on macos as it breaks dark mode
-#ifndef Q_OS_MAC
     if (hasDarkMode()) {
         QPalette palette;
         palette.setColor(QPalette::Window, QColor(53,53,53));
@@ -867,10 +866,13 @@ void FusePDF::handleFoundPDF(const QList<QUrl> &urls)
         ui->tabs->addTab(new PagesListWidget(this, info.filePath(), checksum, pages),
                          QIcon(QIcon::fromTheme(HICOLOR_ICON_DOC, QIcon(FUSEPDF_ICON_DOC))),
                          info.fileName());
+        // don't set palette on macos as it breaks dark mode
+#ifndef Q_OS_MAC
         QPalette pal = getTab(info.filePath())->palette();
         if (hasDarkMode()) { pal.setColor(QPalette::Base, QColor(30, 30, 30)); }
         else { pal.setColor(QPalette::Base, Qt::lightGray); }
         getTab(info.filePath())->setPalette(pal);
+#endif
         connect(this, SIGNAL(foundPagePreview(QString,QString,QString,int)),
                 getTab(info.filePath()), SLOT(setPageIcon(QString,QString,QString,int)));
         connect(getTab(info.filePath()), SIGNAL(requestExportPage(QString,int)),
