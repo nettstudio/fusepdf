@@ -4,8 +4,6 @@ FusePDF is an simple cross-platform and open source application used for merging
 
 ![Screenshot of main interface](https://github.com/nettstudio/fusepdf/raw/main/docs/fusepdf-screenshot-01.png "Screenshot of main interface")
 
-## Features
-
 * Drag-and-drop any PDF document
 * Preview input and output pages
 * Exclude/Include pages
@@ -14,9 +12,7 @@ FusePDF is an simple cross-platform and open source application used for merging
 * PDF compatibility up to version 1.7
 * Change or add PDF meta data (properties)
 
-# Usage
-
-## Basic usage
+# Basic usage
 
 For the most basic usage we assume you have a couple of PDF documents you want to merge into one.
 
@@ -28,7 +24,7 @@ You can move documents up and down, and remove with the ``DEL`` key or right-cli
 
 That's it, if you are satisfied click ``Save`` (or ``Ctrl+S``) and you are done. As default the generated PDF will open in your default PDF viewer.
 
-## Excluding pages
+# Excluding pages
 
 Sometimes you may want to exclude some pages from a document.
 
@@ -38,11 +34,11 @@ Double-click the document or select the tab with the document you want to modify
 
 Enabled pages are marked as green. If you want to exclude a page just double-click it. You can also select all or none through the context menu (right-click).
 
-## Issues
+# Issues
 
 Some common issues users may experience.
 
-### Missing Ghostscript
+## Missing Ghostscript
 
 ![Screenshot of missing Ghostscript](https://github.com/nettstudio/fusepdf/raw/main/docs/fusepdf-screenshot-08.png "Screenshot of missing Ghostscript")
 
