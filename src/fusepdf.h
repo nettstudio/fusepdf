@@ -360,6 +360,7 @@ private slots:
     void handleOutputAdd();
     void on_actionDocumentation_triggered();
     void on_actionOutput_preview_triggered();
+    int pagesToExport();
 
 private:
     Ui::FusePDF *ui;

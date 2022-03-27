@@ -499,10 +499,12 @@ void FusePDF::on_actionOpen_triggered()
 
 void FusePDF::on_actionSave_triggered()
 {
-    if (ui->inputs->topLevelItemCount() == 0) {
+    int totalPages = pagesToExport();
+    qDebug() << "total pages to export" << totalPages;
+    if (ui->inputs->topLevelItemCount() == 0 || totalPages < 1) {
         QMessageBox::warning(this,
-                             tr("No documents"),
-                             tr("No documents to merge, please add some documents before trying to save."));
+                             tr("No documents/pages"),
+                             tr("No documents/pages to merge, please add some documents or enable some pages before trying to save."));
         return;
     }
     QString file = QFileDialog::getSaveFileName(this,
@@ -569,8 +571,9 @@ const QString FusePDF::makeCommand(const QString &filename)
     for (int i = 0; i < ui->inputs->topLevelItemCount(); ++i) {
         QString filename = ui->inputs->topLevelItem(i)->data(0, FUSEPDF_PATH_ROLE).toString();
         PagesListWidget *tab = getTab(filename);
+        int enabledPages = tab? tab->getPagesState(true).size() : 0;
         bool modified = false;
-        if (tab && tab->isModified() && tab->getPagesState(true).size() > 0) {
+        if (tab && tab->isModified() && enabledPages > 0) {
             modified = true;
             QVector<int> pages = tab->getPagesState(true);
             for (int i = 0; i < pages.count(); ++i) {
@@ -580,6 +583,7 @@ const QString FusePDF::makeCommand(const QString &filename)
                 }
             }
         }
+        if (enabledPages < 1) { continue; }
         if (!modified) {
             command.append(QString(" \"%1\"").arg(filename));
         }
@@ -640,7 +644,7 @@ void FusePDF::runCommand(const QString &filename,
         return;
     }
     _output = filename;
-    qDebug() << "runCommand" << command;
+    qDebug() << command;
     _proc->start(command);
 }
 
@@ -1581,7 +1585,8 @@ void FusePDF::generateOutputPreview()
         QString filename = ui->inputs->topLevelItem(i)->data(0, FUSEPDF_PATH_ROLE).toString();
         PagesListWidget *tab = getTab(filename);
         bool modified = false;
-        if (tab && tab->isModified() && tab->getPagesState(true).size() > 0) {
+        int enabledPages = tab? tab->getPagesState(true).size() : 0;
+        if (tab && tab->isModified() && enabledPages > 0) {
             modified = true;
             QVector<int> pages = tab->getPagesState(true);
             for (int i = 0; i < pages.count(); ++i) {
@@ -1595,6 +1600,7 @@ void FusePDF::generateOutputPreview()
                 }
             }
         }
+        if (enabledPages < 1) { continue; }
         if (!modified) {
             docs << filename;
             int pages = getPageCount(filename);
@@ -1612,12 +1618,17 @@ void FusePDF::generateOutputPreview()
 void FusePDF::handleOutputPagesChanged()
 {
     if (!ui->actionOutput_preview->isChecked()) { return; }
+    int totalPages = pagesToExport();
+    if (totalPages < 1) {
+        ui->preview->clear();
+        ui->preview->hide();
+        return;
+    }
     QtConcurrent::run(this, &FusePDF::generateOutputPreview);
 }
 
 void FusePDF::showOutputPreview(const QStringList &images)
 {
-    qDebug() << "ShowOutputPreview" << images;
     if (!ui->actionOutput_preview->isChecked()) { return; }
     if (images.size() < 1) { return; }
     ui->preview->clear();
@@ -1678,4 +1689,25 @@ void FusePDF::on_actionOutput_preview_triggered()
         ui->preview->clear();
         ui->preview->hide();
     }
+}
+
+int FusePDF::pagesToExport()
+{
+    int result = 0;
+    for (int i = 0; i < ui->inputs->topLevelItemCount(); ++i) {
+        QString filename = ui->inputs->topLevelItem(i)->data(0, FUSEPDF_PATH_ROLE).toString();
+        PagesListWidget *tab = getTab(filename);
+        bool modified = false;
+        int enabledPages = tab? tab->getPagesState(true).size() : 0;
+        if (tab && tab->isModified() && enabledPages > 0) {
+            modified = true;
+            QVector<int> pages = tab->getPagesState(true);
+            for (int i = 0; i < pages.count(); ++i) { result++; }
+        }
+        if (enabledPages < 1) { continue; }
+        if (!modified) {
+            result += ui->inputs->topLevelItem(i)->text(1).toInt();
+        }
+    }
+    return result;
 }
