@@ -54,8 +54,9 @@ For macOS [Richard Koch](https://pages.uoregon.edu/koch/) hosts Ghostscript bina
 
 Released : ETA Apr 1, 2022.
 
+  * Check total pages before export (bug fix)
   * Context menu in output
-  * Real time output preview
+  * Real time output preview (default on, can be disabled)
   * UI changes
   * Code changes
   * Support dark mode on Windows
@@ -101,6 +102,8 @@ Released : Jan 24, 2021.
   * Initial release
 
 # Open Source
+
+FusePDF targets Windows as it's primary platform, but since it's open source it can be built and run on most platforms available today. We check compatibility with macOS and Linux and rely on community feedback for more exotic platform. If Qt5 and Ghostscript works on your platform, FusePDF will too.
 
 ## Introduction
 

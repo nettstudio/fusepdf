@@ -528,6 +528,7 @@ void FusePDF::on_actionAbout_triggered()
     QMessageBox::about(this,
                        QString("FusePDF"),
                        QString("<h2>FusePDF %1</h2>"
+                               "<p>Developed by <a href=\"https://github.com/rodlie\">Ole-André Rodlie</a> for NettStudio AS.</p>"
                                "<p>Copyright &copy; 2021, 2022 <a href='https://nettstudio.no'>NettStudio AS</a>. All rights reserved.</p>"
                                "<p style=\"font-size:small;\">This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 3 of the License, or (at your option) any later version.</p>"
                                "<p style=\"font-size:small;\">This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.</p>"
