@@ -7,7 +7,7 @@ FusePDF is an simple cross-platform and open source application used for merging
 ## Features
 
 * Drag-and-drop any PDF document
-* Preview pages
+* Preview input and output pages
 * Exclude/Include pages
 * Export to images and/or PDF
 * Support PDF presets
@@ -34,16 +34,33 @@ Some common issues users may experience.
 
 ![Screenshot of missing Ghostscript](https://github.com/nettstudio/fusepdf/raw/main/docs/fusepdf-screenshot-08.png "Screenshot of missing Ghostscript")
 
-If you see this dialog your installation is broken, or you are using a version of FusePDF shipped without Ghostscript. On Windows follow the instructions or download a FusePDF version with Ghostscript included. On macOS/Linux/BSD make sure Ghostscript (``gs``) is installed, check your package manager for more information.
+If you see this dialog your installation is broken, or you are using a version of FusePDF shipped without Ghostscript. On Windows follow the instructions or download a FusePDF version with Ghostscript included. On macOS/Linux/BSD and others make sure Ghostscript (``gs``) is installed and available in path, check your package manager for more information.
+
+For macOS [Richard Koch](https://pages.uoregon.edu/koch/) hosts Ghostscript binaries that will work with FusePDF. Else use [macports](https://ports.macports.org/port/ghostscript/) or [homebrew](https://formulae.brew.sh/formula/ghostscript) to install Ghostscript.
+
+# Roadmap
+
+## 2.2.0
+
+  * Advanced options
+    * ICC support
+    * Convert to/from RGB/CMYK
+  * Translations
+    * Norwegian
 
 # ChangeLog
 
 ## 2.1.0
 
-Released : TBA
+Released : ETA Apr 1, 2022.
 
+  * Check total pages before export (bug fix)
+  * Context menu in output
+  * Real time output preview (default on, can be disabled)
+  * UI changes
+  * Code changes
   * Support dark mode on Windows
-  * Added support for i18n
+  * Added support for translations (i18n)
   * Added documentation (not complete)
   * Export image bug fix (check format compatibility before export)
   * Windows release updated to Ghostscript 9.55
@@ -85,6 +102,8 @@ Released : Jan 24, 2021.
   * Initial release
 
 # Open Source
+
+FusePDF targets Windows as it's primary platform, but since it's open source it can be built and run on most platforms available today. We check compatibility with macOS and Linux and rely on community feedback for more exotic platform. If Qt5 and Ghostscript works on your platform, FusePDF will too.
 
 ## Introduction
 
@@ -142,6 +161,8 @@ make INSTALL_ROOT=<path_to_package_folder> install
 # License
 
 ## FusePDF
+
+Developed by Ole-André Rodlie for NettStudio AS.
 
 Copyright &copy; 2021, 2022 [NettStudio AS](https://nettstudio.no). All rights reserved.
 

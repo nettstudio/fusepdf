@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>565</width>
+    <width>909</width>
     <height>555</height>
    </rect>
   </property>
@@ -54,7 +54,7 @@
          </attribute>
          <layout class="QHBoxLayout" name="horizontalLayout_2">
           <property name="spacing">
-           <number>0</number>
+           <number>1</number>
           </property>
           <property name="leftMargin">
            <number>0</number>
@@ -125,6 +125,22 @@
               <string>Pages</string>
              </property>
             </column>
+           </widget>
+          </item>
+          <item>
+           <widget class="QListWidget" name="preview">
+            <property name="minimumSize">
+             <size>
+              <width>520</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>520</width>
+              <height>16777215</height>
+             </size>
+            </property>
            </widget>
           </item>
          </layout>
@@ -295,7 +311,7 @@
           </sizepolicy>
          </property>
          <property name="text">
-          <string>Preset</string>
+          <string>Distiller Preset</string>
          </property>
         </widget>
        </item>
@@ -393,7 +409,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>565</width>
+     <width>909</width>
      <height>25</height>
     </rect>
    </property>
@@ -420,12 +436,14 @@
     <addaction name="separator"/>
     <addaction name="actionOpen_saved_PDF"/>
     <addaction name="separator"/>
+    <addaction name="actionOutput_preview"/>
     <addaction name="actionRemember_meta_author"/>
     <addaction name="actionRemember_meta_subject"/>
     <addaction name="actionRemember_meta_title"/>
     <addaction name="separator"/>
     <addaction name="actionOpen_cache_folder"/>
     <addaction name="separator"/>
+    <addaction name="actionDocumentation"/>
     <addaction name="actionCheck_for_updates"/>
     <addaction name="actionReport_issue"/>
    </widget>
@@ -548,10 +566,10 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Enable sorting</string>
+    <string>Automatic sorting</string>
    </property>
    <property name="toolTip">
-    <string>Enable Sorting of items. Note that this will disable manual order.</string>
+    <string>Automatic sorting of items</string>
    </property>
   </action>
   <action name="actionOpen_saved_PDF">
@@ -618,7 +636,23 @@
   </action>
   <action name="actionReport_issue">
    <property name="text">
-    <string>Report issue</string>
+    <string>Support</string>
+   </property>
+   <property name="toolTip">
+    <string>Support</string>
+   </property>
+  </action>
+  <action name="actionDocumentation">
+   <property name="text">
+    <string>Documentation</string>
+   </property>
+  </action>
+  <action name="actionOutput_preview">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Output preview</string>
    </property>
   </action>
  </widget>

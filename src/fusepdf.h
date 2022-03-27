@@ -69,6 +69,9 @@
 #define FUSEPDF_RELEASES_URL "https://github.com/nettstudio/fusepdf/releases"
 #define FUSEPDF_ISSUE_URL "https://github.com/nettstudio/fusepdf/issues"
 #define FUSEPDF_GS_URL "https://www.ghostscript.com/download/gsdnld.html"
+#define FUSEPDF_GS_MAC_URL "https://pages.uoregon.edu/koch/"
+#define FUSEPDF_GS_MACPORTS_URL "https://ports.macports.org/port/ghostscript/"
+#define FUSEPDF_GS_HOMEBREW_URL "https://formulae.brew.sh/formula/ghostscript"
 
 #define FUSEPDF_PATH_ROLE Qt::UserRole + 1
 #define FUSEPDF_PAGES_ROLE Qt::UserRole + 2
@@ -160,9 +163,11 @@ public:
         int x = option.rect.x() + ((option.rect.width()/2) - (dim/2));
         int y = option.rect.y() + (option.rect.height() - dim) - (dim/2);
 
-        QPixmap pix;
-        pix.load(index.data(FUSEPDF_CHECKED_ROLE).toBool()? FUSEPDF_ICON_VALID : FUSEPDF_ICON_DENIED);
-        painter->drawPixmap(QRect(x, y, dim, dim), pix);
+        if (index.data(FUSEPDF_CHECKED_ROLE).isValid()) {
+            QPixmap pix;
+            pix.load(index.data(FUSEPDF_CHECKED_ROLE).toBool()? FUSEPDF_ICON_VALID : FUSEPDF_ICON_DENIED);
+            painter->drawPixmap(QRect(x, y, dim, dim), pix);
+        }
 
         painter->restore();
     }
@@ -188,6 +193,7 @@ signals:
                            int page);
     void requestExportPages(const QString &filename,
                             QVector<int> pages);
+    void changed();
 
 public slots:
     void setPageIcon(const QString &filename,
@@ -219,6 +225,16 @@ public:
 
 signals:
     void foundPDF(const QList<QUrl> &urls);
+    void changed();
+    void removeSelected();
+    void clearAll();
+    void add();
+
+private slots:
+    void handleContextMenu(QPoint pos);
+    void handleRemoveSelectedAction();
+    void handleClearAllAction();
+    void handleAddAction();
 
 protected:
     void dragEnterEvent(QDragEnterEvent *e) { e->acceptProposedAction(); }
@@ -247,6 +263,7 @@ signals:
     void statusMessage(const QString &message,
                        int timeout);
     void exportDone(const QString &path);
+    void generatedOutputPreview(const QStringList &images);
 
 private slots:
     void on_actionOpen_triggered();
@@ -296,14 +313,15 @@ private slots:
     const QString getPagePreview(const QString &filename,
                                  const QString &checksum,
                                  int page,
-                                 int quality = 75);
+                                 int quality = 90);
     void getPagePreviews(const QString &filename,
                          const QString &checksum,
                          int pages);
     const QString getChecksum(const QString &filename);
     const QString extractPDF(const QString &filename,
                              const QString &checksum,
-                             int page);
+                             int page,
+                             bool force = true);
     void showProgress(bool progress);
     void on_actionOpen_cache_folder_triggered();
     void on_actionShow_tooltips_triggered();
@@ -334,6 +352,15 @@ private slots:
     void on_tabs_currentChanged(int index);
     void handleTabButtonClicked(bool checked);
     bool hasDarkMode();
+    void generateOutputPreview();
+    void handleOutputPagesChanged();
+    void showOutputPreview(const QStringList &images);
+    void handleOutputRemoveSelected();
+    void handleOutputClearAll();
+    void handleOutputAdd();
+    void on_actionDocumentation_triggered();
+    void on_actionOutput_preview_triggered();
+    int pagesToExport();
 
 private:
     Ui::FusePDF *ui;

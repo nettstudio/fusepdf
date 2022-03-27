@@ -217,6 +217,7 @@ void PagesListWidget::handleItemClicked(QListWidgetItem *item)
     } else {
         item->setData(FUSEPDF_CHECKED_ROLE, true);
     }
+    emit changed();
 }
 
 void PagesListWidget::handleContextMenu(QPoint pos)
@@ -268,6 +269,7 @@ void PagesListWidget::setCheckedState(bool state)
         if (!item) { continue; }
         item->setData(FUSEPDF_CHECKED_ROLE, state);
     }
+    emit changed();
 }
 
 void PagesListWidget::exportSelectedPage()
@@ -295,10 +297,56 @@ FilesTreeWidget::FilesTreeWidget(QWidget *parent):
     setDragDropMode(QAbstractItemView::InternalMove);
     setDropIndicatorShown(false);
     setIconSize(QSize(32, 32));
+
+    setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(this, SIGNAL(customContextMenuRequested(QPoint)),
+            this, SLOT(handleContextMenu(QPoint)));
+}
+
+void FilesTreeWidget::handleContextMenu(QPoint pos)
+{
+    QMenu menu;
+
+    QAction removeSelectedAction;
+    QAction clearAllAction;
+    QAction addAction;
+
+    removeSelectedAction.setText(tr("Remove"));
+    clearAllAction.setText(tr("Clear"));
+    addAction.setText(tr("Add"));
+
+    connect(&removeSelectedAction, SIGNAL(triggered(bool)),
+            this, SLOT(handleRemoveSelectedAction()));
+    connect(&clearAllAction, SIGNAL(triggered(bool)),
+            this, SLOT(handleClearAllAction()));
+    connect(&addAction, SIGNAL(triggered(bool)),
+            this, SLOT(handleAddAction()));
+
+    menu.addAction(&addAction);
+    if (selectedItems().size() > 0) { menu.addAction(&removeSelectedAction); }
+    if (topLevelItemCount() > 0) { menu.addAction(&clearAllAction); }
+
+    menu.exec(viewport()->mapToGlobal(pos));
+}
+
+void FilesTreeWidget::handleRemoveSelectedAction()
+{
+    emit removeSelected();
+}
+
+void FilesTreeWidget::handleClearAllAction()
+{
+    emit clearAll();
+}
+
+void FilesTreeWidget::handleAddAction()
+{
+    emit add();
 }
 
 void FilesTreeWidget::dropEvent(QDropEvent *e)
 {
+    emit changed();
     if (e->mimeData()->hasUrls()) { emit foundPDF(e->mimeData()->urls()); }
     else { QTreeWidget::dropEvent(e); }
 }
@@ -355,6 +403,14 @@ FusePDF::FusePDF(QWidget *parent)
         palette.setColor(QPalette::Disabled, QPalette::Text, Qt::darkGray);
         palette.setColor(QPalette::Disabled, QPalette::ButtonText, Qt::darkGray);
         qApp->setPalette(palette);
+
+        QPalette previewPalette  = ui->preview->palette();
+        previewPalette.setColor(QPalette::Base, QColor(30, 30, 30));
+        ui->preview->setPalette(previewPalette);
+    } else {
+        QPalette previewPalette  = ui->preview->palette();
+        previewPalette.setColor(QPalette::Base, Qt::lightGray);
+        ui->preview->setPalette(previewPalette);
     }
     QPalette mainPalette = qApp->palette();
     mainPalette.setColor(QPalette::Highlight, QColor(203, 9, 0)); // #cb0900
@@ -400,6 +456,14 @@ FusePDF::FusePDF(QWidget *parent)
             this, SLOT(handleProcessError(QProcess::ProcessError)));
     connect(ui->inputs, SIGNAL(foundPDF(QList<QUrl>)),
             this, SLOT(handleFoundPDF(QList<QUrl>)));
+    connect(ui->inputs, SIGNAL(changed()),
+            this, SLOT(handleOutputPagesChanged()));
+    connect(ui->inputs, SIGNAL(removeSelected()),
+            this, SLOT(handleOutputRemoveSelected()));
+    connect(ui->inputs, SIGNAL(clearAll()),
+            this, SLOT(handleOutputClearAll()));
+    connect(ui->inputs, SIGNAL(add()),
+            this, SLOT(handleOutputAdd()));
     connect(this, SIGNAL(commandReady(QString,QString)),
             this, SLOT(runCommand(QString,QString)));
     connect(this, SIGNAL(statusMessage(QString,int)),
@@ -435,10 +499,12 @@ void FusePDF::on_actionOpen_triggered()
 
 void FusePDF::on_actionSave_triggered()
 {
-    if (ui->inputs->topLevelItemCount() == 0) {
+    int totalPages = pagesToExport();
+    qDebug() << "total pages to export" << totalPages;
+    if (ui->inputs->topLevelItemCount() == 0 || totalPages < 1) {
         QMessageBox::warning(this,
-                             tr("No documents"),
-                             tr("No documents to merge, please add some documents before trying to save."));
+                             tr("No documents/pages"),
+                             tr("No documents/pages to merge, please add some documents or enable some pages before trying to save."));
         return;
     }
     QString file = QFileDialog::getSaveFileName(this,
@@ -462,6 +528,7 @@ void FusePDF::on_actionAbout_triggered()
     QMessageBox::about(this,
                        QString("FusePDF"),
                        QString("<h2>FusePDF %1</h2>"
+                               "<p>Developed by <a href=\"https://github.com/rodlie\">Ole-André Rodlie</a> for NettStudio AS.</p>"
                                "<p>Copyright &copy; 2021, 2022 <a href='https://nettstudio.no'>NettStudio AS</a>. All rights reserved.</p>"
                                "<p style=\"font-size:small;\">This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 3 of the License, or (at your option) any later version.</p>"
                                "<p style=\"font-size:small;\">This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.</p>"
@@ -505,8 +572,9 @@ const QString FusePDF::makeCommand(const QString &filename)
     for (int i = 0; i < ui->inputs->topLevelItemCount(); ++i) {
         QString filename = ui->inputs->topLevelItem(i)->data(0, FUSEPDF_PATH_ROLE).toString();
         PagesListWidget *tab = getTab(filename);
+        int enabledPages = tab? tab->getPagesState(true).size() : 0;
         bool modified = false;
-        if (tab && tab->isModified() && tab->getPagesState(true).size() > 0) {
+        if (tab && tab->isModified() && enabledPages > 0) {
             modified = true;
             QVector<int> pages = tab->getPagesState(true);
             for (int i = 0; i < pages.count(); ++i) {
@@ -516,6 +584,7 @@ const QString FusePDF::makeCommand(const QString &filename)
                 }
             }
         }
+        if (enabledPages < 1) { continue; }
         if (!modified) {
             command.append(QString(" \"%1\"").arg(filename));
         }
@@ -576,7 +645,7 @@ void FusePDF::runCommand(const QString &filename,
         return;
     }
     _output = filename;
-    qDebug() << "runCommand" << command;
+    qDebug() << command;
     _proc->start(command);
 }
 
@@ -645,6 +714,20 @@ void FusePDF::populateUI()
     ui->preset->addItem(docIcon, tr("Screen"), "Screen");
     ui->preset->addItem(docIcon, tr("Printer"), "Printer");
     ui->preset->blockSignals(false);
+
+    ui->preview->hide();
+    ui->preview->setViewMode(QListView::IconMode);
+    ui->preview->setIconSize(QSize(FUSEPDF_PAGE_ICON_SIZE, FUSEPDF_PAGE_ICON_SIZE));
+    ui->preview->setUniformItemSizes(true);
+    ui->preview->setWrapping(true);
+    ui->preview->setResizeMode(QListView::Adjust);
+    ui->preview->setFrameShape(QFrame::NoFrame);
+    ui->preview->setContextMenuPolicy(Qt::CustomContextMenu);
+    ui->preview->setItemDelegate(new PageDelegate(this));
+    ui->preview->setSpacing(10);
+
+    connect(this, SIGNAL(generatedOutputPreview(QStringList)),
+            this, SLOT(showOutputPreview(QStringList)));
 }
 
 void FusePDF::loadSettings()
@@ -724,6 +807,8 @@ void FusePDF::clearInput(bool askFirst)
                      tr("Output"));
     ui->cmd->clear();
     _output.clear();
+    ui->preview->clear();
+    ui->preview->hide();
 }
 
 const QString FusePDF::findGhost()
@@ -786,17 +871,26 @@ void FusePDF::handleFoundPDF(const QList<QUrl> &urls)
         ui->tabs->addTab(new PagesListWidget(this, info.filePath(), checksum, pages),
                          QIcon(QIcon::fromTheme(HICOLOR_ICON_DOC, QIcon(FUSEPDF_ICON_DOC))),
                          info.fileName());
+        QPalette pal = getTab(info.filePath())->palette();
+        if (hasDarkMode()) { pal.setColor(QPalette::Base, QColor(30, 30, 30)); }
+        else { pal.setColor(QPalette::Base, Qt::lightGray); }
+        getTab(info.filePath())->setPalette(pal);
         connect(this, SIGNAL(foundPagePreview(QString,QString,QString,int)),
                 getTab(info.filePath()), SLOT(setPageIcon(QString,QString,QString,int)));
         connect(getTab(info.filePath()), SIGNAL(requestExportPage(QString,int)),
                 this, SLOT(handleExport(QString,int)));
         connect(getTab(info.filePath()), SIGNAL(requestExportPages(QString,QVector<int>)),
                 this, SLOT(handleExports(QString,QVector<int>)));
+        connect(getTab(info.filePath()), SIGNAL(changed()),
+                this, SLOT(handleOutputPagesChanged()));
         QtConcurrent::run(this,
                           &FusePDF::getPagePreviews,
                           info.filePath(),
                           checksum,
                           pages);
+        if (ui->actionOutput_preview->isChecked()) {
+            QtConcurrent::run(this, &FusePDF::generateOutputPreview);
+        }
     }
 }
 
@@ -856,6 +950,7 @@ void FusePDF::loadOptions()
     }
     ui->preset->blockSignals(false);
 
+    ui->actionOutput_preview->setChecked(settings.value("outputPreview", true).toBool());
     ui->actionShow_log->setChecked(settings.value("showLog", false).toBool());
     ui->actionAuto_Sort->setChecked(settings.value("autoSort", false).toBool());
     ui->actionRemember_meta_author->setChecked(settings.value("metaAuthor", true).toBool());
@@ -902,6 +997,7 @@ void FusePDF::saveOptions()
 {
     QSettings settings;
     settings.beginGroup("options");
+    settings.setValue("outputPreview", ui->actionOutput_preview->isChecked());
     settings.setValue("showLog", ui->actionShow_log->isChecked());
     settings.setValue("autoSort", ui->actionAuto_Sort->isChecked());
     settings.setValue("openSavedPDF", ui->actionOpen_saved_PDF->isChecked());
@@ -929,13 +1025,22 @@ bool FusePDF::isNewVersion()
 bool FusePDF::missingGhost()
 {
     if (findGhost().isEmpty()) {
+        QString mac = QString(". %1 <a href=\"%2\">uoregon.edu</a>, %3 <a href=\"%4\">macports</a> %5 <a href=\"%6\">homebrew</a> %7 Ghostscript")
+                      .arg(tr("On macOS you can find installers from"),
+                           FUSEPDF_GS_MAC_URL,
+                           tr("or use"),
+                           FUSEPDF_GS_MACPORTS_URL,
+                           tr("or"),
+                           FUSEPDF_GS_HOMEBREW_URL,
+                           tr("to install"));
         QMessageBox::warning(this,
                              QString("%1 Ghostscript").arg(tr("Missing")),
-                             QString("%1 Ghostscript, %2 <a href=\"%4\">ghostscript.com</a> %3.")
+                             QString("%1 Ghostscript, %2 <a href=\"%4\">ghostscript.com</a> %3%5.")
                              .arg(tr("Unable to find"),
-                                  tr("please download the latest installer from"),
+                                  tr("please download the latest Windows installer from"),
                                   tr("and install it before running this application again"),
-                                  FUSEPDF_GS_URL));
+                                  FUSEPDF_GS_URL,
+                                  mac));
         return true;
     }
     return false;
@@ -972,6 +1077,8 @@ void FusePDF::deleteDocumentItem()
     if (!tab) { return; }
     ui->tabs->removeTab(index);
     tab->deleteLater();
+
+    handleOutputPagesChanged();
 }
 
 QByteArray FusePDF::toUtf16Hex(QString str)
@@ -1170,14 +1277,16 @@ const QString FusePDF::getChecksum(const QString &filename)
 
 const QString FusePDF::extractPDF(const QString &filename,
                                   const QString &checksum,
-                                  int page)
+                                  int page,
+                                  bool force)
 {
-    emit statusMessage(tr("Extracting page %1 from %2 ...").arg(page).arg(QFileInfo(filename).fileName()), 1000);
+    emit statusMessage(tr("Extracting pages ..."), 1000);
     QString cache = getCachePath();
     QString command = findGhost();
 
     if (command.isEmpty() || cache.isEmpty()) { return QString(); }
     cache = QString(FUSEPDF_CACHE_PDF).arg(cache, checksum, QString::number(page));
+    if (!force && QFile::exists(cache) && isPDF(cache)) { return cache; }
 #ifdef Q_OS_WIN
     command = QString("\"%1\"").arg(findGhost());
 #endif
@@ -1213,24 +1322,24 @@ void FusePDF::on_actionShow_tooltips_triggered()
 
 void FusePDF::showTooltips(bool show)
 {
-    ui->metaTitleLabel->setToolTip(show?tr("Set document title"):QString());
+    ui->metaTitleLabel->setToolTip(show?tr("Set custom document title"):QString());
     ui->metaTitle->setToolTip(show?ui->metaTitleLabel->toolTip():QString());
-    ui->metaAuthorLabel->setToolTip(show?tr("Set document author"):QString());
+    ui->metaAuthorLabel->setToolTip(show?tr("Set custom document author"):QString());
     ui->metaAuthor->setToolTip(show?ui->metaAuthorLabel->toolTip():QString());
-    ui->metaSubjectLabel->setToolTip(show?tr("Set document subject"):QString());
+    ui->metaSubjectLabel->setToolTip(show?tr("Set custom document subject"):QString());
     ui->metaSubject->setToolTip(show?ui->metaSubjectLabel->toolTip():QString());
     ui->presetLabel->setToolTip(show?tr("Distiller presets\n\n"
                                         "- DEFAULT: selects output intended to be useful across a wide variety of uses, possibly at the expense of a larger output file.\n"
-                                        "- PREPRESS: selects output similar to Acrobat Distiller \"Prepress Optimized\" (up to version X) setting.\n"
-                                        "- EBOOK: selects medium-resolution output similar to the Acrobat Distiller (up to version X) \"eBook\" setting.\n"
-                                        "- SCREEN: selects low-resolution output similar to the Acrobat Distiller (up to version X) \"Screen Optimized\" setting.\n"
-                                        "- PRINTER: selects output similar to the Acrobat Distiller \"Print Optimized\" (up to version X) setting."):QString());
+                                        "- PREPRESS: selects output similar to Acrobat Distiller \"Prepress Optimized\" setting.\n"
+                                        "- EBOOK: selects medium-resolution output similar to the Acrobat Distiller \"eBook\" setting.\n"
+                                        "- SCREEN: selects low-resolution output similar to the Acrobat Distiller \"Screen Optimized\" setting.\n"
+                                        "- PRINTER: selects output similar to the Acrobat Distiller \"Print Optimized\" setting."):QString());
     ui->preset->setToolTip(show?ui->presetLabel->toolTip():QString());
     ui->compatLabel->setToolTip(show?tr("Select the PDF version this document should be compatible with."):QString());
     ui->compat->setToolTip(show?ui->compatLabel->toolTip():QString());
-    ui->inputs->setToolTip(show?tr("Drag and drop PDF documents you want to merge here. You can re-arrange after adding them (if sorting is disabled).\n\n"
+    /*ui->inputs->setToolTip(show?tr("Drag and drop PDF documents you want to merge here. You can re-arrange after adding them (if sorting is disabled).\n\n"
                                    "Note that the first document will define the paper size on the final output.\n\n"
-                                   "You can remove a document with the DEL key."):QString());
+                                   "You can remove a document with the DEL key."):QString());*/
 }
 
 void FusePDF::on_actionCheck_for_updates_triggered()
@@ -1468,3 +1577,138 @@ bool FusePDF::hasDarkMode()
     return false;
 }
 
+void FusePDF::generateOutputPreview()
+{
+    QString cache = getCachePath();
+    if (cache.isEmpty()) { return; }
+    QStringList docs, images;
+    for (int i = 0; i < ui->inputs->topLevelItemCount(); ++i) {
+        QString filename = ui->inputs->topLevelItem(i)->data(0, FUSEPDF_PATH_ROLE).toString();
+        PagesListWidget *tab = getTab(filename);
+        bool modified = false;
+        int enabledPages = tab? tab->getPagesState(true).size() : 0;
+        if (tab && tab->isModified() && enabledPages > 0) {
+            modified = true;
+            QVector<int> pages = tab->getPagesState(true);
+            for (int i = 0; i < pages.count(); ++i) {
+                QString extracted = extractPDF(filename, getChecksum(filename), pages.at(i), false);
+                if (!extracted.isEmpty()) {
+                    docs << extracted;
+                    QString checksum = getChecksum(filename);
+                    QString image = QString(FUSEPDF_CACHE_JPEG).arg(cache, checksum, QString::number(pages.at(i)));
+                    if (!QFile::exists(image)) { image = getPagePreview(filename, checksum, i); }
+                    if (!image.isEmpty()) { images << image; }
+                }
+            }
+        }
+        if (enabledPages < 1) { continue; }
+        if (!modified) {
+            docs << filename;
+            int pages = getPageCount(filename);
+            QString checksum = getChecksum(filename);
+            for (int i = 1; i <= pages; ++i) {
+                QString image = QString(FUSEPDF_CACHE_JPEG).arg(cache, checksum, QString::number(i));
+                if (!QFile::exists(image)) { image = getPagePreview(filename, checksum, i); }
+                if (!image.isEmpty() && !images.contains(image)) { images << image; }
+            }
+        }
+    }
+    if (images.size() > 0) { emit generatedOutputPreview(images); }
+}
+
+void FusePDF::handleOutputPagesChanged()
+{
+    if (!ui->actionOutput_preview->isChecked()) { return; }
+    int totalPages = pagesToExport();
+    if (totalPages < 1) {
+        ui->preview->clear();
+        ui->preview->hide();
+        return;
+    }
+    QtConcurrent::run(this, &FusePDF::generateOutputPreview);
+}
+
+void FusePDF::showOutputPreview(const QStringList &images)
+{
+    if (!ui->actionOutput_preview->isChecked()) { return; }
+    if (images.size() < 1) { return; }
+    ui->preview->clear();
+    ui->preview->show();
+    for (int i = 0; i < images.size(); ++i) {
+        QListWidgetItem *item = new QListWidgetItem(QIcon(FUSEPDF_ICON_LOGO),
+                                                    QString(),
+                                                    ui->preview);
+        item->setFlags(Qt::ItemIsEnabled);
+        QPixmap pix(FUSEPDF_PAGE_ICON_SIZE, FUSEPDF_PAGE_ICON_SIZE);
+        pix.fill(QColor(Qt::transparent));
+        QPainter p(&pix);
+        QPixmap ppix = QPixmap::fromImage(QImage(images.at(i))).scaledToHeight(FUSEPDF_PAGE_ICON_SIZE,
+                                                                               Qt::SmoothTransformation);
+        ppix = ppix.copy(0, 0, FUSEPDF_PAGE_ICON_SIZE, FUSEPDF_PAGE_ICON_SIZE);
+        QPainter pp(&ppix);
+        QPainterPath ppath;
+        ppath.addRect(0, 0, ppix.width(), ppix.height());
+        QPen ppen(Qt::black, 2);
+        pp.setPen(ppen);
+        pp.drawPath(ppath);
+        p.drawPixmap((pix.width()/2)-(ppix.width()/2), 0, ppix);
+        item->setIcon(pix);
+    }
+}
+
+void FusePDF::handleOutputRemoveSelected()
+{
+    deleteDocumentItem();
+}
+
+void FusePDF::handleOutputClearAll()
+{
+    clearInput(true);
+}
+
+void FusePDF::handleOutputAdd()
+{
+    on_actionOpen_triggered();
+}
+
+
+void FusePDF::on_actionDocumentation_triggered()
+{
+    QString url = "https://fusepdf.no";
+    QString readme = QString("%1/README.pdf").arg(qApp->applicationDirPath());
+    if (QFile::exists(readme)) { url = readme; }
+    QDesktopServices::openUrl(QUrl::fromUserInput(url));
+}
+
+
+void FusePDF::on_actionOutput_preview_triggered()
+{
+    if (ui->actionOutput_preview->isChecked()) {
+        ui->preview->clear();
+        handleOutputPagesChanged();
+    } else {
+        ui->preview->clear();
+        ui->preview->hide();
+    }
+}
+
+int FusePDF::pagesToExport()
+{
+    int result = 0;
+    for (int i = 0; i < ui->inputs->topLevelItemCount(); ++i) {
+        QString filename = ui->inputs->topLevelItem(i)->data(0, FUSEPDF_PATH_ROLE).toString();
+        PagesListWidget *tab = getTab(filename);
+        bool modified = false;
+        int enabledPages = tab? tab->getPagesState(true).size() : 0;
+        if (tab && tab->isModified() && enabledPages > 0) {
+            modified = true;
+            QVector<int> pages = tab->getPagesState(true);
+            for (int i = 0; i < pages.count(); ++i) { result++; }
+        }
+        if (enabledPages < 1) { continue; }
+        if (!modified) {
+            result += ui->inputs->topLevelItem(i)->text(1).toInt();
+        }
+    }
+    return result;
+}
