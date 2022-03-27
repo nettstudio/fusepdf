@@ -384,6 +384,10 @@ FusePDF::FusePDF(QWidget *parent)
     ui->toolBar->addWidget(ui->compatLabel);
     ui->toolBar->addWidget(ui->compat);
 
+    QPalette previewPalette  = ui->preview->palette();
+    previewPalette.setColor(QPalette::Base, hasDarkMode() ? QColor(30, 30, 30) : Qt::lightGray);
+    ui->preview->setPalette(previewPalette);
+
     // don't set palette on macos as it breaks dark mode
 #ifndef Q_OS_MAC
     if (hasDarkMode()) {
@@ -403,14 +407,6 @@ FusePDF::FusePDF(QWidget *parent)
         palette.setColor(QPalette::Disabled, QPalette::Text, Qt::darkGray);
         palette.setColor(QPalette::Disabled, QPalette::ButtonText, Qt::darkGray);
         qApp->setPalette(palette);
-
-        QPalette previewPalette  = ui->preview->palette();
-        previewPalette.setColor(QPalette::Base, QColor(30, 30, 30));
-        ui->preview->setPalette(previewPalette);
-    } else {
-        QPalette previewPalette  = ui->preview->palette();
-        previewPalette.setColor(QPalette::Base, Qt::lightGray);
-        ui->preview->setPalette(previewPalette);
     }
     QPalette mainPalette = qApp->palette();
     mainPalette.setColor(QPalette::Highlight, QColor(203, 9, 0)); // #cb0900
@@ -717,7 +713,7 @@ void FusePDF::populateUI()
 
     ui->preview->hide();
     ui->preview->setViewMode(QListView::IconMode);
-    ui->preview->setIconSize(QSize(FUSEPDF_PAGE_ICON_SIZE, FUSEPDF_PAGE_ICON_SIZE));
+    ui->preview->setIconSize(QSize(310, 310));
     ui->preview->setUniformItemSizes(true);
     ui->preview->setWrapping(true);
     ui->preview->setResizeMode(QListView::Adjust);

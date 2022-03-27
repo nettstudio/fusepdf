@@ -131,13 +131,13 @@
            <widget class="QListWidget" name="preview">
             <property name="minimumSize">
              <size>
-              <width>520</width>
+              <width>340</width>
               <height>0</height>
              </size>
             </property>
             <property name="maximumSize">
              <size>
-              <width>520</width>
+              <width>340</width>
               <height>16777215</height>
              </size>
             </property>
@@ -175,7 +175,7 @@
      <widget class="QWidget" name="widget" native="true">
       <property name="maximumSize">
        <size>
-        <width>270</width>
+        <width>250</width>
         <height>16777215</height>
        </size>
       </property>
@@ -410,7 +410,7 @@
      <x>0</x>
      <y>0</y>
      <width>909</width>
-     <height>25</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
