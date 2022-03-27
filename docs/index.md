@@ -178,6 +178,11 @@ The Creative Commons CC0 Public Domain Dedication waives copyright interest in a
 
 ## Qt
 
+Source code:
+
+ * [qtbase](https://mirrors.dotsrc.org/qtproject/archive/qt/5.12/5.12.12/submodules/qtbase-everywhere-src-5.12.12.zip) 5.12.12
+ * [qttools](https://mirrors.dotsrc.org/qtproject/archive/qt/5.12/5.12.12/submodules/qttools-everywhere-src-5.12.12.zip) 5.12.12
+
 Copyright &copy; 2020 The Qt Company Ltd and other contributors.
 
 Qt and the Qt logo are trademarks of The Qt Company Ltd.
@@ -189,6 +194,10 @@ This program is distributed in the hope that it will be useful, but WITHOUT ANY 
 You should have received a copy of the GNU General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ## GPL Ghostscript
+
+Source code:
+
+ * [Ghostscript](https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs9550/ghostscript-9.55.0.tar.xz) 9.55
 
 Copyright &copy; 2000-2021 Artifex Software, Inc.  All rights reserved.
 
