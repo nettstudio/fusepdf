@@ -66,6 +66,7 @@ REM     curl --url %GS_URL% -o "%TOOLS%\%GS_EXE%"
 REM )
 
 if exist "%TOOLS%\gs.zip" (
+    cd "%CWD%\build"
     7z x "%TOOLS%\gs.zip"
     MOVE gs FusePDF-%FUSEPDF%-x64\
 )
