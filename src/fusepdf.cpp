@@ -1020,13 +1020,22 @@ bool FusePDF::isNewVersion()
 bool FusePDF::missingGhost()
 {
     if (findGhost().isEmpty()) {
+        QString mac = QString(". %1 <a href=\"%2\">uoregon.edu</a>, %3 <a href=\"%4\">macports</a> %5 <a href=\"%6\">homebrew</a> %7 Ghostscript")
+                      .arg(tr("On macOS you can find installers from"),
+                           FUSEPDF_GS_MAC_URL,
+                           tr("or use"),
+                           FUSEPDF_GS_MACPORTS_URL,
+                           tr("or"),
+                           FUSEPDF_GS_HOMEBREW_URL,
+                           tr("to install"));
         QMessageBox::warning(this,
                              QString("%1 Ghostscript").arg(tr("Missing")),
-                             QString("%1 Ghostscript, %2 <a href=\"%4\">ghostscript.com</a> %3.")
+                             QString("%1 Ghostscript, %2 <a href=\"%4\">ghostscript.com</a> %3%5.")
                              .arg(tr("Unable to find"),
-                                  tr("please download the latest installer from"),
+                                  tr("please download the latest Windows installer from"),
                                   tr("and install it before running this application again"),
-                                  FUSEPDF_GS_URL));
+                                  FUSEPDF_GS_URL,
+                                  mac));
         return true;
     }
     return false;

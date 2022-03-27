@@ -69,6 +69,9 @@
 #define FUSEPDF_RELEASES_URL "https://github.com/nettstudio/fusepdf/releases"
 #define FUSEPDF_ISSUE_URL "https://github.com/nettstudio/fusepdf/issues"
 #define FUSEPDF_GS_URL "https://www.ghostscript.com/download/gsdnld.html"
+#define FUSEPDF_GS_MAC_URL "https://pages.uoregon.edu/koch/"
+#define FUSEPDF_GS_MACPORTS_URL "https://ports.macports.org/port/ghostscript/"
+#define FUSEPDF_GS_HOMEBREW_URL "https://formulae.brew.sh/formula/ghostscript"
 
 #define FUSEPDF_PATH_ROLE Qt::UserRole + 1
 #define FUSEPDF_PAGES_ROLE Qt::UserRole + 2
