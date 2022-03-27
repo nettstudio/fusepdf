@@ -82,3 +82,5 @@ gs
 gs.zip
 gs*.zip
 qt
+pandoc-*
+
