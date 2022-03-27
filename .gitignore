@@ -78,4 +78,7 @@ mxe
 *.iss
 build
 pandoc
-
+gs
+gs.zip
+gs*.zip
+qt
