@@ -433,6 +433,7 @@
     <addaction name="actionShow_log"/>
     <addaction name="actionShow_tooltips"/>
     <addaction name="actionAuto_Sort"/>
+    <addaction name="actionSupport_dark_mode"/>
     <addaction name="separator"/>
     <addaction name="actionOpen_saved_PDF"/>
     <addaction name="separator"/>
