@@ -655,6 +655,14 @@
     <string>Output preview</string>
    </property>
   </action>
+  <action name="actionSupport_dark_mode">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Support dark mode</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>

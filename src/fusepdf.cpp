@@ -384,6 +384,10 @@ FusePDF::FusePDF(QWidget *parent)
     ui->toolBar->addWidget(ui->compatLabel);
     ui->toolBar->addWidget(ui->compat);
 
+#ifndef Q_OS_WIN
+    ui->actionSupport_dark_mode->setVisible(false);
+#endif
+
     // don't set palette on macos as it breaks dark mode
 #ifndef Q_OS_MAC
     QPalette previewPalette  = ui->preview->palette();
@@ -948,6 +952,9 @@ void FusePDF::loadOptions()
     }
     ui->preset->blockSignals(false);
 
+#ifdef Q_OS_WIN
+    ui->actionSupport_dark_mode->setChecked(settings.value("supportDarkMode", true).toBool());
+#endif
     ui->actionOutput_preview->setChecked(settings.value("outputPreview", true).toBool());
     ui->actionShow_log->setChecked(settings.value("showLog", false).toBool());
     ui->actionAuto_Sort->setChecked(settings.value("autoSort", false).toBool());
@@ -995,6 +1002,10 @@ void FusePDF::saveOptions()
 {
     QSettings settings;
     settings.beginGroup("options");
+
+#ifdef Q_OS_WIN
+    settings.setValue("supportDarkMode", ui->actionSupport_dark_mode->isChecked());
+#endif
     settings.setValue("outputPreview", ui->actionOutput_preview->isChecked());
     settings.setValue("showLog", ui->actionShow_log->isChecked());
     settings.setValue("autoSort", ui->actionAuto_Sort->isChecked());
@@ -1569,6 +1580,11 @@ void FusePDF::handleTabButtonClicked(bool checked)
 bool FusePDF::hasDarkMode()
 {
 #ifdef Q_OS_WIN
+    QSettings options;
+    options.beginGroup("options");
+    bool supportDarkMode = options.value("supportDarkMode", true).toBool();
+    options.endGroup();
+    if (!supportDarkMode) { return false; }
     QSettings settings("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize", QSettings::NativeFormat);
     if (settings.value("AppsUseLightTheme") == 0) { return true; }
 #endif
