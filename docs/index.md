@@ -60,16 +60,16 @@ For macOS [Richard Koch](https://pages.uoregon.edu/koch/) hosts Ghostscript bina
 
 ## 2.1.0
 
-Released : ETA Apr 1, 2022.
+Released : Apr 1, 2022.
 
   * Check total pages before export (bug fix)
   * Context menu in output
   * Real time output preview (default on, can be disabled)
   * UI changes
   * Code changes
-  * Support dark mode on Windows
+  * Support dark mode on Windows (can be disabled)
   * Added support for translations (i18n)
-  * Added documentation (not complete)
+  * Added basic documentation (not complete)
   * Export image bug fix (check format compatibility before export)
   * Windows release updated to Ghostscript 9.55
   * Windows release updated to Qt 5.12.12
