@@ -7,7 +7,7 @@ call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary
 
 set CWD=%cd%
 set TOOLS=%CWD%\tools
-set FUSEPDF=2.1.0
+set FUSEPDF=2.2.0
 set QT_MAJOR=5
 set QT_MINOR=12
 set QT_PATCH=12

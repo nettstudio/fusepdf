@@ -48,8 +48,6 @@ For macOS [Richard Koch](https://pages.uoregon.edu/koch/) hosts Ghostscript bina
 
 # Roadmap
 
-## 2.2.0
-
   * Advanced options
     * ICC support
     * Convert to/from RGB/CMYK
@@ -57,6 +55,10 @@ For macOS [Richard Koch](https://pages.uoregon.edu/koch/) hosts Ghostscript bina
     * Norwegian
 
 # ChangeLog
+
+## 2.2.0
+
+N/A
 
 ## 2.1.0
 
