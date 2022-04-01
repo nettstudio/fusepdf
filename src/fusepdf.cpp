@@ -719,7 +719,6 @@ void FusePDF::populateUI()
     ui->preset->addItem(docIcon, tr("Printer"), "Printer");
     ui->preset->blockSignals(false);
 
-    ui->preview->hide();
     ui->preview->setViewMode(QListView::IconMode);
     ui->preview->setIconSize(QSize(310, 310));
     ui->preview->setUniformItemSizes(true);
@@ -812,7 +811,6 @@ void FusePDF::clearInput(bool askFirst)
     ui->cmd->clear();
     _output.clear();
     ui->preview->clear();
-    ui->preview->hide();
 }
 
 const QString FusePDF::findGhost()
@@ -1641,7 +1639,6 @@ void FusePDF::handleOutputPagesChanged()
     int totalPages = pagesToExport();
     if (totalPages < 1) {
         ui->preview->clear();
-        ui->preview->hide();
         return;
     }
     QtConcurrent::run(this, &FusePDF::generateOutputPreview);
@@ -1707,7 +1704,6 @@ void FusePDF::on_actionOutput_preview_triggered()
         handleOutputPagesChanged();
     } else {
         ui->preview->clear();
-        ui->preview->hide();
     }
 }
 
