@@ -235,6 +235,7 @@ private slots:
     void handleRemoveSelectedAction();
     void handleClearAllAction();
     void handleAddAction();
+    void delayedChanged();
 
 protected:
     void dragEnterEvent(QDragEnterEvent *e) { e->acceptProposedAction(); }

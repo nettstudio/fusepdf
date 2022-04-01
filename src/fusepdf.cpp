@@ -344,9 +344,14 @@ void FilesTreeWidget::handleAddAction()
     emit add();
 }
 
-void FilesTreeWidget::dropEvent(QDropEvent *e)
+void FilesTreeWidget::delayedChanged()
 {
     emit changed();
+}
+
+void FilesTreeWidget::dropEvent(QDropEvent *e)
+{
+    QTimer::singleShot(10, this, SLOT(delayedChanged()));
     if (e->mimeData()->hasUrls()) { emit foundPDF(e->mimeData()->urls()); }
     else { QTreeWidget::dropEvent(e); }
 }
