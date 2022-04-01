@@ -699,14 +699,14 @@ void FusePDF::populateUI()
 
     ui->compat->blockSignals(true);
     ui->compat->clear();
-    ui->compat->addItem(docIcon, QString("PDF %1 1.0").arg(versionString), "1.0");
-    ui->compat->addItem(docIcon, QString("PDF %1 1.1").arg(versionString), "1.1");
-    ui->compat->addItem(docIcon, QString("PDF %1 1.2").arg(versionString), "1.2");
-    ui->compat->addItem(docIcon, QString("PDF %1 1.3").arg(versionString), "1.3");
-    ui->compat->addItem(docIcon, QString("PDF %1 1.4").arg(versionString), "1.4");
-    ui->compat->addItem(docIcon, QString("PDF %1 1.5").arg(versionString), "1.5");
-    ui->compat->addItem(docIcon, QString("PDF %1 1.6").arg(versionString), "1.6");
-    ui->compat->addItem(docIcon, QString("PDF %1 1.7").arg(versionString), "1.7");
+    ui->compat->addItem(docIcon, QString("PDF %1 1.0 (Acrobat 1.0)").arg(versionString), "1.0");
+    ui->compat->addItem(docIcon, QString("PDF %1 1.1 (Acrobat 2.0)").arg(versionString), "1.1");
+    ui->compat->addItem(docIcon, QString("PDF %1 1.2 (Acrobat 3.0)").arg(versionString), "1.2");
+    ui->compat->addItem(docIcon, QString("PDF %1 1.3 (Acrobat 4.0)").arg(versionString), "1.3");
+    ui->compat->addItem(docIcon, QString("PDF %1 1.4 (Acrobat 5.0)").arg(versionString), "1.4");
+    ui->compat->addItem(docIcon, QString("PDF %1 1.5 (Acrobat 6.0)").arg(versionString), "1.5");
+    ui->compat->addItem(docIcon, QString("PDF %1 1.6 (Acrobat 7.0)").arg(versionString), "1.6");
+    ui->compat->addItem(docIcon, QString("PDF %1 1.7 (Acrobat 8.0)").arg(versionString), "1.7");
     ui->compat->blockSignals(false);
 
     ui->preset->blockSignals(true);
