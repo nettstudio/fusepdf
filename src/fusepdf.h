@@ -73,6 +73,10 @@
 #define FUSEPDF_GS_MACPORTS_URL "https://ports.macports.org/port/ghostscript/"
 #define FUSEPDF_GS_HOMEBREW_URL "https://formulae.brew.sh/formula/ghostscript"
 
+#define FUSEPDF_TOOLBOX_PREVIEW 0
+#define FUSEPDF_TOOLBOX_OUTPUT 1
+#define FUSEPDF_TOOLBOX_DOC 2
+
 #define FUSEPDF_PATH_ROLE Qt::UserRole + 1
 #define FUSEPDF_PAGES_ROLE Qt::UserRole + 2
 #define FUSEPDF_PAGE_ROLE Qt::UserRole + 3
@@ -112,6 +116,7 @@
 #define FUSEPDF_GS_EXPORT " -q -sDEVICE=%4 -o \"%2\" -dFirstPage=%3 -dLastPage=%3 -dTextAlphaBits=4 -dGraphicsAlphaBits=4 -r%5x%5 \"%1\""
 #define FUSEPDF_GS_COUNT " -q -dNODISPLAY -dNOSAFER -c \"/pdffile (%1) (r) file runpdfbegin (PageCount: ) print pdfpagecount = quit\""
 #define FUSEPDF_GS_EXTRACT " -q -dNOPAUSE -dBATCH -sOutputFile=\"%2\" -dFirstPage=%3 -dLastPage=%3 -sDEVICE=pdfwrite \"%1\""
+#define FUSEPDF_GS_INFO " -q -dNODISPLAY -sFile=\"%1\" -dDumpMediaSizes \"%2\""
 
 enum exportImageType {
     exportImageTypeUndefined,
@@ -282,7 +287,8 @@ private slots:
     void saveSettings();
     void handleProcOutput();
     void clearInput(bool askFirst = false);
-    static const QString findGhost();
+    static const QString findGhost(bool pathOnly = false);
+    static const QString findGhostPdfInfo();
     void on_actionShow_log_triggered();
     void on_actionAbout_Qt_triggered();
     void handleFoundPDF(const QList<QUrl> &urls);

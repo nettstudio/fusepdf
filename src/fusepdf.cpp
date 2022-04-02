@@ -365,6 +365,8 @@ FusePDF::FusePDF(QWidget *parent)
     ui->setupUi(this);
     setWindowIcon(QIcon(FUSEPDF_ICON_LOGO));
 
+    ui->toolBox->setItemEnabled(FUSEPDF_TOOLBOX_DOC, !findGhostPdfInfo().isEmpty());
+
     QFont font = this->font();
     if (font.pointSize() < 9) {
         font.setPointSize(9);
@@ -813,34 +815,47 @@ void FusePDF::clearInput(bool askFirst)
     ui->preview->clear();
 }
 
-const QString FusePDF::findGhost()
+const QString FusePDF::findGhost(bool pathOnly)
 {
 #ifdef Q_OS_WIN
     QString appDir = QString("%1/gs").arg(qApp->applicationDirPath());
     if (QFile::exists(appDir)) {
         QString bin64 = appDir + "/bin/gswin64c.exe";
-        if (QFile::exists(bin64)) { return bin64; }
+        if (QFile::exists(bin64)) { return pathOnly ? appDir : bin64; }
         QString bin32 = appDir + "/bin/gswin32c.exe";
-        if (QFile::exists(bin32)) { return bin32; }
+        if (QFile::exists(bin32)) { return pathOnly ? appDir : bin32; }
     }
     QString programFilesPath(qgetenv("PROGRAMFILES"));
     QDirIterator it(programFilesPath + "/gs", QStringList() << "*.*", QDir::Dirs/*, QDirIterator::Subdirectories*/);
     while (it.hasNext()) {
         QString folder = it.next();
         QString bin64 = folder + "/bin/gswin64c.exe";
-        if (QFile::exists(bin64)) { return bin64; }
+        if (QFile::exists(bin64)) { return pathOnly ? folder : bin64; }
         QString bin32 = folder + "/bin/gswin32c.exe";
-        if (QFile::exists(bin32)) { return bin32; }
+        if (QFile::exists(bin32)) { return pathOnly ? folder : bin32; }
     }
     return QString();
 #endif
 #ifdef Q_OS_MAC
+    if (pathOnly) { return QString(); }
     QStringList gs;
     gs << "/opt/local/bin/gs" << "/usr/local/bin/gs";
     for (int i = 0; i < gs.size(); ++i) { if (QFile::exists(gs.at(i))) { return gs.at(i); } }
     return QString();
 #endif
-    return QString("gs");
+    return pathOnly ? QString() : QString("gs");
+}
+
+const QString FusePDF::findGhostPdfInfo()
+{
+    QString folder = findGhost(true);
+    if (!QFile::exists(folder)) { return QString(); }
+
+    QString filename = QString("%1/lib/pdf_info.ps").arg(folder);
+    qDebug() << "have pdf_info.ps?" << filename;
+    if (QFile::exists(filename)) { return filename; }
+
+    return QString();
 }
 
 void FusePDF::on_actionShow_log_triggered()
