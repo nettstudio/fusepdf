@@ -122,7 +122,12 @@
             </column>
             <column>
              <property name="text">
-              <string>Pages</string>
+              <string>Export pages</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>Total pages</string>
              </property>
             </column>
            </widget>
@@ -208,6 +213,14 @@
           <number>0</number>
          </property>
          <widget class="QWidget" name="previewTab">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>350</width>
+            <height>158</height>
+           </rect>
+          </property>
           <attribute name="label">
            <string>Preview</string>
           </attribute>

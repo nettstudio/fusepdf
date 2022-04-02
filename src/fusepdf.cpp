@@ -866,6 +866,7 @@ void FusePDF::handleFoundPDF(const QList<QUrl> &urls)
         item->setData(0, FUSEPDF_CHECKSUM_ROLE, checksum);
         item->setText(0, info.fileName());
         item->setText(1, QString::number(pages));
+        item->setText(2, QString::number(pages));
         item->setIcon(0, QIcon(FUSEPDF_ICON_MAIN));
         item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsDragEnabled | Qt::ItemIsEnabled | Qt::ItemNeverHasChildren);
         if (!info.absolutePath().isEmpty()) { _lastLoadDir = info.absolutePath(); }
@@ -1720,6 +1721,7 @@ int FusePDF::pagesToExport()
             QVector<int> pages = tab->getPagesState(true);
             for (int i = 0; i < pages.count(); ++i) { result++; }
         }
+        ui->inputs->topLevelItem(i)->setText(1, QString::number(enabledPages));
         if (enabledPages < 1) { continue; }
         if (!modified) {
             result += ui->inputs->topLevelItem(i)->text(1).toInt();
