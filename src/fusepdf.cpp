@@ -365,6 +365,8 @@ FusePDF::FusePDF(QWidget *parent)
     ui->setupUi(this);
     setWindowIcon(QIcon(FUSEPDF_ICON_LOGO));
 
+    qRegisterMetaType<FusePDF::pdfInfo>("FusePDF::pdfInfo");
+
     ui->toolBox->setItemEnabled(FUSEPDF_TOOLBOX_DOC, !findGhostPdfInfo().isEmpty());
 
     QFont font = this->font();
@@ -478,6 +480,8 @@ FusePDF::FusePDF(QWidget *parent)
             this, SLOT(handleExportDone(QString)));
     connect(_tabButton, SIGNAL(clicked(bool)),
             this, SLOT(handleTabButtonClicked(bool)));
+    connect(this, SIGNAL(foundPdfInfo(FusePDF::pdfInfo)),
+            this, SLOT(handleFoundPdfInfo(FusePDF::pdfInfo)));
 
     QTimer::singleShot(0, this, SLOT(loadSettings()));
 }
@@ -813,6 +817,8 @@ void FusePDF::clearInput(bool askFirst)
     ui->cmd->clear();
     _output.clear();
     ui->preview->clear();
+    _pdfInfo.clear();
+    ui->pdfInfo->clear();
 }
 
 const QString FusePDF::findGhost(bool pathOnly)
@@ -909,6 +915,10 @@ void FusePDF::handleFoundPDF(const QList<QUrl> &urls)
                           info.filePath(),
                           checksum,
                           pages);
+        QtConcurrent::run(this,
+                          &FusePDF::getPdfInfo,
+                          info.filePath(),
+                          checksum);
         if (ui->actionOutput_preview->isChecked()) {
             QtConcurrent::run(this, &FusePDF::generateOutputPreview);
         }
@@ -1744,3 +1754,69 @@ int FusePDF::pagesToExport()
     }
     return result;
 }
+
+void FusePDF::getPdfInfo(const QString &filename,
+                         const QString &checksum)
+{
+    QString ps = FusePDF::findGhostPdfInfo();
+    if (!isPDF(filename) || ps.isEmpty() || checksum.isEmpty()) { return; }
+
+    QString command = findGhost();
+    if (command.isEmpty()) { return; }
+#ifdef Q_OS_WIN
+    command = QString("\"%1\"").arg(findGhost());
+#endif
+    command.append(QString(FUSEPDF_GS_INFO).arg(filename, ps));
+
+    FusePDF::pdfInfo pdf;
+    pdf.filename = filename;
+    pdf.checksum = checksum;
+
+    QProcess proc;
+    proc.start(command);
+    proc.waitForFinished();
+    pdf.info = proc.readAll();
+    proc.close();
+
+    qDebug() << command;
+    if (!pdf.info.isEmpty()) { emit foundPdfInfo(pdf); }
+}
+
+void FusePDF::handleFoundPdfInfo(const pdfInfo &pdf)
+{
+    if (pdf.filename.isEmpty() || pdf.checksum.isEmpty() || pdf.info.isEmpty()) { return; }
+
+    bool add = true;
+    for(std::vector<FusePDF::pdfInfo>::iterator it = std::begin(_pdfInfo); it != std::end(_pdfInfo); ++it) {
+        QString filename = (*it).filename;
+        QString checksum = (*it).checksum;
+        if (pdf.filename != filename) { continue; }
+        if (pdf.checksum != checksum) { continue; }
+        add = false;
+        break;
+    }
+    if (add) { _pdfInfo.push_back(pdf); }
+}
+
+void FusePDF::on_inputs_itemClicked(QTreeWidgetItem *item,
+                                    int column)
+{
+    Q_UNUSED(column)
+    if (!item) { return; }
+    QString filename = item->data(0, FUSEPDF_PATH_ROLE).toString();
+    QString checksum = item->data(0, FUSEPDF_CHECKSUM_ROLE).toString();
+    QString info;
+    for(std::vector<FusePDF::pdfInfo>::iterator it = std::begin(_pdfInfo); it != std::end(_pdfInfo); ++it) {
+        if ((*it).filename == filename && (*it).checksum == checksum) {
+            info = (*it).info;
+            break;
+        }
+    }
+    if (info.isEmpty()) {
+        ui->pdfInfo->clear();
+        return;
+    }
+    ui->toolBox->setCurrentIndex(FUSEPDF_TOOLBOX_DOC);
+    ui->pdfInfo->setPlainText(info);
+}
+

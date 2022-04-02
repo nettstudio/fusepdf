@@ -64,6 +64,7 @@
 #include <QPushButton>
 #include <QStyledItemDelegate>
 #include <QPixmap>
+#include <vector>
 
 #define FUSEPDF_SITE_URL "https://fusepdf.no"
 #define FUSEPDF_RELEASES_URL "https://github.com/nettstudio/fusepdf/releases"
@@ -116,7 +117,7 @@
 #define FUSEPDF_GS_EXPORT " -q -sDEVICE=%4 -o \"%2\" -dFirstPage=%3 -dLastPage=%3 -dTextAlphaBits=4 -dGraphicsAlphaBits=4 -r%5x%5 \"%1\""
 #define FUSEPDF_GS_COUNT " -q -dNODISPLAY -dNOSAFER -c \"/pdffile (%1) (r) file runpdfbegin (PageCount: ) print pdfpagecount = quit\""
 #define FUSEPDF_GS_EXTRACT " -q -dNOPAUSE -dBATCH -sOutputFile=\"%2\" -dFirstPage=%3 -dLastPage=%3 -sDEVICE=pdfwrite \"%1\""
-#define FUSEPDF_GS_INFO " -q -dNODISPLAY -sFile=\"%1\" -dDumpMediaSizes \"%2\""
+#define FUSEPDF_GS_INFO " -q -dNODISPLAY -dNOSAFER -sFile=\"%1\" -dDumpMediaSizes \"%2\""
 
 enum exportImageType {
     exportImageTypeUndefined,
@@ -256,6 +257,12 @@ class FusePDF : public QMainWindow
     Q_OBJECT
 
 public:
+    struct pdfInfo {
+        QString filename;
+        QString checksum;
+        QString info;
+    };
+
     FusePDF(QWidget *parent = nullptr);
     ~FusePDF();
 
@@ -270,6 +277,7 @@ signals:
                        int timeout);
     void exportDone(const QString &path);
     void generatedOutputPreview(const QStringList &images);
+    void foundPdfInfo(const FusePDF::pdfInfo &pdf);
 
 private slots:
     void on_actionOpen_triggered();
@@ -368,6 +376,11 @@ private slots:
     void on_actionDocumentation_triggered();
     void on_actionOutput_preview_triggered();
     int pagesToExport();
+    void getPdfInfo(const QString &filename,
+                    const QString &checksum);
+    void handleFoundPdfInfo(const FusePDF::pdfInfo &pdf);
+    void on_inputs_itemClicked(QTreeWidgetItem *item,
+                               int column);
 
 private:
     Ui::FusePDF *ui;
@@ -377,5 +390,6 @@ private:
     QString _lastExportDir;
     QProcess *_proc;
     QPushButton *_tabButton;
+    std::vector<pdfInfo> _pdfInfo;
 };
 #endif // FUSEPDF_H
