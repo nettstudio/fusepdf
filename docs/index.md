@@ -65,10 +65,6 @@ If you see this dialog your installation is broken, or you are using a version o
 
 For macOS [Richard Koch](https://pages.uoregon.edu/koch/) hosts Ghostscript binaries that will work with FusePDF. Else use [macports](https://ports.macports.org/port/ghostscript/) or [homebrew](https://formulae.brew.sh/formula/ghostscript) to install Ghostscript.
 
-# Roadmap
-
-See https://github.com/nettstudio/fusepdf/issues.
-
 # ChangeLog
 
 ## 2.2.0
