@@ -1,16 +1,35 @@
 # Merge PDF documents
 
-FusePDF is an simple cross-platform and open source application used for merging, splitting and extracting PDF pages and documents.
+FusePDF is an simple cross-platform and open source application used for converting, merging and splitting PDF documents.
 
 ![Screenshot of main interface](https://github.com/nettstudio/fusepdf/raw/main/docs/fusepdf-screenshot-01.png "Screenshot of main interface")
 
 * Drag-and-drop any PDF document
 * Preview input and output pages
 * Exclude/Include pages
-* Export to images and/or PDF
-* Support PDF presets
-* PDF compatibility up to version 1.7
-* Change or add PDF meta data (properties)
+* Export to images (TIFF/PNG)
+* Modify meta data (properties)
+* Supports common distiller presets
+
+## Supported PDF versions
+
+FusePDF supports the most common Portable Document Format (PDF) versions and standards.
+
+* PDF 1.0 (Acrobat 1.0)
+* PDF 1.1 (Acrobat 2.0)
+* PDF 1.2 (Acrobat 3.0)
+* PDF 1.3 (Acrobat 4.0)
+* PDF 1.4 (Acrobat 5.0)
+* PDF 1.5 (Acrobat 6.0)
+* PDF 1.6 (Acrobat 7.0)
+* PDF 1.7 (Acrobat 8.0 / ISO 32000-1)
+* PDF 2.0 (ISO 32000-2)
+
+PDF/A is an ISO-standardized version of the Portable Document Format (PDF) specialized for use in the archiving and long-term preservation of electronic documents.
+
+* PDF/A-1 (ISO 19005-1)
+* PDF/A-2 (ISO 19005-2)
+* PDF/A-3 (ISO 19005-3)
 
 # Basic usage
 
@@ -48,17 +67,22 @@ For macOS [Richard Koch](https://pages.uoregon.edu/koch/) hosts Ghostscript bina
 
 # Roadmap
 
-  * Advanced options
-    * ICC support
-    * Convert to/from RGB/CMYK
-  * Translations
-    * Norwegian
+See https://github.com/nettstudio/fusepdf/issues.
 
 # ChangeLog
 
 ## 2.2.0
 
-N/A
+Released : ETA Apr 2022.
+
+* Preview update bug fix
+* Updated UI
+* Set document properties as tooltip
+* Can now save to PDF 2.0 (ISO 32000-2)
+* Can now save to PDF/A
+  * PDF/A-1 (ISO 19005-1)
+  * PDF/A-2 (ISO 19005-2)
+  * PDF/A-3 (ISO 19005-3)
 
 ## 2.1.0
 
