@@ -2,7 +2,7 @@
 
 FusePDF is an simple cross-platform and open source application used for merging, splitting and extracting PDF pages and documents.
 
-![Screenshot of main interface](https://github.com/nettstudio/fusepdf/raw/main/docs/fusepdf-screenshot-01.png "Screenshot of main interface")
+![Screenshot of main interface](https://github.com/nettstudio/fusepdf/raw/v2.1/docs/fusepdf-screenshot-01.png "Screenshot of main interface")
 
 * Drag-and-drop any PDF document
 * Preview input and output pages
@@ -18,7 +18,7 @@ For the most basic usage we assume you have a couple of PDF documents you want t
 
 You can add PDF documents in various ways, either by drag-and-drop or with the ``Open`` action in the toolbar, right-click and ``Add`` or in the ``File`` menu (``Ctrl+O``). You can select multiple documents with the open dialog, and of course drag-and-drop multiple documents.
 
-![Screenshot of main interface with document added](https://github.com/nettstudio/fusepdf/raw/main/docs/fusepdf-screenshot-02.png "Screenshot of main interface with document added")
+![Screenshot of main interface with document added](https://github.com/nettstudio/fusepdf/raw/v2.1/docs/fusepdf-screenshot-02.png "Screenshot of main interface with document added")
 
 You can move documents up and down, and remove with the ``DEL`` key or right-click ``Remove``.
 
@@ -30,7 +30,7 @@ Sometimes you may want to exclude some pages from a document.
 
 Double-click the document or select the tab with the document you want to modify.
 
-![Screenshot of document interface](https://github.com/nettstudio/fusepdf/raw/main/docs/fusepdf-screenshot-03.png "Screenshot of document interface")
+![Screenshot of document interface](https://github.com/nettstudio/fusepdf/raw/v2.1/docs/fusepdf-screenshot-03.png "Screenshot of document interface")
 
 Enabled pages are marked as green. If you want to exclude a page just double-click it. You can also select all or none through the context menu (right-click).
 
@@ -40,7 +40,7 @@ Some common issues users may experience.
 
 ## Missing Ghostscript
 
-![Screenshot of missing Ghostscript](https://github.com/nettstudio/fusepdf/raw/main/docs/fusepdf-screenshot-08.png "Screenshot of missing Ghostscript")
+![Screenshot of missing Ghostscript](https://github.com/nettstudio/fusepdf/raw/v2.1/docs/fusepdf-screenshot-08.png "Screenshot of missing Ghostscript")
 
 If you see this dialog your installation is broken, or you are using a version of FusePDF shipped without Ghostscript. On Windows follow the instructions or download a FusePDF version with Ghostscript included. On macOS/Linux/BSD and others make sure Ghostscript (``gs``) is installed and available in path, check your package manager for more information.
 
