@@ -367,8 +367,6 @@ FusePDF::FusePDF(QWidget *parent)
 
     qRegisterMetaType<FusePDF::pdfInfo>("FusePDF::pdfInfo");
 
-    ui->toolBox->setItemEnabled(FUSEPDF_TOOLBOX_DOC, !findGhostPdfInfo().isEmpty());
-
     QFont font = this->font();
     if (font.pointSize() < 9) {
         font.setPointSize(9);
@@ -841,9 +839,7 @@ void FusePDF::clearInput(bool askFirst)
     ui->cmd->clear();
     _output.clear();
     ui->preview->clear();
-    _pdfInfo.clear();
-    ui->pdfInfo->clear();
-    ui->toolBox->setCurrentIndex(ui->actionOutput_preview->isChecked() ? FUSEPDF_TOOLBOX_PREVIEW : FUSEPDF_TOOLBOX_OUTPUT);
+    ui->toolBox->setCurrentIndex(FUSEPDF_TOOLBOX_OUTPUT);
 }
 
 const QString FusePDF::findGhost(bool pathOnly)
@@ -1187,7 +1183,6 @@ void FusePDF::deleteDocumentItem()
     ui->tabs->removeTab(index);
     tab->deleteLater();
 
-    ui->pdfInfo->clear();
     ui->toolBox->setCurrentIndex(ui->actionOutput_preview->isChecked() ? FUSEPDF_TOOLBOX_PREVIEW : FUSEPDF_TOOLBOX_OUTPUT);
 
     handleOutputPagesChanged();
@@ -1859,39 +1854,14 @@ void FusePDF::getPdfInfo(const QString &filename,
 void FusePDF::handleFoundPdfInfo(const pdfInfo &pdf)
 {
     if (pdf.filename.isEmpty() || pdf.checksum.isEmpty() || pdf.info.isEmpty()) { return; }
-
-    bool add = true;
-    for(std::vector<FusePDF::pdfInfo>::iterator it = std::begin(_pdfInfo); it != std::end(_pdfInfo); ++it) {
-        QString filename = (*it).filename;
-        QString checksum = (*it).checksum;
-        if (pdf.filename != filename) { continue; }
-        if (pdf.checksum != checksum) { continue; }
-        add = false;
-        break;
-    }
-    if (add) { _pdfInfo.push_back(pdf); }
-}
-
-void FusePDF::on_inputs_itemClicked(QTreeWidgetItem *item,
-                                    int column)
-{
-    Q_UNUSED(column)
-    if (!item) { return; }
-    QString filename = item->data(0, FUSEPDF_PATH_ROLE).toString();
-    QString checksum = item->data(0, FUSEPDF_CHECKSUM_ROLE).toString();
-    QString info;
-    for(std::vector<FusePDF::pdfInfo>::iterator it = std::begin(_pdfInfo); it != std::end(_pdfInfo); ++it) {
-        if ((*it).filename == filename && (*it).checksum == checksum) {
-            info = (*it).info;
+    for (int i = 0; i < ui->inputs->topLevelItemCount(); ++i) {
+        QString filename = ui->inputs->topLevelItem(i)->data(0, FUSEPDF_PATH_ROLE).toString();
+        QString checksum = ui->inputs->topLevelItem(i)->data(0, FUSEPDF_CHECKSUM_ROLE).toString();
+        if (filename == pdf.filename && checksum == pdf.checksum) {
+            ui->inputs->topLevelItem(i)->setToolTip(0, pdf.info);
             break;
         }
     }
-    if (info.isEmpty()) {
-        ui->pdfInfo->clear();
-        return;
-    }
-    ui->toolBox->setCurrentIndex(FUSEPDF_TOOLBOX_DOC);
-    ui->pdfInfo->setPlainText(info);
 }
 
 const QString FusePDF::stripMarks(QString s)

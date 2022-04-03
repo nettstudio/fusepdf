@@ -218,7 +218,7 @@
             <x>0</x>
             <y>0</y>
             <width>350</width>
-            <height>158</height>
+            <height>193</height>
            </rect>
           </property>
           <attribute name="label">
@@ -261,11 +261,11 @@
             <x>0</x>
             <y>0</y>
             <width>350</width>
-            <height>158</height>
+            <height>193</height>
            </rect>
           </property>
           <attribute name="label">
-           <string>Output properties</string>
+           <string>Properties</string>
           </attribute>
           <layout class="QVBoxLayout" name="verticalLayout">
            <property name="leftMargin">
@@ -382,45 +382,6 @@
               </size>
              </property>
             </spacer>
-           </item>
-          </layout>
-         </widget>
-         <widget class="QWidget" name="infoTab">
-          <property name="geometry">
-           <rect>
-            <x>0</x>
-            <y>0</y>
-            <width>350</width>
-            <height>158</height>
-           </rect>
-          </property>
-          <attribute name="label">
-           <string>Document properties</string>
-          </attribute>
-          <layout class="QVBoxLayout" name="verticalLayout_4">
-           <property name="leftMargin">
-            <number>0</number>
-           </property>
-           <property name="topMargin">
-            <number>0</number>
-           </property>
-           <property name="rightMargin">
-            <number>0</number>
-           </property>
-           <property name="bottomMargin">
-            <number>0</number>
-           </property>
-           <item>
-            <widget class="QPlainTextEdit" name="pdfInfo">
-             <property name="font">
-              <font>
-               <pointsize>8</pointsize>
-              </font>
-             </property>
-             <property name="readOnly">
-              <bool>true</bool>
-             </property>
-            </widget>
            </item>
           </layout>
          </widget>

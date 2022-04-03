@@ -65,7 +65,6 @@
 #include <QStyledItemDelegate>
 #include <QPixmap>
 #include <QRegularExpression>
-#include <vector>
 
 #define FUSEPDF_SITE_URL "https://fusepdf.no"
 #define FUSEPDF_RELEASES_URL "https://github.com/nettstudio/fusepdf/releases"
@@ -77,7 +76,6 @@
 
 #define FUSEPDF_TOOLBOX_PREVIEW 0
 #define FUSEPDF_TOOLBOX_OUTPUT 1
-#define FUSEPDF_TOOLBOX_DOC 2
 
 #define FUSEPDF_PATH_ROLE Qt::UserRole + 1
 #define FUSEPDF_PAGES_ROLE Qt::UserRole + 2
@@ -119,7 +117,7 @@
 #define FUSEPDF_GS_EXPORT " -q -sDEVICE=%4 -o \"%2\" -dFirstPage=%3 -dLastPage=%3 -dTextAlphaBits=4 -dGraphicsAlphaBits=4 -r%5x%5 \"%1\""
 #define FUSEPDF_GS_COUNT " -q -dNODISPLAY -dNOSAFER -c \"/pdffile (%1) (r) file runpdfbegin (PageCount: ) print pdfpagecount = quit\""
 #define FUSEPDF_GS_EXTRACT " -q -dNOPAUSE -dBATCH -sOutputFile=\"%2\" -dFirstPage=%3 -dLastPage=%3 -sDEVICE=pdfwrite \"%1\""
-#define FUSEPDF_GS_INFO " -q -dNODISPLAY -dNOSAFER -sFile=\"%1\" -dDumpMediaSizes -dDumpFontsUsed -dShowEmbeddedFonts \"%2\""
+#define FUSEPDF_GS_INFO " -q -dNODISPLAY -dNOSAFER -sFile=\"%1\" -dDumpMediaSizes=false -dDumpFontsUsed=false \"%2\""
 
 enum exportImageType {
     exportImageTypeUndefined,
@@ -383,8 +381,6 @@ private slots:
     void getPdfInfo(const QString &filename,
                     const QString &checksum);
     void handleFoundPdfInfo(const FusePDF::pdfInfo &pdf);
-    void on_inputs_itemClicked(QTreeWidgetItem *item,
-                               int column);
     static const QString stripMarks(QString s);
 
 private:
@@ -395,6 +391,5 @@ private:
     QString _lastExportDir;
     QProcess *_proc;
     QPushButton *_tabButton;
-    std::vector<pdfInfo> _pdfInfo;
 };
 #endif // FUSEPDF_H
