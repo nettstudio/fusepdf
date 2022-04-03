@@ -365,6 +365,8 @@ FusePDF::FusePDF(QWidget *parent)
     ui->setupUi(this);
     setWindowIcon(QIcon(FUSEPDF_ICON_LOGO));
 
+    ui->toolBox->setCurrentIndex(FUSEPDF_TOOLBOX_OUTPUT);
+
     qRegisterMetaType<FusePDF::pdfInfo>("FusePDF::pdfInfo");
 
     QFont font = this->font();
@@ -731,7 +733,8 @@ void FusePDF::populateUI()
     ui->compat->addItem(docIcon, QString("PDF %1 1.4 (Acrobat 5.0)").arg(versionString), "1.4");
     ui->compat->addItem(docIcon, QString("PDF %1 1.5 (Acrobat 6.0)").arg(versionString), "1.5");
     ui->compat->addItem(docIcon, QString("PDF %1 1.6 (Acrobat 7.0)").arg(versionString), "1.6");
-    ui->compat->addItem(docIcon, QString("PDF %1 1.7 (Acrobat 8.0)").arg(versionString), "1.7");
+    ui->compat->addItem(docIcon, QString("PDF %1 1.7 (Acrobat 8.0/ISO 32000-1)").arg(versionString), "1.7");
+    ui->compat->addItem(docIcon, QString("PDF %1 2.0 (ISO 32000-2)").arg(versionString), "2.0");
     ui->compat->addItem(docIcon, QString("PDF/A-1 (ISO 19005-1)"), "A1");
     ui->compat->addItem(docIcon, QString("PDF/A-2 (ISO 19005-2)"), "A2");
     ui->compat->addItem(docIcon, QString("PDF/A-3 (ISO 19005-3)"), "A3");
@@ -1765,6 +1768,7 @@ void FusePDF::showOutputPreview(const QStringList &images)
         p.drawPixmap((pix.width()/2)-(ppix.width()/2), 0, ppix);
         item->setIcon(pix);
     }
+    if (ui->actionOutput_preview->isChecked()) { ui->toolBox->setCurrentIndex(FUSEPDF_TOOLBOX_PREVIEW); }
 }
 
 void FusePDF::handleOutputRemoveSelected()
