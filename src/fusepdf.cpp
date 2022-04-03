@@ -629,9 +629,9 @@ const QString FusePDF::makeCommand(const QString &filename,
 
     QString marks;
     marks.append("/Creator(FusePDF - https://fusepdf.no)");
-    if (!title.isEmpty()) { marks.append(QString("/Title(%1)").arg(pdfa > 0 ? title : QString(toUtf16Hex(title)).toUpper())); }
-    if (!subject.isEmpty()) { marks.append(QString("/Subject(%1)").arg(pdfa > 0 ? subject : QString(toUtf16Hex(subject)).toUpper())); }
-    if (!author.isEmpty()) { marks.append(QString("/Author(%1)").arg(pdfa > 0 ? author : QString(toUtf16Hex(author)).toUpper())); }
+    if (!title.isEmpty()) { marks.append(QString(pdfa > 0 ? "/Title(%1)" : "/Title<%1>").arg(pdfa > 0 ? title : QString(toUtf16Hex(title)).toUpper())); }
+    if (!subject.isEmpty()) { marks.append(QString(pdfa > 0 ? "/Subject(%1)" : "/Subject<%1>").arg(pdfa > 0 ? subject : QString(toUtf16Hex(subject)).toUpper())); }
+    if (!author.isEmpty()) { marks.append(QString(pdfa > 0 ? "/Author(%1)" : "/Author<%1>").arg(pdfa > 0 ? author : QString(toUtf16Hex(author)).toUpper())); }
     command.append(QString(" -c \"[%1/DOCINFO pdfmark\"").arg(marks));
 
     qDebug() << command;
