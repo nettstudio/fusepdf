@@ -604,7 +604,7 @@ const QString FusePDF::makeCommand(const QString &filename,
 
     if (pdfa > 0) {
         command.append(QString(" -dEmbedAllFonts=true -dNOSAFER -dNOOUTERSAVE -dPDFACompatibilityPolicy=1 -sProcessColorModel=DeviceRGB -sColorConversionStrategy=RGB -dPDFA=%1").arg(pdfa));
-        command.append(QString(" \"%1\"").arg(findGhostPdfa(title)));
+        command.append(QString(" \"%1\"").arg(findGhostPdfa()));
     }
     for (int i = 0; i < ui->inputs->topLevelItemCount(); ++i) {
         QString filename = ui->inputs->topLevelItem(i)->data(0, FUSEPDF_PATH_ROLE).toString();
@@ -629,9 +629,9 @@ const QString FusePDF::makeCommand(const QString &filename,
 
     QString marks;
     marks.append("/Creator(FusePDF - https://fusepdf.no)");
-    if (!title.isEmpty()) { marks.append(QString(pdfa > 0 ? "/Title(%1)" : "/Title<%1>").arg(pdfa > 0 ? title : QString(toUtf16Hex(title)).toUpper())); }
-    if (!subject.isEmpty()) { marks.append(QString(pdfa > 0 ? "/Subject(%1)" : "/Subject<%1>").arg(pdfa > 0 ? subject : QString(toUtf16Hex(subject)).toUpper())); }
-    if (!author.isEmpty()) { marks.append(QString(pdfa > 0 ? "/Author(%1)" : "/Author<%1>").arg(pdfa > 0 ? author : QString(toUtf16Hex(author)).toUpper())); }
+    if (!title.isEmpty()) { marks.append(QString(pdfa > 0 ? "/Title(%1)" : "/Title<%1>").arg(pdfa > 0 ? stripMarks(title) : QString(toUtf16Hex(title)).toUpper())); }
+    if (!subject.isEmpty()) { marks.append(QString(pdfa > 0 ? "/Subject(%1)" : "/Subject<%1>").arg(pdfa > 0 ? stripMarks(subject) : QString(toUtf16Hex(subject)).toUpper())); }
+    if (!author.isEmpty()) { marks.append(QString(pdfa > 0 ? "/Author(%1)" : "/Author<%1>").arg(pdfa > 0 ? stripMarks(author) : QString(toUtf16Hex(author)).toUpper())); }
     command.append(QString(" -c \"[%1/DOCINFO pdfmark\"").arg(marks));
 
     qDebug() << command;
@@ -891,12 +891,13 @@ const QString FusePDF::findGhostPdfInfo()
 
 const QString FusePDF::findGhostPdfa(const QString &title)
 {
+    Q_UNUSED(title)
     QString cachePath = getCachePath();
     if (cachePath.isEmpty() || !QFile::exists(cachePath)) { return QString(); }
 
     QString iccPath = QString("%1/srgb.icc").arg(cachePath);
     QString pdfaPath = QString("%1/PDFA_def.ps").arg(cachePath);
-    if ((QFile::exists(iccPath) && title.isEmpty()) && QFile::exists(pdfaPath)) { return pdfaPath; }
+    if ((QFile::exists(iccPath) /*&& title.isEmpty()*/) && QFile::exists(pdfaPath)) { return pdfaPath; }
 
     if (!QFile::exists(pdfaPath) || !title.isEmpty()) {
         QString def;
@@ -907,7 +908,7 @@ const QString FusePDF::findGhostPdfa(const QString &title)
         }
         if (def.isEmpty()) { return QString(); }
         def = def.replace("srgb.icc", iccPath);
-        if (!title.isEmpty()) { def = def.replace("Title (Title)", QString("Title (%1)").arg(title)); }
+        //if (!title.isEmpty()) { def = def.replace("Title (Title)", QString("Title (%1)").arg(title)); }
         QFile pdfa(pdfaPath);
         if (pdfa.open(QIODevice::WriteOnly)) {
             pdfa.write(def.toUtf8());
@@ -1891,5 +1892,37 @@ void FusePDF::on_inputs_itemClicked(QTreeWidgetItem *item,
     }
     ui->toolBox->setCurrentIndex(FUSEPDF_TOOLBOX_DOC);
     ui->pdfInfo->setPlainText(info);
+}
+
+const QString FusePDF::stripMarks(QString s)
+{
+    s.remove(QRegularExpression("[" + QRegularExpression::escape("'!*,?|¡¿") + "]"));
+    if (s.contains(QRegularExpression("[" + QRegularExpression::escape("$/:ÅØÆåøæÀÁÄÙÛÜàáäçèéêëïñóöùûü") + "]"))) {
+        s.replace(QRegularExpression("[" + QRegularExpression::escape(":/") + "]"), "-");
+        s.replace(QRegularExpression("[$]"), "s");
+
+        s.replace(QRegularExpression("[Å]"), "AA");
+        s.replace(QRegularExpression("[Ø]"), "OE");
+        s.replace(QRegularExpression("[Æ]"), "AE");
+
+        s.replace(QRegularExpression("[ÁÀ]"), "A");
+        s.replace(QRegularExpression("[Ä]"), "Ae");
+        s.replace(QRegularExpression("[ÜÛÙ]"), "U");
+
+        s.replace(QRegularExpression("[å]"), "aa");
+        s.replace(QRegularExpression("[ø]"), "oe");
+        s.replace(QRegularExpression("[æ]"), "ae");
+
+        s.replace(QRegularExpression("[áà]"), "a");
+        s.replace(QRegularExpression("[ä]"), "ae");
+        s.replace(QRegularExpression("[ç]"), "c");
+        s.replace(QRegularExpression("[ëêéè]"), "e");
+        s.replace(QRegularExpression("[ï]"), "i");
+        s.replace(QRegularExpression("[ñ]"), "n");
+        s.replace(QRegularExpression("[óö]"), "o");
+        s.replace(QRegularExpression("[ûù]"), "u");
+        s.replace(QRegularExpression("[ü]"), "ue");
+    }
+    return s;
 }
 

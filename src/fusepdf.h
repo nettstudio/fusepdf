@@ -64,6 +64,7 @@
 #include <QPushButton>
 #include <QStyledItemDelegate>
 #include <QPixmap>
+#include <QRegularExpression>
 #include <vector>
 
 #define FUSEPDF_SITE_URL "https://fusepdf.no"
@@ -384,6 +385,7 @@ private slots:
     void handleFoundPdfInfo(const FusePDF::pdfInfo &pdf);
     void on_inputs_itemClicked(QTreeWidgetItem *item,
                                int column);
+    static const QString stripMarks(QString s);
 
 private:
     Ui::FusePDF *ui;
