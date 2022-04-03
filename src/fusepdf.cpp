@@ -365,8 +365,6 @@ FusePDF::FusePDF(QWidget *parent)
     ui->setupUi(this);
     setWindowIcon(QIcon(FUSEPDF_ICON_LOGO));
 
-    qDebug() << "PDF/A ?" << findGhostPdfa();
-
     qRegisterMetaType<FusePDF::pdfInfo>("FusePDF::pdfInfo");
 
     ui->toolBox->setItemEnabled(FUSEPDF_TOOLBOX_DOC, !findGhostPdfInfo().isEmpty());
@@ -511,6 +509,7 @@ void FusePDF::on_actionOpen_triggered()
 
 void FusePDF::on_actionSave_triggered()
 {
+    ui->toolBox->setCurrentIndex(FUSEPDF_TOOLBOX_OUTPUT);
     int totalPages = pagesToExport();
     qDebug() << "total pages to export" << totalPages;
     if (ui->inputs->topLevelItemCount() == 0 || totalPages < 1) {
@@ -551,7 +550,18 @@ void FusePDF::on_actionAbout_triggered()
 
 void FusePDF::prepCommand(const QString &filename)
 {
-    QString command = makeCommand(filename);
+    QString compat = ui->compat->currentData().toString();
+    int pdfa = 0;
+    if (compat == "A1") { pdfa = 1; }
+    else if (compat == "A2") { pdfa = 2; }
+    else if (compat == "A3") { pdfa = 3; }
+    /*if (pdfa > 0 && ui->metaTitle->text().isEmpty()) {
+        QMessageBox::warning(this,
+                             tr("PDF/A Warning"),
+                             tr("Document title is not optional in PDF/A. Please add title in 'Output properties'."));
+        return;
+    }*/
+    QString command = makeCommand(filename, pdfa);
     if (!command.isEmpty()) { emit commandReady(filename, command); }
     else {
         showProgress(false);
@@ -561,7 +571,8 @@ void FusePDF::prepCommand(const QString &filename)
     }
 }
 
-const QString FusePDF::makeCommand(const QString &filename)
+const QString FusePDF::makeCommand(const QString &filename,
+                                   int pdfa)
 {
     if (filename.isEmpty()) { return QString(); }
 
@@ -570,17 +581,31 @@ const QString FusePDF::makeCommand(const QString &filename)
     command = QString("\"%1\"").arg(findGhost());
 #endif
     command.append(" -sDEVICE=pdfwrite");
-    if (!ui->compat->currentData().toString().isEmpty() &&
+    if (pdfa == 0 &&
+        !ui->compat->currentData().toString().isEmpty() &&
         ui->compat->currentData().toString().toLower() != "default") {
         command.append(QString(" -dCompatibilityLevel=%1").arg(ui->compat->currentData().toString()));
     }
-    if (!ui->preset->currentData().toString().isEmpty() &&
+    if (pdfa == 0 &&
+        !ui->preset->currentData().toString().isEmpty() &&
         ui->preset->currentData().toString().toLower() != "none")
     {
         command.append(QString(" -dPDFSETTINGS=/%1").arg(ui->preset->currentData().toString().toLower()));
     }
-    command.append(" -dNOPAUSE -dBATCH -dDetectDuplicateImages -dCompressFonts=true");
+    command.append(" -dNOPAUSE -dBATCH");
+
+    if (pdfa == 0) { command.append(" -dDetectDuplicateImages -dCompressFonts=true"); }
+
     command.append(QString(" -sOutputFile=\"%1\"").arg(filename));
+
+    QString title = ui->metaTitle->text();
+    QString subject = ui->metaSubject->text();
+    QString author = ui->metaAuthor->text();
+
+    if (pdfa > 0) {
+        command.append(QString(" -dEmbedAllFonts=true -dNOSAFER -dNOOUTERSAVE -dPDFACompatibilityPolicy=1 -sProcessColorModel=DeviceRGB -sColorConversionStrategy=RGB -dPDFA=%1").arg(pdfa));
+        command.append(QString(" \"%1\"").arg(findGhostPdfa(title)));
+    }
     for (int i = 0; i < ui->inputs->topLevelItemCount(); ++i) {
         QString filename = ui->inputs->topLevelItem(i)->data(0, FUSEPDF_PATH_ROLE).toString();
         PagesListWidget *tab = getTab(filename);
@@ -602,17 +627,11 @@ const QString FusePDF::makeCommand(const QString &filename)
         }
     }
 
-    QString title = ui->metaTitle->text();
-    QString subject = ui->metaSubject->text();
-    QString author = ui->metaAuthor->text();
-
     QString marks;
     marks.append("/Creator(FusePDF - https://fusepdf.no)");
-
-    if (!title.isEmpty()) { marks.append(QString("/Title<%1>").arg(QString(toUtf16Hex(title)).toUpper())); }
-    if (!subject.isEmpty()) { marks.append(QString("/Subject<%1>").arg(QString(toUtf16Hex(subject)).toUpper())); }
-    if (!author.isEmpty()) { marks.append(QString("/Author<%1>").arg(QString(toUtf16Hex(author)).toUpper())); }
-
+    if (!title.isEmpty()) { marks.append(QString("/Title(%1)").arg(pdfa > 0 ? title : QString(toUtf16Hex(title)).toUpper())); }
+    if (!subject.isEmpty()) { marks.append(QString("/Subject(%1)").arg(pdfa > 0 ? subject : QString(toUtf16Hex(subject)).toUpper())); }
+    if (!author.isEmpty()) { marks.append(QString("/Author(%1)").arg(pdfa > 0 ? author : QString(toUtf16Hex(author)).toUpper())); }
     command.append(QString(" -c \"[%1/DOCINFO pdfmark\"").arg(marks));
 
     qDebug() << command;
@@ -715,6 +734,9 @@ void FusePDF::populateUI()
     ui->compat->addItem(docIcon, QString("PDF %1 1.5 (Acrobat 6.0)").arg(versionString), "1.5");
     ui->compat->addItem(docIcon, QString("PDF %1 1.6 (Acrobat 7.0)").arg(versionString), "1.6");
     ui->compat->addItem(docIcon, QString("PDF %1 1.7 (Acrobat 8.0)").arg(versionString), "1.7");
+    ui->compat->addItem(docIcon, QString("PDF/A-1 (ISO 19005-1)"), "A1");
+    ui->compat->addItem(docIcon, QString("PDF/A-2 (ISO 19005-2)"), "A2");
+    ui->compat->addItem(docIcon, QString("PDF/A-3 (ISO 19005-3)"), "A3");
     ui->compat->blockSignals(false);
 
     ui->preset->blockSignals(true);
@@ -867,16 +889,16 @@ const QString FusePDF::findGhostPdfInfo()
     return QString();
 }
 
-const QString FusePDF::findGhostPdfa()
+const QString FusePDF::findGhostPdfa(const QString &title)
 {
     QString cachePath = getCachePath();
     if (cachePath.isEmpty() || !QFile::exists(cachePath)) { return QString(); }
 
     QString iccPath = QString("%1/srgb.icc").arg(cachePath);
     QString pdfaPath = QString("%1/PDFA_def.ps").arg(cachePath);
-    if (QFile::exists(iccPath) && QFile::exists(pdfaPath)) { return pdfaPath; }
+    if ((QFile::exists(iccPath) && title.isEmpty()) && QFile::exists(pdfaPath)) { return pdfaPath; }
 
-    if (!QFile::exists(pdfaPath)) {
+    if (!QFile::exists(pdfaPath) || !title.isEmpty()) {
         QString def;
         QFile defFile(":/assets/ps/PDFA_def.ps");
         if (defFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -884,7 +906,8 @@ const QString FusePDF::findGhostPdfa()
             defFile.close();
         }
         if (def.isEmpty()) { return QString(); }
-        def = def.replace("srgb.icc", QString("\"%1\"").arg(iccPath));
+        def = def.replace("srgb.icc", iccPath);
+        if (!title.isEmpty()) { def = def.replace("Title (Title)", QString("Title (%1)").arg(title)); }
         QFile pdfa(pdfaPath);
         if (pdfa.open(QIODevice::WriteOnly)) {
             pdfa.write(def.toUtf8());

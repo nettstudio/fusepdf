@@ -86,6 +86,7 @@
 #define FUSEPDF_IMAGE_TYPE_ROLE Qt::UserRole + 6
 #define FUSEPDF_IMAGE_RES_ROLE Qt::UserRole + 7
 #define FUSEPDF_CHECKED_ROLE Qt::UserRole + 8
+#define FUSEPDF_PDFA_ROLE Qt::userRole + 9
 
 #define FUSEPDF_PAGE_ICON_SIZE 470
 #define FUSEPDF_ICON_DEFAULT_SIZE 22
@@ -285,7 +286,8 @@ private slots:
     void on_actionQuit_triggered();
     void on_actionAbout_triggered();
     void prepCommand(const QString &filename);
-    const QString makeCommand(const QString &filename);
+    const QString makeCommand(const QString &filename,
+                              int pdfa = 0);
     void runCommand(const QString &filename,
                     const QString &command);
     void commandStarted();
@@ -297,7 +299,7 @@ private slots:
     void clearInput(bool askFirst = false);
     static const QString findGhost(bool pathOnly = false);
     static const QString findGhostPdfInfo();
-    static const QString findGhostPdfa();
+    static const QString findGhostPdfa(const QString &title = QString());
     void on_actionShow_log_triggered();
     void on_actionAbout_Qt_triggered();
     void handleFoundPDF(const QList<QUrl> &urls);

@@ -1,15 +1,12 @@
 %!
-% This is a sample prefix file for creating a PDF/A document.
-% Users should modify entries marked with "Customize".
-% This assumes an ICC profile resides in the file (srgb.icc),
-% in the current directory unless the user modifies the corresponding line below.
+% PDF/A document.
 
 % Define entries in the document Info dictionary :
-%[ /Title (Title)       % Customise
-%  /DOCINFO pdfmark
+[ /Title (Title)
+  /DOCINFO pdfmark
 
 % Define an ICC profile :
-/ICCProfile (srgb.icc) % Customise
+/ICCProfile (srgb.icc)
 def
 
 [/_objdef {icc_PDFA} /type /stream /OBJ pdfmark
