@@ -117,7 +117,7 @@
 #define FUSEPDF_GS_EXPORT " -q -sDEVICE=%4 -o \"%2\" -dFirstPage=%3 -dLastPage=%3 -dTextAlphaBits=4 -dGraphicsAlphaBits=4 -r%5x%5 \"%1\""
 #define FUSEPDF_GS_COUNT " -q -dNODISPLAY -dNOSAFER -c \"/pdffile (%1) (r) file runpdfbegin (PageCount: ) print pdfpagecount = quit\""
 #define FUSEPDF_GS_EXTRACT " -q -dNOPAUSE -dBATCH -sOutputFile=\"%2\" -dFirstPage=%3 -dLastPage=%3 -sDEVICE=pdfwrite \"%1\""
-#define FUSEPDF_GS_INFO " -q -dNODISPLAY -dNOSAFER -sFile=\"%1\" -dDumpMediaSizes \"%2\""
+#define FUSEPDF_GS_INFO " -q -dNODISPLAY -dNOSAFER -sFile=\"%1\" -dDumpMediaSizes -dDumpFontsUsed -dShowEmbeddedFonts \"%2\""
 
 enum exportImageType {
     exportImageTypeUndefined,
@@ -297,6 +297,7 @@ private slots:
     void clearInput(bool askFirst = false);
     static const QString findGhost(bool pathOnly = false);
     static const QString findGhostPdfInfo();
+    static const QString findGhostPdfa();
     void on_actionShow_log_triggered();
     void on_actionAbout_Qt_triggered();
     void handleFoundPDF(const QList<QUrl> &urls);

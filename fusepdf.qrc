@@ -11,5 +11,7 @@
         <file>assets/fusepdf-denied.png</file>
         <file>assets/fusepdf-valid.png</file>
         <file>assets/fusepdf-gofirst.png</file>
+        <file>assets/icc/srgb.icc</file>
+        <file>assets/ps/PDFA_def.ps</file>
     </qresource>
 </RCC>

@@ -365,6 +365,8 @@ FusePDF::FusePDF(QWidget *parent)
     ui->setupUi(this);
     setWindowIcon(QIcon(FUSEPDF_ICON_LOGO));
 
+    qDebug() << "PDF/A ?" << findGhostPdfa();
+
     qRegisterMetaType<FusePDF::pdfInfo>("FusePDF::pdfInfo");
 
     ui->toolBox->setItemEnabled(FUSEPDF_TOOLBOX_DOC, !findGhostPdfInfo().isEmpty());
@@ -819,6 +821,7 @@ void FusePDF::clearInput(bool askFirst)
     ui->preview->clear();
     _pdfInfo.clear();
     ui->pdfInfo->clear();
+    ui->toolBox->setCurrentIndex(ui->actionOutput_preview->isChecked() ? FUSEPDF_TOOLBOX_PREVIEW : FUSEPDF_TOOLBOX_OUTPUT);
 }
 
 const QString FusePDF::findGhost(bool pathOnly)
@@ -861,6 +864,50 @@ const QString FusePDF::findGhostPdfInfo()
     qDebug() << "have pdf_info.ps?" << filename;
     if (QFile::exists(filename)) { return filename; }
 
+    return QString();
+}
+
+const QString FusePDF::findGhostPdfa()
+{
+    QString cachePath = getCachePath();
+    if (cachePath.isEmpty() || !QFile::exists(cachePath)) { return QString(); }
+
+    QString iccPath = QString("%1/srgb.icc").arg(cachePath);
+    QString pdfaPath = QString("%1/PDFA_def.ps").arg(cachePath);
+    if (QFile::exists(iccPath) && QFile::exists(pdfaPath)) { return pdfaPath; }
+
+    if (!QFile::exists(pdfaPath)) {
+        QString def;
+        QFile defFile(":/assets/ps/PDFA_def.ps");
+        if (defFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+            def = defFile.readAll();
+            defFile.close();
+        }
+        if (def.isEmpty()) { return QString(); }
+        def = def.replace("srgb.icc", QString("\"%1\"").arg(iccPath));
+        QFile pdfa(pdfaPath);
+        if (pdfa.open(QIODevice::WriteOnly)) {
+            pdfa.write(def.toUtf8());
+            pdfa.close();
+        }
+    }
+
+    if (!QFile::exists(iccPath)) {
+        QFile iccfile(":/assets/icc/srgb.icc");
+        QByteArray iccBuffer;
+        if (iccfile.open(QIODevice::ReadOnly)) {
+            iccBuffer = iccfile.readAll();
+            iccfile.close();
+        }
+        if (iccBuffer.size() < 2500) { return QString(); }
+        QFile srgb(iccPath);
+        if (srgb.open(QIODevice::WriteOnly)) {
+            srgb.write(iccBuffer);
+            srgb.close();
+        }
+    }
+
+    if (QFile::exists(iccPath) && QFile::exists(pdfaPath)) { return pdfaPath; }
     return QString();
 }
 
@@ -1115,6 +1162,9 @@ void FusePDF::deleteDocumentItem()
     if (!tab) { return; }
     ui->tabs->removeTab(index);
     tab->deleteLater();
+
+    ui->pdfInfo->clear();
+    ui->toolBox->setCurrentIndex(ui->actionOutput_preview->isChecked() ? FUSEPDF_TOOLBOX_PREVIEW : FUSEPDF_TOOLBOX_OUTPUT);
 
     handleOutputPagesChanged();
 }
