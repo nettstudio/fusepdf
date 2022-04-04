@@ -1095,6 +1095,9 @@ void FusePDF::loadOptions()
     }
 
     settings.endGroup();
+
+    ui->toolBox->setItemEnabled(FUSEPDF_TOOLBOX_PREVIEW,
+                                ui->actionOutput_preview->isChecked());
 }
 
 void FusePDF::saveOptions()
@@ -1798,11 +1801,14 @@ void FusePDF::on_actionDocumentation_triggered()
 
 void FusePDF::on_actionOutput_preview_triggered()
 {
-    if (ui->actionOutput_preview->isChecked()) {
-        ui->preview->clear();
+    bool checked = ui->actionOutput_preview->isChecked();
+    ui->toolBox->setItemEnabled(FUSEPDF_TOOLBOX_PREVIEW, checked);
+    ui->preview->clear();
+    if (checked) {
+        ui->toolBox->setCurrentIndex(FUSEPDF_TOOLBOX_PREVIEW);
         handleOutputPagesChanged();
     } else {
-        ui->preview->clear();
+        ui->toolBox->setCurrentIndex(FUSEPDF_TOOLBOX_OUTPUT);
     }
 }
 
