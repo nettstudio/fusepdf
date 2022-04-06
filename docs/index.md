@@ -69,11 +69,12 @@ For macOS [Richard Koch](https://pages.uoregon.edu/koch/) hosts Ghostscript bina
 
 ## 2.2.0
 
-Released : ETA Apr 2022.
+Released : Apr 8, 2022.
 
+* Clear cache option
 * Preview update bug fix
 * Updated UI
-* Set document properties as tooltip
+* Set document properties as tooltip (Windows)
 * Can now save to PDF 2.0 (ISO 32000-2)
 * Can now save to PDF/A
   * PDF/A-1 (ISO 19005-1)
