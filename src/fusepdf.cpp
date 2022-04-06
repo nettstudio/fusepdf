@@ -1906,3 +1906,19 @@ const QString FusePDF::stripMarks(QString s)
     return s;
 }
 
+const QString FusePDF::getCacheSize()
+{
+    QString cachePath = getCachePath();
+    if (QFile::exists(cachePath)) {
+        QDirIterator it (cachePath, QDirIterator::Subdirectories);
+        qint64 total = 0;
+        while (it.hasNext()) {
+            it.next();
+            total += it.fileInfo().size();
+        }
+        QLocale locale = this->locale();
+        QString value = locale.formattedDataSize(total);
+        return value;
+    }
+    return QString();
+}

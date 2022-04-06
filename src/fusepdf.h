@@ -382,6 +382,7 @@ private slots:
                     const QString &checksum);
     void handleFoundPdfInfo(const FusePDF::pdfInfo &pdf);
     static const QString stripMarks(QString s);
+    const QString getCacheSize();
 
 private:
     Ui::FusePDF *ui;
