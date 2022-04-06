@@ -1052,7 +1052,7 @@ void FusePDF::loadOptions()
     ui->preset->blockSignals(false);
 
 #ifdef Q_OS_WIN
-    ui->actionSupport_dark_mode->setChecked(settings.value("supportDarkMode", true).toBool());
+    ui->actionSupport_dark_mode->setChecked(settings.value("supportDarkMode", false).toBool());
 #endif
     ui->actionOutput_preview->setChecked(settings.value("outputPreview", true).toBool());
     ui->actionShow_log->setChecked(settings.value("showLog", false).toBool());
@@ -1686,7 +1686,7 @@ bool FusePDF::hasDarkMode()
 #ifdef Q_OS_WIN
     QSettings options;
     options.beginGroup("options");
-    bool supportDarkMode = options.value("supportDarkMode", true).toBool();
+    bool supportDarkMode = options.value("supportDarkMode", false).toBool();
     options.endGroup();
     if (!supportDarkMode) { return false; }
     QSettings settings("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize", QSettings::NativeFormat);
