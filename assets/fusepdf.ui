@@ -510,6 +510,7 @@
     <addaction name="actionOpen_saved_PDF"/>
     <addaction name="separator"/>
     <addaction name="actionOutput_preview"/>
+    <addaction name="separator"/>
     <addaction name="actionRemember_meta_author"/>
     <addaction name="actionRemember_meta_subject"/>
     <addaction name="actionRemember_meta_title"/>
