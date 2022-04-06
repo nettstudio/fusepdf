@@ -383,6 +383,7 @@ private slots:
     void handleFoundPdfInfo(const FusePDF::pdfInfo &pdf);
     static const QString stripMarks(QString s);
     const QString getCacheSize();
+    void on_actionClear_cache_triggered();
 
 private:
     Ui::FusePDF *ui;

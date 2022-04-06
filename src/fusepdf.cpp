@@ -1916,9 +1916,34 @@ const QString FusePDF::getCacheSize()
             it.next();
             total += it.fileInfo().size();
         }
-        QLocale locale = this->locale();
-        QString value = locale.formattedDataSize(total);
-        return value;
+        if (total > 0) {
+            QLocale locale = this->locale();
+            QString value = locale.formattedDataSize(total);
+            return value;
+        }
     }
     return QString();
 }
+
+void FusePDF::on_actionClear_cache_triggered()
+{
+    QString cachePath = getCachePath();
+    QString cacheSize = getCacheSize();
+    if (cacheSize.isEmpty() || cachePath.isEmpty() || !QFile::exists(cachePath)) { return; }
+    QString info = QString("%1 %2 %4:<br><strong>%5</strong>?<br><br>%6.").arg(tr("Are you sure you want to remove"),
+                                                                               cacheSize,
+                                                                               tr("from"),
+                                                                               cachePath,
+                                                                               tr("Everything in the folder will be removed"));
+    int ret = QMessageBox::question(this,
+                                    tr("Clear cache?"),
+                                    info,
+                                    QMessageBox::Yes | QMessageBox::No,
+                                    QMessageBox::No);
+    if (ret == QMessageBox::Yes) {
+            QDir dir(cachePath);
+            dir.removeRecursively();
+            getCachePath();
+    }
+}
+

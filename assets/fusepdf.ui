@@ -515,6 +515,7 @@
     <addaction name="actionRemember_meta_title"/>
     <addaction name="separator"/>
     <addaction name="actionOpen_cache_folder"/>
+    <addaction name="actionClear_cache"/>
     <addaction name="separator"/>
     <addaction name="actionDocumentation"/>
     <addaction name="actionCheck_for_updates"/>
@@ -734,6 +735,11 @@
    </property>
    <property name="text">
     <string>Support dark mode</string>
+   </property>
+  </action>
+  <action name="actionClear_cache">
+   <property name="text">
+    <string>Clear cache</string>
    </property>
   </action>
  </widget>
