@@ -1,4 +1,4 @@
-# Merge PDF documents
+# Convert/Merge/Split PDF documents
 
 FusePDF is an simple cross-platform and open source application used for converting, merging and splitting PDF documents.
 
