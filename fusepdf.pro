@@ -23,7 +23,7 @@ unix:!mac {
 } else {
     TARGET = FusePDF
 }
-VERSION = 2.2.0
+VERSION = 2.3.0
 TEMPLATE = app
 
 QT += core gui widgets concurrent

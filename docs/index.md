@@ -67,6 +67,10 @@ For macOS [Richard Koch](https://pages.uoregon.edu/koch/) hosts Ghostscript bina
 
 # ChangeLog
 
+## 2.3.0
+
+N/A
+
 ## 2.2.0
 
 Released : Apr 8, 2022.
